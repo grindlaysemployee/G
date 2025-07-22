@@ -4,7 +4,7 @@ const categoryFilter = document.getElementById("categoryFilter");
 
 const products = [
   { name: "Cylinder Block", image: "images/Cylinder Block.png", category: "Cylinder Block"  },
-  { name: "CYL IR 1.75 (234)", image: "images/CYL IR 1.75 (234).png", category: "Cylinder Block"   },
+  { name: "CYL IR 1.75 (234)", image: "images/CYL IR 1.75 _234_.png", category: "Cylinder Block"   },
   { name: "CYL IR 1.75 (2340)", image: "images/CYL IR 1.75 (2340).png", category: "Cylinder Block"   },
   { name: "CYL IR 2.5 (242)", image: "images/CYL IR 2.5 (242).png", category: "Cylinder Block"   },
   { name: "CYL IR 2.5 (2475)", image: "images/CYL IR 2.5 (2475).png", category: "Cylinder Block"  },
