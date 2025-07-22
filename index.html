@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Product Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- GRINDTECH Heading -->
+  <h1 class="main-heading">GRINDTECH PRODUCT</h1>
+
+<!-- Sticky Filter Bar -->
+<div class="filter-bar">
+  <select id="categoryFilter" onchange="filterProducts()">
+    <option value="All">All Categories</option>
+    <option value="Piston Ring">Piston Ring</option>
+    <option value="Piston">Piston</option>
+    <option value="Cylinder Block">Cylinder Block</option>
+    <option value="Elgi Item">Elgi Item</option>
+  </select>
+
+  <input type="text" id="searchInput" placeholder="Search Products" onkeyup="filterProducts()">
+</div>
+
+
+  <!-- Product Gallery -->
+  <div class="container">
+    <div class="gallery" id="gallery">
+      <!-- Product cards will be injected via JavaScript -->
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
