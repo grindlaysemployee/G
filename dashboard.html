@@ -12,8 +12,9 @@
   </div>
 
   <script>
-    const emp = JSON.parse(localStorage.getItem("employee"));
-    if (!emp) window.location.href = "index.html";
+    const empWrapper = JSON.parse(localStorage.getItem("employee"));
+    if (!empWrapper || !empWrapper.employee) window.location.href = "index.html";
+    const emp = empWrapper.employee;
 
     const profile = `
       <p><strong>Emp Code:</strong> ${emp.empCode}</p>
