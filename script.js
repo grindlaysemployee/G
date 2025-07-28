@@ -2,7 +2,8 @@ async function login() {
   const empid = document.getElementById("empid").value;
   const password = document.getElementById("password").value;
 
-  const apiUrl = `https://script.google.com/macros/s/your_script_id/exec?empid=${empid}&password=${password}`;
+  const apiUrl = `https://script.google.com/macros/s/AKfycbwYourScriptIDHere/exec?empid=${empid}&password=${password}`;
+
 
   try {
     const response = await fetch(apiUrl);
