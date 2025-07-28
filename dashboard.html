@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="login-box">
+    <h2>Employee Profile</h2>
+    <div id="profile"></div>
+  </div>
+
+  <script>
+    const emp = JSON.parse(localStorage.getItem("employee"));
+    if (!emp) window.location.href = "index.html";
+
+    const profile = `
+      <p><strong>Name:</strong> ${emp.name}</p>
+      <p><strong>Emp Code:</strong> ${emp.empCode}</p>
+      <p><strong>Designation:</strong> ${emp.designation}</p>
+      <p><strong>Father's Name:</strong> ${emp.fatherName}</p>
+      <p><strong>Gender:</strong> ${emp.sex}</p>
+      <p><strong>ESIC Number:</strong> ${emp.esic}</p>
+      <p><strong>PF Number:</strong> ${emp.pf}</p>
+      <p><strong>Date of Birth:</strong> ${emp.dob}</p>
+      <p><strong>Mobile:</strong> ${emp.mobile}</p>
+      <p><strong>Aadhar:</strong> ${emp.adhar}</p>
+      <p><strong>ID Proof:</strong> ${emp.idCard}</p>
+      <p><strong>Permanent Address:</strong> ${emp.permanentAddress}</p>
+      <p><strong>Local Address:</strong> ${emp.localAddress}</p>
+      <p><strong>Date of Joining:</strong> ${emp.joiningDate}</p>
+      <p><strong>Emergency Contact:</strong> ${emp.emergencyContact}</p>
+      <p><strong>Status:</strong> ${emp.status}</p>
+    `;
+
+    document.getElementById("profile").innerHTML = profile;
+  </script>
+</body>
+</html>
