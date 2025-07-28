@@ -1,10 +1,14 @@
 async function login() {
-  const empid = document.getElementById("empid").value;
-  const password = document.getElementById("password").value;
+  const empid = document.getElementById("empid").value.trim();
+  const password = document.getElementById("password").value.trim();
 
-  const apiUrl = `https://script.google.com/macros/s/AKfycbwHqEiiudOUcLFIw_IBizrfhacpWoqhNTqjBikac5YaTjhotypHY53Vb3J9-hYXSPaT/exec?empid=${empid}&password=${password}`;
+  if (!empid || !password) {
+    document.getElementById("error").innerText = "Please enter both ID and password.";
+    return;
+  }
 
-  
+  const apiUrl = `https://script.google.com/macros/s/AKfycbwHqEiiudOUcLFIw_IBizrfhacpWoqhNTqjBikac5YaTjhotypHY53Vb3J9-hYXSPaT/exec?empid=${encodeURIComponent(empid)}&password=${encodeURIComponent(password)}`;
+
   try {
     const response = await fetch(apiUrl);
     const data = await response.json();
@@ -16,6 +20,7 @@ async function login() {
       document.getElementById("error").innerText = data.message;
     }
   } catch (err) {
-    document.getElementById("error").innerText = "API error.";
+    console.error(err);  // Helpful for debugging
+    document.getElementById("error").innerText = "API error. Please try again.";
   }
 }
