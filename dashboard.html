@@ -13,24 +13,24 @@
 
   <script>
     const emp = JSON.parse(localStorage.getItem("employee"));
-    if (!emp) window.location.href = "index.html";
+    if (!emp || !emp.success) window.location.href = "index.html";
 
     const profile = `
-      <p><strong>Emp Code:</strong> ${emp.empCode}</p>
+      <p><strong>Emp Code:</strong> ${emp.empcode}</p>
       <p><strong>Name:</strong> ${emp.name}</p>
       <p><strong>Designation:</strong> ${emp.designation}</p>
-      <p><strong>Father's Name:</strong> ${emp.fatherName}</p>
+      <p><strong>Father's Name:</strong> ${emp.fathername}</p>
       <p><strong>Gender:</strong> ${emp.sex}</p>
       <p><strong>ESIC Number:</strong> ${emp.esic}</p>
       <p><strong>PF Number:</strong> ${emp.pf}</p>
       <p><strong>DOB:</strong> ${emp.dob}</p>
       <p><strong>Mobile:</strong> ${emp.mobile}</p>
-      <p><strong>Aadhar:</strong> ${emp.adhar}</p>
-      <p><strong>ID Proof:</strong> ${emp.idCard}</p>
-      <p><strong>Permanent Address:</strong> ${emp.permanentAddress}</p>
-      <p><strong>Local Address:</strong> ${emp.localAddress}</p>
-      <p><strong>Date of Joining:</strong> ${emp.joiningDate}</p>
-      <p><strong>Emergency Contact:</strong> ${emp.emergencyContact}</p>
+      <p><strong>Aadhar:</strong> ${emp.aadhar}</p>
+      <p><strong>ID Proof:</strong> ${emp.idproof}</p>
+      <p><strong>Permanent Address:</strong> ${emp.permanent}</p>
+      <p><strong>Local Address:</strong> ${emp.local}</p>
+      <p><strong>Date of Joining:</strong> ${emp.doj}</p>
+      <p><strong>Emergency Contact:</strong> ${emp.emergency}</p>
       <p><strong>Status:</strong> ${emp.status}</p>
     `;
 
