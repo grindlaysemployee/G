@@ -1,7 +1,5 @@
 const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
-
-
 function formatDate(dateStr) {
   if (!dateStr) return "";
   const d = new Date(dateStr);
@@ -26,10 +24,10 @@ function login() {
         return;
       }
 
+      // Show employee name
       document.getElementById("empName").textContent = data.Name;
-      const detailsList = document.getElementById("detailsList");
-      detailsList.innerHTML = "";
 
+      // Prepare data list
       const fields = {
         "Emp ID": data.empid,
         "Emp Code": data["Emp Code"],
@@ -49,13 +47,18 @@ function login() {
         "Status": data["EMPLOYEE STATUS"]
       };
 
+      const detailsList = document.getElementById("detailsList");
+      detailsList.innerHTML = "";
+
       for (let key in fields) {
         const li = document.createElement("li");
         li.textContent = `${key}: ${fields[key] || ''}`;
         detailsList.appendChild(li);
       }
 
+      // Show the profile section
       document.getElementById("employeeDetails").classList.remove("hidden");
+      document.getElementById("loginSection").classList.add("hidden");
     })
     .catch(err => {
       console.error("Error:", err);
