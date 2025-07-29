@@ -9,6 +9,10 @@ function login() {
     return;
   }
 
+  // Show loading spinner
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("loadingSpinner").classList.remove("hidden");
+
   const formData = new FormData();
   formData.append("empId", empId);
   formData.append("password", password);
@@ -21,6 +25,8 @@ function login() {
     .then(data => {
       if (!data || !data.success) {
         alert("Invalid Employee ID or Password");
+        document.getElementById("loadingSpinner").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
         return;
       }
 
@@ -55,11 +61,13 @@ function login() {
         detailsList.appendChild(li);
       }
 
+      document.getElementById("loadingSpinner").classList.add("hidden");
       document.getElementById("employeeDetails").classList.remove("hidden");
-      document.getElementById("loginSection").classList.add("hidden");
     })
     .catch(err => {
       console.error("Error:", err);
       alert("Something went wrong!");
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
     });
 }
