@@ -109,6 +109,17 @@
         document.getElementById("login").style.display = "none";
         document.getElementById("profile").style.display = "block";
 
+        // Format ISO date to dd-MMM-yy
+        function formatDate(isoStr) {
+          if (!isoStr) return "";
+          const date = new Date(isoStr);
+          const day = String(date.getDate()).padStart(2, '0');
+          const monthNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+          const month = monthNames[date.getMonth()];
+          const year = String(date.getFullYear()).slice(-2);
+          return `${day}-${month}-${year}`;
+        }
+
         // Fill profile fields
         document.getElementById("name").textContent = data.name;
         document.getElementById("empIdProfile").textContent = data.empId;
@@ -118,13 +129,13 @@
         document.getElementById("gender").textContent = data.gender;
         document.getElementById("esicNumber").textContent = data.esicNumber;
         document.getElementById("pfNumber").textContent = data.pfNumber;
-        document.getElementById("dob").textContent = data.dob;
+        document.getElementById("dob").textContent = formatDate(data.dob);
         document.getElementById("mobile").textContent = data.mobile;
         document.getElementById("aadhar").textContent = data.aadhar;
         document.getElementById("idProof").textContent = data.idProof;
         document.getElementById("permanentAddress").textContent = data.permanentAddress;
         document.getElementById("localAddress").textContent = data.localAddress;
-        document.getElementById("joiningDate").textContent = data.joiningDate;
+        document.getElementById("joiningDate").textContent = formatDate(data.joiningDate);
         document.getElementById("emergencyContact").textContent = data.emergencyContact;
         document.getElementById("status").textContent = data.status;
 
