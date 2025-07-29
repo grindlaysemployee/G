@@ -4,21 +4,17 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Employee Login</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div class="login-box">
-    <img src="image/image3.png" alt="Employee" class="profile-pic" />
-    <h2>Employee Login</h2>
-
-    <input type="text" id="empId" placeholder="Employee ID" />
-    <input type="password" id="password" placeholder="Password" />
-    <button onclick="login()">Login</button>
-
-    <div id="employeeDetails" class="hidden">
-      <h2>Welcome, <span id="empName"></span></h2>
-      <ul id="detailsList"></ul>
+    <div class="lens-container">
+      <img src="image/image3.png" alt="Company Logo" class="lens-image">
     </div>
+    <h2>Employee Login</h2>
+    <input type="text" id="empId" placeholder="Employee ID">
+    <input type="password" id="password" placeholder="Password">
+    <button onclick="login()">Login</button>
   </div>
 
   <script src="script.js"></script>
