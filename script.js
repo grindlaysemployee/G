@@ -1,65 +1,54 @@
-async function login() {
+const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
+
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const options = { day: '2-digit', month: 'short', year: '2-digit' };
+  return d.toLocaleDateString('en-GB', options).replace(/ /g, '-');
+}
+
+function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorMsg = document.getElementById("errorMsg");
-  errorMsg.textContent = "";
 
   if (!empId || !password) {
-    errorMsg.textContent = "Please enter both Employee ID and Password.";
+    alert("Please enter Employee ID and Password");
     return;
   }
 
-  const url = "https://script.google.com/macros/s/AKfycbzwxQPojqkdeSHmIXyO4dCABlREXYkL2B51ZKP1K5MNNpTDvanNCPHAT2OluD35lbqS/exec";
+  fetch(`${apiUrl}?empId=${empId}&password=${password}`, { method: "GET" })
+    .then(res => res.json())
+    .then(data => {
+      if (!data || !data.success) {
+        alert("Invalid Employee ID or Password");
+        return;
+      }
 
-  const formData = new FormData();
-  formData.append("empId", empId);
-  formData.append("password", password);
+      // Set employee name
+      document.getElementById("empName").textContent = data.name;
 
-  try {
-    const res = await fetch(url, {
-      method: "POST",
-      body: formData
-    });
-
-    const data = await res.json();
-
-    if (data.success) {
-      document.getElementById("login").style.display = "none";
-      document.getElementById("profile").style.display = "block";
-
-      // Helper function to format date
-      const formatDate = (isoDateStr) => {
-        if (!isoDateStr) return "";
-        const d = new Date(isoDateStr);
-        return d.toLocaleDateString('en-GB', {
-          day: '2-digit',
-          month: 'short',
-          year: '2-digit'
-        });
+      const fields = {
+        "Employee ID": data.empId,
+        "Department": data.department,
+        "Leaves Taken": data.leavesTaken,
+        "Total Leaves": data.totalLeaves,
+        "Attendance": data.attendance
       };
 
-      // Fill profile fields
-      document.getElementById("name").textContent = data.name || "";
-      document.getElementById("empIdProfile").textContent = data.empId || "";
-      document.getElementById("empCode").textContent = data.empCode || "";
-      document.getElementById("designation").textContent = data.designation || "";
-      document.getElementById("fatherName").textContent = data.fatherName || "";
-      document.getElementById("gender").textContent = data.gender || "";
-      document.getElementById("esicNumber").textContent = data.esicNumber || "";
-      document.getElementById("pfNumber").textContent = data.pfNumber || "";
-      document.getElementById("dob").textContent = formatDate(data.dob);
-      document.getElementById("mobile").textContent = data.mobile || "";
-      document.getElementById("aadhar").textContent = data.aadhar || "";
-      document.getElementById("idProof").textContent = data.idProof || "";
-      document.getElementById("permanentAddress").textContent = data.permanentAddress || "";
-      document.getElementById("localAddress").textContent = data.localAddress || "";
-      document.getElementById("joiningDate").textContent = formatDate(data.joiningDate);
-      document.getElementById("emergencyContact").textContent = data.emergencyContact || "";
-      document.getElementById("status").textContent = data.status || "";
-    } else {
-      errorMsg.textContent = data.message || "Invalid credentials.";
-    }
-  } catch (error) {
-    errorMsg.textContent = "Login failed. Please try again.";
-  }
+      const detailsList = document.getElementById("detailsList");
+      detailsList.innerHTML = "";
+
+      for (let key in fields) {
+        const li = document.createElement("li");
+        li.textContent = `${key}: ${fields[key]}`;
+        detailsList.appendChild(li);
+      }
+
+      document.getElementById("employeeDetails").classList.remove("hidden");
+      document.getElementById("loginSection").classList.add("hidden");
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("Something went wrong!");
+    });
 }
