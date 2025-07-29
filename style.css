@@ -1,6 +1,6 @@
 body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f0f4f8;
+  font-family: 'Segoe UI', sans-serif;
+  background: #f0f2f5;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -9,92 +9,57 @@ body {
 }
 
 .login-box {
-  background-color: #ffffff;
-  border: 1px solid #cbd5e1;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
-  border-radius: 8px;
-  padding: 30px 40px;
-  width: 360px;
+  background: white;
+  padding: 30px;
+  border-radius: 12px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
   text-align: center;
+  width: 320px;
+  border: 2px solid #ccc;
 }
 
-.profile-pic {
-  width: 100px;
-  height: 100px;
-  object-fit: cover;
+.lens-container {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
   border-radius: 50%;
-  margin-bottom: 20px;
-  border: 2px solid #3b82f6;
+  border: 6px solid #333;
+  overflow: hidden;
+  background: radial-gradient(circle, #fff 20%, #ccc 90%);
+  box-shadow: inset 0 0 10px rgba(0,0,0,0.4), 0 0 10px rgba(0,0,0,0.1);
+}
+
+.lens-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 h2 {
   margin-bottom: 20px;
-  color: #1f2937;
-  font-weight: 600;
-}
-
-label {
-  display: block;
-  text-align: left;
-  margin: 8px 0 4px;
-  font-size: 14px;
-  font-weight: 500;
-  color: #374151;
+  font-weight: bold;
 }
 
 input {
   width: 100%;
   padding: 10px;
-  border: 1px solid #d1d5db;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  font-size: 14px;
-  background-color: #f9fafb;
-  transition: border-color 0.2s;
-}
-
-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  background-color: #ffffff;
+  margin-bottom: 12px;
+  border: 1px solid #aaa;
+  border-radius: 6px;
+  font-size: 16px;
 }
 
 button {
-  background-color: #3b82f6;
-  color: white;
+  padding: 10px 20px;
+  font-size: 16px;
+  background: #000;
+  color: #fff;
   border: none;
-  padding: 10px 0;
-  border-radius: 4px;
-  width: 100%;
-  font-size: 15px;
+  border-radius: 6px;
   cursor: pointer;
-  font-weight: 500;
-  margin-top: 10px;
+  transition: background 0.3s ease;
 }
 
 button:hover {
-  background-color: #2563eb;
-}
-
-#employeeDetails {
-  margin-top: 25px;
-  text-align: left;
-}
-
-#employeeDetails h2 {
-  font-size: 18px;
-  color: #111827;
-  font-weight: 600;
-}
-
-#employeeDetails ul {
-  list-style: none;
-  padding: 0;
-  margin-top: 10px;
-}
-
-#employeeDetails li {
-  margin-bottom: 6px;
-  font-size: 14px;
-  color: #374151;
+  background: #444;
 }
