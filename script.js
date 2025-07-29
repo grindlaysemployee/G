@@ -1,4 +1,3 @@
-
 async function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -10,7 +9,7 @@ async function login() {
     return;
   }
 
-  const url = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
+  const url = "https://script.google.com/macros/s/AKfycbzwxQPojqkdeSHmIXyO4dCABlREXYkL2B51ZKP1K5MNNpTDvanNCPHAT2OluD35lbqS/exec";
 
   const formData = new FormData();
   formData.append("empId", empId);
