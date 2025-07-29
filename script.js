@@ -16,23 +16,37 @@ function login() {
     return;
   }
 
-  fetch(`${apiUrl}?empId=${empId}&password=${password}`, { method: "GET" })
+  fetch(apiUrl, {
+    method: "POST",
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `empId=${encodeURIComponent(empId)}&password=${encodeURIComponent(password)}`
+  })
     .then(res => res.json())
     .then(data => {
       if (!data || !data.success) {
-        alert("Invalid Employee ID or Password");
+        alert(data.message || "Invalid Employee ID or Password");
         return;
       }
 
-      // Set employee name
       document.getElementById("empName").textContent = data.name;
 
       const fields = {
         "Employee ID": data.empId,
-        "Department": data.department,
-        "Leaves Taken": data.leavesTaken,
-        "Total Leaves": data.totalLeaves,
-        "Attendance": data.attendance
+        "Emp Code": data.empCode,
+        "Designation": data.designation,
+        "Father's Name": data.fatherName,
+        "Gender": data.gender,
+        "ESIC Number": data.esicNumber,
+        "PF Number": data.pfNumber,
+        "Date of Birth": data.dob,
+        "Mobile Number": data.mobile,
+        "Aadhar Number": data.aadhar,
+        "ID Proof": data.idProof,
+        "Permanent Address": data.permanentAddress,
+        "Local Address": data.localAddress,
+        "Joining Date": data.joiningDate,
+        "Emergency Contact": data.emergencyContact,
+        "Status": data.status
       };
 
       const detailsList = document.getElementById("detailsList");
@@ -52,4 +66,3 @@ function login() {
       alert("Something went wrong!");
     });
 }
- 
