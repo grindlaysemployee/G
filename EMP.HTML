@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Employee Portal</title>
+  <style>
+    body {
+      font-family: Arial;
+      background-color: #f2f2f2;
+      margin: 0;
+      padding: 40px;
+    }
+    .container {
+      max-width: 400px;
+      margin: auto;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #ccc;
+    }
+    h2 {
+      text-align: center;
+    }
+    input, button {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+    }
+    button {
+      background-color: #007BFF;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    #profile {
+      display: none;
+    }
+    .error {
+      color: red;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container" id="login">
+  <h2>Employee Login</h2>
+  <input type="text" id="empId" placeholder="Employee ID" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Login</button>
+  <p class="error" id="errorMsg"></p>
+</div>
+
+<div class="container" id="profile">
+  <h2>Welcome, <span id="empName"></span></h2>
+  <p><strong>Emp ID:</strong> <span id="empID"></span></p>
+  <p><strong>Department:</strong> <span id="department"></span></p>
+  <p><strong>Leaves Taken:</strong> <span id="leavesTaken"></span> / <span id="totalLeaves"></span></p>
+  <p><strong>Attendance:</strong> <span id="attendance"></span></p>
+</div>
+
+<script>
+  async function login() {
+    const empId = document.getElementById("empId").value.trim();
+    const password = document.getElementById("password").value.trim();
+    const errorMsg = document.getElementById("errorMsg");
+    errorMsg.textContent = "";
+
+    if (!empId || !password) {
+      errorMsg.textContent = "Please enter both Employee ID and Password.";
+      return;
+    }
+
+    const url = "https://script.google.com/macros/s/AKfycbzwxQPojqkdeSHmIXyO4dCABlREXYkL2B51ZKP1K5MNNpTDvanNCPHAT2OluD35lbqS/exec"; // 👈 Replace with your deployed URL
+
+    const formData = new FormData();
+    formData.append("empId", empId);
+    formData.append("password", password);
+
+    try {
+      const res = await fetch(url, {
+        method: "POST",
+        body: formData
+      });
+
+      const data = await res.json();
+
+      if (data.success) {
+        document.getElementById("login").style.display = "none";
+        document.getElementById("profile").style.display = "block";
+        document.getElementById("empName").textContent = data.name;
+        document.getElementById("empID").textContent = data.empId;
+        document.getElementById("department").textContent = data.department;
+        document.getElementById("leavesTaken").textContent = data.leavesTaken;
+        document.getElementById("totalLeaves").textContent = data.totalLeaves;
+        document.getElementById("attendance").textContent = data.attendance;
+      } else {
+        errorMsg.textContent = data.message || "Invalid credentials.";
+      }
+    } catch (error) {
+      errorMsg.textContent = "Login failed. Please try again.";
+    }
+  }
+</script>
+
+</body>
+</html>
