@@ -16,13 +16,18 @@
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
   </div>
-<div id="loadingSpinner" class="hidden">
-  <h2>Loading...</h2>
-</div>
 
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="login-box hidden">
+    <div class="spinner"></div>
+    <p>Loading employee data...</p>
+  </div>
+
+  <!-- Employee Details -->
   <div id="employeeDetails" class="login-box hidden">
     <h2>Welcome, <span id="empName"></span></h2>
     <ul id="detailsList"></ul>
+    <button onclick="location.reload()">Logout</button>
   </div>
 
   <script src="script.js"></script>
