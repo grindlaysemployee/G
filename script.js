@@ -53,7 +53,7 @@ function login() {
       for (let key in fields) {
         const li = document.createElement("li");
         li.textContent = `${key}: ${fields[key] || ''}`;
-        detailsList.appendChild(li);
+        detailsList.appendChild(li); 
       }
 
       // Show the profile section
