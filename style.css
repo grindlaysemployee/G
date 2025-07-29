@@ -1,0 +1,50 @@
+body {
+  font-family: Arial, sans-serif;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  margin: 0;
+  background-color: #f3f3f3;
+}
+
+.login-box {
+  border: 3px solid black;
+  padding: 20px 40px;
+  border-radius: 10px;
+  background-color: white;
+  text-align: center;
+  width: 300px;
+}
+
+.profile-pic {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid black;
+  margin-bottom: 15px;
+}
+
+input {
+  display: block;
+  width: 100%;
+  padding: 8px;
+  margin: 10px 0;
+}
+
+button {
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+.hidden {
+  display: none;
+}
+
+#employeeDetails ul {
+  text-align: left;
+  margin-top: 20px;
+  padding-left: 0;
+  list-style: none;
+}
