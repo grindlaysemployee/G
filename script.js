@@ -1,12 +1,5 @@
 const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  const options = { day: '2-digit', month: 'short', year: '2-digit' };
-  return d.toLocaleDateString('en-GB', options).replace(/ /g, '-');
-}
-
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -16,18 +9,22 @@ function login() {
     return;
   }
 
+  const formData = new FormData();
+  formData.append("empId", empId);
+  formData.append("password", password);
+
   fetch(apiUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `empId=${encodeURIComponent(empId)}&password=${encodeURIComponent(password)}`
+    body: formData
   })
     .then(res => res.json())
     .then(data => {
       if (!data || !data.success) {
-        alert(data.message || "Invalid Employee ID or Password");
+        alert("Invalid Employee ID or Password");
         return;
       }
 
+      // Set employee name
       document.getElementById("empName").textContent = data.name;
 
       const fields = {
@@ -39,8 +36,8 @@ function login() {
         "ESIC Number": data.esicNumber,
         "PF Number": data.pfNumber,
         "Date of Birth": data.dob,
-        "Mobile Number": data.mobile,
-        "Aadhar Number": data.aadhar,
+        "Mobile": data.mobile,
+        "Aadhar": data.aadhar,
         "ID Proof": data.idProof,
         "Permanent Address": data.permanentAddress,
         "Local Address": data.localAddress,
