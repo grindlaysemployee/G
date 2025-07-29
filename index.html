@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div class="login-box">
+  <div id="loginSection" class="login-box">
     <div class="lens-container">
       <img src="image/image3.png" alt="Company Logo" class="lens-image">
     </div>
@@ -15,6 +15,11 @@
     <input type="text" id="empId" placeholder="Employee ID">
     <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
+  </div>
+
+  <div id="employeeDetails" class="login-box hidden">
+    <h2>Welcome, <span id="empName"></span></h2>
+    <ul id="detailsList"></ul>
   </div>
 
   <script src="script.js"></script>
