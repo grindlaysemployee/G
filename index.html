@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>Employee Portal</title>
+  <title>Grindtech Employee Portal</title>
   <style>
     body {
       font-family: Arial;
@@ -10,7 +10,7 @@
       padding: 40px;
     }
     .container {
-      max-width: 400px;
+      max-width: 600px;
       margin: auto;
       background: white;
       padding: 20px;
@@ -40,6 +40,13 @@
       color: red;
       text-align: center;
     }
+    .profile-field {
+      margin: 5px 0;
+    }
+    .profile-field strong {
+      display: inline-block;
+      width: 180px;
+    }
   </style>
 </head>
 <body>
@@ -53,11 +60,23 @@
 </div>
 
 <div class="container" id="profile">
-  <h2>Welcome, <span id="empName"></span></h2>
-  <p><strong>Emp ID:</strong> <span id="empID"></span></p>
-  <p><strong>Department:</strong> <span id="department"></span></p>
-  <p><strong>Leaves Taken:</strong> <span id="leavesTaken"></span> / <span id="totalLeaves"></span></p>
-  <p><strong>Attendance:</strong> <span id="attendance"></span></p>
+  <h2>Welcome, <span id="name"></span></h2>
+  <div class="profile-field"><strong>Emp ID:</strong> <span id="empIdProfile"></span></div>
+  <div class="profile-field"><strong>Emp Code:</strong> <span id="empCode"></span></div>
+  <div class="profile-field"><strong>Designation:</strong> <span id="designation"></span></div>
+  <div class="profile-field"><strong>Father's Name:</strong> <span id="fatherName"></span></div>
+  <div class="profile-field"><strong>Gender:</strong> <span id="gender"></span></div>
+  <div class="profile-field"><strong>ESIC Number:</strong> <span id="esicNumber"></span></div>
+  <div class="profile-field"><strong>PF Number:</strong> <span id="pfNumber"></span></div>
+  <div class="profile-field"><strong>Date of Birth:</strong> <span id="dob"></span></div>
+  <div class="profile-field"><strong>Mobile Number:</strong> <span id="mobile"></span></div>
+  <div class="profile-field"><strong>Aadhar Number:</strong> <span id="aadhar"></span></div>
+  <div class="profile-field"><strong>ID Proof:</strong> <span id="idProof"></span></div>
+  <div class="profile-field"><strong>Permanent Address:</strong> <span id="permanentAddress"></span></div>
+  <div class="profile-field"><strong>Local Address:</strong> <span id="localAddress"></span></div>
+  <div class="profile-field"><strong>Date of Joining:</strong> <span id="joiningDate"></span></div>
+  <div class="profile-field"><strong>Emergency Contact:</strong> <span id="emergencyContact"></span></div>
+  <div class="profile-field"><strong>Status:</strong> <span id="status"></span></div>
 </div>
 
 <script>
@@ -72,7 +91,7 @@
       return;
     }
 
-    const url = "https://script.google.com/macros/s/AKfycbzwxQPojqkdeSHmIXyO4dCABlREXYkL2B51ZKP1K5MNNpTDvanNCPHAT2OluD35lbqS/exec"; // 👈 Replace with your deployed URL
+    const url = "https://script.google.com/macros/s/AKfycbzwxQPojqkdeSHmIXyO4dCABlREXYkL2B51ZKP1K5MNNpTDvanNCPHAT2OluD35lbqS/exec";
 
     const formData = new FormData();
     formData.append("empId", empId);
@@ -89,12 +108,26 @@
       if (data.success) {
         document.getElementById("login").style.display = "none";
         document.getElementById("profile").style.display = "block";
-        document.getElementById("empName").textContent = data.name;
-        document.getElementById("empID").textContent = data.empId;
-        document.getElementById("department").textContent = data.department;
-        document.getElementById("leavesTaken").textContent = data.leavesTaken;
-        document.getElementById("totalLeaves").textContent = data.totalLeaves;
-        document.getElementById("attendance").textContent = data.attendance;
+
+        // Fill profile fields
+        document.getElementById("name").textContent = data.name;
+        document.getElementById("empIdProfile").textContent = data.empId;
+        document.getElementById("empCode").textContent = data.empCode;
+        document.getElementById("designation").textContent = data.designation;
+        document.getElementById("fatherName").textContent = data.fatherName;
+        document.getElementById("gender").textContent = data.gender;
+        document.getElementById("esicNumber").textContent = data.esicNumber;
+        document.getElementById("pfNumber").textContent = data.pfNumber;
+        document.getElementById("dob").textContent = data.dob;
+        document.getElementById("mobile").textContent = data.mobile;
+        document.getElementById("aadhar").textContent = data.aadhar;
+        document.getElementById("idProof").textContent = data.idProof;
+        document.getElementById("permanentAddress").textContent = data.permanentAddress;
+        document.getElementById("localAddress").textContent = data.localAddress;
+        document.getElementById("joiningDate").textContent = data.joiningDate;
+        document.getElementById("emergencyContact").textContent = data.emergencyContact;
+        document.getElementById("status").textContent = data.status;
+
       } else {
         errorMsg.textContent = data.message || "Invalid credentials.";
       }
