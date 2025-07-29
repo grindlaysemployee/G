@@ -1,50 +1,100 @@
 body {
-  font-family: Arial, sans-serif;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f0f4f8;
   display: flex;
   justify-content: center;
   align-items: center;
   height: 100vh;
   margin: 0;
-  background-color: #f3f3f3;
 }
 
 .login-box {
-  border: 3px solid black;
-  padding: 20px 40px;
-  border-radius: 10px;
-  background-color: white;
+  background-color: #ffffff;
+  border: 1px solid #cbd5e1;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.06);
+  border-radius: 8px;
+  padding: 30px 40px;
+  width: 360px;
   text-align: center;
-  width: 300px;
 }
 
 .profile-pic {
-  width: 120px;
-  height: 120px;
-  border-radius: 50%;
+  width: 100px;
+  height: 100px;
   object-fit: cover;
-  border: 2px solid black;
-  margin-bottom: 15px;
+  border-radius: 50%;
+  margin-bottom: 20px;
+  border: 2px solid #3b82f6;
+}
+
+h2 {
+  margin-bottom: 20px;
+  color: #1f2937;
+  font-weight: 600;
+}
+
+label {
+  display: block;
+  text-align: left;
+  margin: 8px 0 4px;
+  font-size: 14px;
+  font-weight: 500;
+  color: #374151;
 }
 
 input {
-  display: block;
   width: 100%;
-  padding: 8px;
-  margin: 10px 0;
+  padding: 10px;
+  border: 1px solid #d1d5db;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  font-size: 14px;
+  background-color: #f9fafb;
+  transition: border-color 0.2s;
+}
+
+input:focus {
+  outline: none;
+  border-color: #3b82f6;
+  background-color: #ffffff;
 }
 
 button {
-  padding: 8px 16px;
+  background-color: #3b82f6;
+  color: white;
+  border: none;
+  padding: 10px 0;
+  border-radius: 4px;
+  width: 100%;
+  font-size: 15px;
   cursor: pointer;
+  font-weight: 500;
+  margin-top: 10px;
 }
 
-.hidden {
-  display: none;
+button:hover {
+  background-color: #2563eb;
+}
+
+#employeeDetails {
+  margin-top: 25px;
+  text-align: left;
+}
+
+#employeeDetails h2 {
+  font-size: 18px;
+  color: #111827;
+  font-weight: 600;
 }
 
 #employeeDetails ul {
-  text-align: left;
-  margin-top: 20px;
-  padding-left: 0;
   list-style: none;
+  padding: 0;
+  margin-top: 10px;
+}
+
+#employeeDetails li {
+  margin-bottom: 6px;
+  font-size: 14px;
+  color: #374151;
 }
