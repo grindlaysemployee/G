@@ -118,8 +118,24 @@
         document.getElementById("gender").textContent = data.gender;
         document.getElementById("esicNumber").textContent = data.esicNumber;
         document.getElementById("pfNumber").textContent = data.pfNumber;
-        document.getElementById("dob").textContent = data.dob; // already formatted
+        document.getElementById("dob").textContent = data.dob;
         document.getElementById("mobile").textContent = data.mobile;
         document.getElementById("aadhar").textContent = data.aadhar;
         document.getElementById("idProof").textContent = data.idProof;
-        document.getElementById("pe
+        document.getElementById("permanentAddress").textContent = data.permanentAddress;
+        document.getElementById("localAddress").textContent = data.localAddress;
+        document.getElementById("joiningDate").textContent = data.joiningDate;
+        document.getElementById("emergencyContact").textContent = data.emergencyContact;
+        document.getElementById("status").textContent = data.status;
+
+      } else {
+        errorMsg.textContent = data.message || "Invalid credentials.";
+      }
+    } catch (error) {
+      errorMsg.textContent = "Login failed. Please try again.";
+    }
+  }
+</script>
+
+</body>
+</html>
