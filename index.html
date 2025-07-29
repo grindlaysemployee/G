@@ -1,27 +1,39 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Login</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Grindtech Employee Portal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="loginSection" class="login-box">
-    <div class="lens-container">
-      <img src="image/image3.png" alt="Company Logo" class="lens-image">
-    </div>
-    <h2>Employee Login</h2>
-    <input type="text" id="empId" placeholder="Employee ID">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-  </div>
 
-  <div id="employeeDetails" class="login-box hidden">
-    <h2>Welcome, <span id="empName"></span></h2>
-    <ul id="detailsList"></ul>
-  </div>
+<div class="container" id="login">
+  <h2>Employee Login</h2>
+  <input type="text" id="empId" placeholder="Employee ID" />
+  <input type="password" id="password" placeholder="Password" />
+  <button onclick="login()">Login</button>
+  <p class="error" id="errorMsg"></p>
+</div>
 
-  <script src="script.js"></script>
+<div class="container" id="profile">
+  <h2>Welcome, <span id="name"></span></h2>
+  <div class="profile-field"><strong>Emp ID:</strong> <span id="empIdProfile"></span></div>
+  <div class="profile-field"><strong>Emp Code:</strong> <span id="empCode"></span></div>
+  <div class="profile-field"><strong>Designation:</strong> <span id="designation"></span></div>
+  <div class="profile-field"><strong>Father's Name:</strong> <span id="fatherName"></span></div>
+  <div class="profile-field"><strong>Gender:</strong> <span id="gender"></span></div>
+  <div class="profile-field"><strong>ESIC Number:</strong> <span id="esicNumber"></span></div>
+  <div class="profile-field"><strong>PF Number:</strong> <span id="pfNumber"></span></div>
+  <div class="profile-field"><strong>Date of Birth:</strong> <span id="dob"></span></div>
+  <div class="profile-field"><strong>Mobile Number:</strong> <span id="mobile"></span></div>
+  <div class="profile-field"><strong>Aadhar Number:</strong> <span id="aadhar"></span></div>
+  <div class="profile-field"><strong>ID Proof:</strong> <span id="idProof"></span></div>
+  <div class="profile-field"><strong>Permanent Address:</strong> <span id="permanentAddress"></span></div>
+  <div class="profile-field"><strong>Local Address:</strong> <span id="localAddress"></span></div>
+  <div class="profile-field"><strong>Date of Joining:</strong> <span id="joiningDate"></span></div>
+  <div class="profile-field"><strong>Emergency Contact:</strong> <span id="emergencyContact"></span></div>
+  <div class="profile-field"><strong>Status:</strong> <span id="status"></span></div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
