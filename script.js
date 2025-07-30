@@ -1,72 +1,93 @@
+const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
-const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec"; // 🔁 Replace with your deployed Apps Script URL
-let currentEmployeeData = {};
+let leaveStatusURL = "";
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
-  const errorMessage = document.getElementById("error-message");
 
   if (!empId || !password) {
-    errorMessage.textContent = "Please enter both Employee ID and Password.";
+    alert("Please enter Employee ID and Password");
     return;
   }
 
-  errorMessage.textContent = "Logging in...";
+  document.getElementById("loginSection").classList.add("hidden");
+  document.getElementById("loadingSpinner").classList.remove("hidden");
+
+  const formData = new FormData();
+  formData.append("empId", empId);
+  formData.append("password", password);
 
   fetch(apiUrl, {
     method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: `empId=${empId}&password=${password}`,
+    body: formData
   })
     .then(res => res.json())
     .then(data => {
-      if (data.success) {
-        currentEmployeeData = data;
-        showDashboard(data);
-      } else {
-        errorMessage.textContent = "Invalid login. Please try again.";
+      if (!data || !data.success) {
+        alert("Invalid Employee ID or Password");
+        document.getElementById("loadingSpinner").classList.add("hidden");
+        document.getElementById("loginSection").classList.remove("hidden");
+        return;
       }
+
+      document.getElementById("empName").textContent = data.name;
+
+      const employeeImage = document.getElementById("employeeImage");
+      employeeImage.src = `image/${data.empId}.jpg`;
+      employeeImage.onerror = function () {
+        this.src = "image/default.jpg";
+      };
+
+      leaveStatusURL = data.leaveStatusURL || "";
+
+      const fields = {
+        "Employee ID": data.empId,
+        "Emp Code": data.empCode,
+        "Designation": data.designation,
+        "Father's Name": data.fatherName,
+        "Gender": data.gender,
+        "ESIC Number": data.esicNumber,
+        "PF Number": data.pfNumber,
+        "Date of Birth": data.dob,
+        "Mobile": data.mobile,
+        "Aadhar": data.aadhar,
+        "ID Proof": data.idProof,
+        "Permanent Address": data.permanentAddress,
+        "Local Address": data.localAddress,
+        "Joining Date": data.joiningDate,
+        "Emergency Contact": data.emergencyContact,
+        "Status": data.status
+      };
+
+      const detailsList = document.getElementById("detailsList");
+      detailsList.innerHTML = "";
+
+      for (let key in fields) {
+        const li = document.createElement("li");
+        li.textContent = `${key}: ${fields[key] || "N/A"}`;
+        detailsList.appendChild(li);
+      }
+
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("employeeDetails").classList.remove("hidden");
     })
     .catch(err => {
-      console.error(err);
-      errorMessage.textContent = "Something went wrong!";
+      console.error("Error:", err);
+      alert("Something went wrong!");
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
     });
 }
 
-function showDashboard(data) {
-  document.getElementById("login-box").style.display = "none";
-  document.getElementById("dashboard").style.display = "flex";
-
-  document.getElementById("welcome-text").textContent = `Welcome, ${data.Name || ""}`;
-  document.getElementById("employee-img").src = `image/${data['Emp Code']}.png`;
-
-  const basicFields = ["Employee ID", "Emp Code", "Designation", "Status"];
-  const basicList = document.getElementById("basic-details");
-  basicList.innerHTML = "";
-  basicFields.forEach(field => {
-    const key = field.replace(" ", "");
-    const li = document.createElement("li");
-    li.textContent = `${field}: ${data[field] || ""}`;
-    basicList.appendChild(li);
-  });
-
-  const exclude = ["Name", "Emp Code", "Employee ID", "Designation", "Status", "LeaveApplyURL", "LeaveStatusURL"];
-  const otherList = document.getElementById("other-details");
-  otherList.innerHTML = "";
-  for (let key in data) {
-    if (!exclude.includes(key)) {
-      const li = document.createElement("li");
-      li.textContent = `${key}: ${data[key]}`;
-      otherList.appendChild(li);
-    }
+function openLeaveStatus() {
+  if (leaveStatusURL) {
+    window.open(leaveStatusURL, "_blank");
+  } else {
+    alert("Leave status link not available.");
   }
 }
 
 function logout() {
-  document.getElementById("dashboard").style.display = "none";
-  document.getElementById("login-box").style.display = "block";
-  document.getElementById("empId").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("error-message").textContent = "";
+  location.reload();
 }
