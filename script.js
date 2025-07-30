@@ -55,13 +55,11 @@ function login() {
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
 
-      // Create table
       const table = document.createElement("table");
       table.style.width = "100%";
       table.style.borderCollapse = "collapse";
       table.style.marginTop = "10px";
 
-      // Add rows
       for (let key in fields) {
         const tr = document.createElement("tr");
 
@@ -84,9 +82,9 @@ function login() {
 
       detailsList.appendChild(table);
 
-      // Load and insert image
+      // Load image using Employee ID
       const img = document.createElement("img");
-      img.src = `image/${data.empCode}.jpg`;
+      img.src = `image/${data.empId}.jpg`;
       img.alt = "Employee Image";
       img.className = "lens-image";
       img.style.display = "block";
