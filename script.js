@@ -61,7 +61,7 @@ function login() {
         "Joining Date": data.joiningDate,
         "Emergency Contact": data.emergencyContact,
         "Status": data.status,
-        "Leave Status";data.leavestatusurl
+        "Leave Status" : data.leavestatusurl
       };
 
       const detailsList = document.getElementById("detailsList");
