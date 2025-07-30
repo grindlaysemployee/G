@@ -1,6 +1,6 @@
 const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
-let leaveStatusURL = ""; // Store employee's leave status link
+let leaveStatusURL = "";
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
@@ -41,10 +41,12 @@ function login() {
 
       leaveStatusURL = data.leaveStatusURL || "";
 
+      document.getElementById("basic-empId").textContent = data.empId;
+      document.getElementById("basic-empCode").textContent = data.empCode;
+      document.getElementById("basic-designation").textContent = data.designation;
+      document.getElementById("basic-status").textContent = data.status;
+
       const fields = {
-        "Employee ID": data.empId,
-        "Emp Code": data.empCode,
-        "Designation": data.designation,
         "Father's Name": data.fatherName,
         "Gender": data.gender,
         "ESIC Number": data.esicNumber,
@@ -56,8 +58,7 @@ function login() {
         "Permanent Address": data.permanentAddress,
         "Local Address": data.localAddress,
         "Joining Date": data.joiningDate,
-        "Emergency Contact": data.emergencyContact,
-        "Status": data.status
+        "Emergency Contact": data.emergencyContact
       };
 
       const detailsList = document.getElementById("detailsList");
