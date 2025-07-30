@@ -2,40 +2,45 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Dashboard</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta name="viewport" content="width=500, user-scalable=no" />
+  <title>Employee Login</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <div id="login-box" class="login-container">
+
+  <!-- Login Section -->
+  <div id="loginSection" class="login-box">
+    <div class="lens-container">
+      <img src="image/image3.png" alt="Company Logo" class="lens-image">
+    </div>
     <h2>Employee Login</h2>
-    <input type="text" id="empId" placeholder="Employee ID" />
-    <input type="password" id="password" placeholder="Password" />
+    <input type="text" id="empId" placeholder="Employee ID">
+    <input type="password" id="password" placeholder="Password">
     <button onclick="login()">Login</button>
-    <p id="error-message" class="error-message"></p>
   </div>
 
-  <div id="dashboard" class="dashboard-container" style="display:none;">
-    <div class="left-section">
-      <h2>Other Details</h2>
-      <ul id="other-details" class="detail-list"></ul>
+  <!-- Loading Spinner -->
+  <div id="loadingSpinner" class="login-box hidden">
+    <div class="spinner"></div>
+    <p>Loading employee data...</p>
+  </div>
+
+  <!-- Employee Details Section -->
+  <div id="employeeDetails" class="dashboard hidden">
+    <!-- Left: Details -->
+    <div class="left-panel">
+      <h2>Welcome, <span id="empName"></span></h2>
+      <ul id="detailsList"></ul>
     </div>
 
-    <div class="center-section">
-      <img id="employee-img" class="employee-image" src="" alt="Employee Image"/>
-      <h2 id="welcome-text">Welcome</h2>
-      <ul id="basic-details" class="detail-list"></ul>
-
+    <!-- Right: Image + Buttons -->
+    <div class="right-panel">
+      <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
-        <button class="green" onclick="window.open(currentEmployeeData.LeaveApplyURL)">Leave Apply</button>
-        <button class="green" onclick="window.open(currentEmployeeData.LeaveStatusURL)">Leave Status</button>
-        <button class="red" onclick="logout()">Logout</button>
+        <button id="leaveapply">Leave Apply</button>
+        <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
+        <button onclick="logout()" class="logout">Logout</button>
       </div>
-    </div>
-
-    <div class="right-section">
-      <h2>Current Month Attendance</h2>
-      <div class="attendance-box"></div>
     </div>
   </div>
 
