@@ -1,5 +1,7 @@
 const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
+let leaveStatusURL = ""; // Store employee's leave status link
+
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -9,7 +11,6 @@ function login() {
     return;
   }
 
-  // Show loading spinner
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
@@ -30,20 +31,16 @@ function login() {
         return;
       }
 
-      // Set employee name
       document.getElementById("empName").textContent = data.name;
 
-      // Set employee image using empId (e.g., E65.jpg)
-      const imagePath = `image/${data.empId}.jpg`;
       const employeeImage = document.getElementById("employeeImage");
-      employeeImage.src = imagePath;
-
-      // Optional: fallback if image not found
+      employeeImage.src = `image/${data.empId}.jpg`;
       employeeImage.onerror = function () {
-        this.src = "image/default.jpg"; // Optional fallback image
+        this.src = "image/default.jpg";
       };
 
-      // Employee details
+      leaveStatusURL = data.leaveStatusURL || "";
+
       const fields = {
         "Employee ID": data.empId,
         "Emp Code": data.empCode,
@@ -68,7 +65,7 @@ function login() {
 
       for (let key in fields) {
         const li = document.createElement("li");
-        li.textContent = `${key}: ${fields[key]}`;
+        li.textContent = `${key}: ${fields[key] || "N/A"}`;
         detailsList.appendChild(li);
       }
 
@@ -81,4 +78,16 @@ function login() {
       document.getElementById("loadingSpinner").classList.add("hidden");
       document.getElementById("loginSection").classList.remove("hidden");
     });
+}
+
+function openLeaveStatus() {
+  if (leaveStatusURL) {
+    window.open(leaveStatusURL, "_blank");
+  } else {
+    alert("Leave status link not available.");
+  }
+}
+
+function logout() {
+  location.reload();
 }
