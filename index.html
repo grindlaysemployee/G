@@ -3,35 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Portal</title>
+  <title>Employee Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div class="container">
-    <!-- LEFT COLUMN: Extended Details -->
-    <div class="employee-details">
-      <div class="scroll-section" id="leftDetails">
-        <!-- Dynamic content inserted here -->
-      </div>
+  <div id="loginSection" class="login-section">
+    <div class="login-box">
+      <h2>Employee Login</h2>
+      <input type="text" id="empId" placeholder="Employee ID" />
+      <input type="password" id="password" placeholder="Password" />
+      <button onclick="login()">Login</button>
+    </div>
+  </div>
+
+  <div id="loadingSpinner" class="hidden">Loading...</div>
+
+  <div id="employeeDetails" class="dashboard hidden">
+    <div class="left-panel">
+      <ul id="detailsList"></ul>
     </div>
 
-    <!-- RIGHT COLUMN: Profile + Basic Info -->
-    <div class="employee-profile">
-      <button class="logout-btn" onclick="logout()">Logout</button>
-      <img id="empImage" class="emp-image" src="" alt="Employee Image"/>
-      <h2 id="empName">Welcome, </h2>
-      <div class="info-box" id="basicDetails">
-        <!-- Dynamic content inserted here -->
+    <div class="right-panel">
+      <div class="header">
+        <img id="employeeImage" src="image/default.jpg" alt="Employee Image" />
+        <h2>Welcome, <span id="empName"></span></h2>
       </div>
 
+      <ul class="basic-info">
+        <li><strong>Employee ID:</strong> <span id="basic-empId"></span></li>
+        <li><strong>Emp Code:</strong> <span id="basic-empCode"></span></li>
+        <li><strong>Designation:</strong> <span id="basic-designation"></span></li>
+        <li><strong>Status:</strong> <span id="basic-status"></span></li>
+      </ul>
+
       <div class="button-group">
-        <button class="action-btn green" onclick="applyLeave()">Leave Apply</button>
-        <button class="action-btn green" onclick="viewLeaveStatus()">Leave Status</button>
+        <button onclick="window.open('leave-apply.html')">Leave Apply</button>
+        <button onclick="openLeaveStatus()">Leave Status</button>
+        <button class="logout" onclick="logout()">Logout</button>
       </div>
     </div>
   </div>
 
-  <div class="spinner" id="spinner">Loading...</div>
   <script src="script.js"></script>
 </body>
 </html>
