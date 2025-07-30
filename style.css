@@ -27,6 +27,7 @@ body {
   height: 100px;
   border-radius: 50%;
   object-fit: cover;
+  border: 2px solid #ccc;
 }
 
 input[type="text"],
@@ -102,4 +103,8 @@ button:hover {
   border-radius: 8px;
   font-size: 15px;
 }
- 
+
+#detailsList li strong {
+  display: inline-block;
+  width: 160px;
+}
