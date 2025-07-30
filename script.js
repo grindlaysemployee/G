@@ -30,24 +30,35 @@ function login() {
         return;
       }
 
+      // Set employee name
       document.getElementById("empName").textContent = data.name;
 
+      // Set employee image using empId (e.g., E65.jpg)
+      const imagePath = `image/${data.empId}.jpg`;
+      const employeeImage = document.getElementById("employeeImage");
+      employeeImage.src = imagePath;
+
+      // Optional: fallback if image not found
+      employeeImage.onerror = function () {
+        this.src = "image/default.jpg"; // Optional fallback image
+      };
+
+      // Employee details
       const fields = {
         "Employee ID": data.empId,
         "Emp Code": data.empCode,
-        "Name": data.name,
         "Designation": data.designation,
         "Father's Name": data.fatherName,
         "Gender": data.gender,
         "ESIC Number": data.esicNumber,
         "PF Number": data.pfNumber,
         "Date of Birth": data.dob,
-        "Joining Date": data.joiningDate,
         "Mobile": data.mobile,
         "Aadhar": data.aadhar,
         "ID Proof": data.idProof,
         "Permanent Address": data.permanentAddress,
         "Local Address": data.localAddress,
+        "Joining Date": data.joiningDate,
         "Emergency Contact": data.emergencyContact,
         "Status": data.status
       };
@@ -55,43 +66,11 @@ function login() {
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
 
-      const table = document.createElement("table");
-      table.style.width = "100%";
-      table.style.borderCollapse = "collapse";
-      table.style.marginTop = "10px";
-
       for (let key in fields) {
-        const tr = document.createElement("tr");
-
-        const tdKey = document.createElement("td");
-        tdKey.textContent = key;
-        tdKey.style.fontWeight = "bold";
-        tdKey.style.padding = "8px";
-        tdKey.style.borderBottom = "1px solid #ccc";
-        tdKey.style.width = "40%";
-
-        const tdValue = document.createElement("td");
-        tdValue.textContent = fields[key] || "-";
-        tdValue.style.padding = "8px";
-        tdValue.style.borderBottom = "1px solid #ccc";
-
-        tr.appendChild(tdKey);
-        tr.appendChild(tdValue);
-        table.appendChild(tr);
+        const li = document.createElement("li");
+        li.textContent = `${key}: ${fields[key]}`;
+        detailsList.appendChild(li);
       }
-
-      detailsList.appendChild(table);
-
-      // Load image using Employee ID
-      const img = document.createElement("img");
-      img.src = `image/${data.empId}.jpg`;
-      img.alt = "Employee Image";
-      img.className = "lens-image";
-      img.style.display = "block";
-      img.style.margin = "15px auto";
-
-      const employeeDetailsDiv = document.getElementById("employeeDetails");
-      employeeDetailsDiv.insertBefore(img, detailsList);
 
       document.getElementById("loadingSpinner").classList.add("hidden");
       document.getElementById("employeeDetails").classList.remove("hidden");
