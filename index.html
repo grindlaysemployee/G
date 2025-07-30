@@ -2,46 +2,36 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=500, user-scalable=no" />
-  <title>Employee Login</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Employee Portal</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-
-  <!-- Login Section -->
-  <div id="loginSection" class="login-box">
-    <div class="lens-container">
-      <img src="image/image3.png" alt="Company Logo" class="lens-image">
+  <div class="container">
+    <!-- LEFT COLUMN: Extended Details -->
+    <div class="employee-details">
+      <div class="scroll-section" id="leftDetails">
+        <!-- Dynamic content inserted here -->
+      </div>
     </div>
-    <h2>Employee Login</h2>
-    <input type="text" id="empId" placeholder="Employee ID">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
-  </div>
 
-  <!-- Loading Spinner -->
-  <div id="loadingSpinner" class="login-box hidden">
-    <div class="spinner"></div>
-    <p>Loading employee data...</p>
-  </div>
+    <!-- RIGHT COLUMN: Profile + Basic Info -->
+    <div class="employee-profile">
+      <button class="logout-btn" onclick="logout()">Logout</button>
+      <img id="empImage" class="emp-image" src="" alt="Employee Image"/>
+      <h2 id="empName">Welcome, </h2>
+      <div class="info-box" id="basicDetails">
+        <!-- Dynamic content inserted here -->
+      </div>
 
-  <!-- Employee Details Section -->
-  <div id="employeeDetails" class="login-box hidden">
-    <!-- Sticky employee image -->
-    <div class="lens-container">
-      <img id="employeeImage" src="" alt="Employee Photo" class="lens-image">
-    </div>
-    <h2>Welcome, <span id="empName"></span></h2>
-    <ul id="detailsList"></ul>
-
-    <!-- Action buttons -->
-    <div class="button-group">
-      <button class="action-button" onclick="window.open('https://forms.gle/your-leave-apply-link', '_blank')">Leave Apply</button>
-      <button class="action-button" onclick="openLeaveStatus()">Leave Status</button>
-      <button onclick="logout()" class="action-button logout">Logout</button>
+      <div class="button-group">
+        <button class="action-btn green" onclick="applyLeave()">Leave Apply</button>
+        <button class="action-btn green" onclick="viewLeaveStatus()">Leave Status</button>
+      </div>
     </div>
   </div>
 
+  <div class="spinner" id="spinner">Loading...</div>
   <script src="script.js"></script>
 </body>
 </html>
