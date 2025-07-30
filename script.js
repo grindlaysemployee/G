@@ -60,8 +60,7 @@ function login() {
         "Local Address": data.localAddress,
         "Joining Date": data.joiningDate,
         "Emergency Contact": data.emergencyContact,
-        "Status": data.status,
-        "Leave Status" : data.leavestatusurl
+        "Status": data.status
       };
 
       const detailsList = document.getElementById("detailsList");
