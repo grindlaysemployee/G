@@ -3,46 +3,39 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Employee Portal</title>
+  <title>Employee Dashboard</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <div id="loginSection">
+  <div id="login-box" class="login-container">
     <h2>Employee Login</h2>
     <input type="text" id="empId" placeholder="Employee ID" />
     <input type="password" id="password" placeholder="Password" />
     <button onclick="login()">Login</button>
+    <p id="error-message" class="error-message"></p>
   </div>
 
-  <div id="loadingSpinner" class="hidden">Loading...</div>
-
-  <div id="employeeDetails" class="hidden main-layout">
-    <div class="left-panel">
+  <div id="dashboard" class="dashboard-container" style="display:none;">
+    <div class="left-section">
       <h2>Other Details</h2>
-      <ul id="detailsList"></ul>
+      <ul id="other-details" class="detail-list"></ul>
     </div>
 
-    <div class="center-panel">
-      <img id="employeeImage" src="image/default.jpg" alt="Employee Image" />
-      <h2 id="empName">Welcome, </h2>
-      <ul class="basic-info">
-        <li id="empIdField"></li>
-        <li id="empCodeField"></li>
-        <li id="designationField"></li>
-        <li id="statusField"></li>
-      </ul>
+    <div class="center-section">
+      <img id="employee-img" class="employee-image" src="" alt="Employee Image"/>
+      <h2 id="welcome-text">Welcome</h2>
+      <ul id="basic-details" class="detail-list"></ul>
+
       <div class="button-group">
-        <button onclick="window.open('https://forms.gle/VmkgUhK44DoWfBCa6')" class="btn-green">Leave Apply</button>
-        <button onclick="openLeaveStatus()" class="btn-green">Leave Status</button>
-        <button onclick="logout()" class="btn-red">Logout</button>
+        <button class="green" onclick="window.open(currentEmployeeData.LeaveApplyURL)">Leave Apply</button>
+        <button class="green" onclick="window.open(currentEmployeeData.LeaveStatusURL)">Leave Status</button>
+        <button class="red" onclick="logout()">Logout</button>
       </div>
     </div>
 
-    <div class="right-panel">
+    <div class="right-section">
       <h2>Current Month Attendance</h2>
-      <div class="attendance-box">
-        <!-- Placeholder for future attendance data -->
-      </div>
+      <div class="attendance-box"></div>
     </div>
   </div>
 
