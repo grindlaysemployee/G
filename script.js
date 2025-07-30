@@ -1,93 +1,72 @@
-const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 
-let leaveStatusURL = "";
+const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/execL"; // 🔁 Replace with your deployed Apps Script URL
+let currentEmployeeData = {};
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
+  const errorMessage = document.getElementById("error-message");
 
   if (!empId || !password) {
-    alert("Please enter Employee ID and Password");
+    errorMessage.textContent = "Please enter both Employee ID and Password.";
     return;
   }
 
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("loadingSpinner").classList.remove("hidden");
-
-  const formData = new FormData();
-  formData.append("empId", empId);
-  formData.append("password", password);
+  errorMessage.textContent = "Logging in...";
 
   fetch(apiUrl, {
     method: "POST",
-    body: formData
+    headers: { "Content-Type": "application/x-www-form-urlencoded" },
+    body: `empId=${empId}&password=${password}`,
   })
     .then(res => res.json())
     .then(data => {
-      if (!data || !data.success) {
-        alert("Invalid Employee ID or Password");
-        document.getElementById("loadingSpinner").classList.add("hidden");
-        document.getElementById("loginSection").classList.remove("hidden");
-        return;
+      if (data.success) {
+        currentEmployeeData = data;
+        showDashboard(data);
+      } else {
+        errorMessage.textContent = "Invalid login. Please try again.";
       }
-
-      document.getElementById("empName").textContent = `Welcome, ${data.name}`;
-
-      document.getElementById("employeeImage").src = `image/${data.empId}.jpg`;
-      document.getElementById("employeeImage").onerror = function () {
-        this.src = "image/default.jpg";
-      };
-
-      leaveStatusURL = data.leaveStatusURL || "";
-
-      document.getElementById("empIdField").textContent = `Employee ID: ${data.empId}`;
-      document.getElementById("empCodeField").textContent = `Emp Code: ${data.empCode}`;
-      document.getElementById("designationField").textContent = `Designation: ${data.designation}`;
-      document.getElementById("statusField").textContent = `Status: ${data.status}`;
-
-      const otherDetails = {
-        "Father's Name": data.fatherName,
-        "Gender": data.gender,
-        "ESIC Number": data.esicNumber,
-        "PF Number": data.pfNumber,
-        "Date of Birth": data.dob,
-        "Mobile": data.mobile,
-        "Aadhar": data.aadhar,
-        "ID Proof": data.idProof,
-        "Permanent Address": data.permanentAddress,
-        "Local Address": data.localAddress,
-        "Joining Date": data.joiningDate,
-        "Emergency Contact": data.emergencyContact,
-      };
-
-      const detailsList = document.getElementById("detailsList");
-      detailsList.innerHTML = "";
-
-      for (let key in otherDetails) {
-        const li = document.createElement("li");
-        li.textContent = `${key}: ${otherDetails[key] || "N/A"}`;
-        detailsList.appendChild(li);
-      }
-
-      document.getElementById("loadingSpinner").classList.add("hidden");
-      document.getElementById("employeeDetails").classList.remove("hidden");
     })
     .catch(err => {
-      console.error("Error:", err);
-      alert("Something went wrong!");
-      document.getElementById("loadingSpinner").classList.add("hidden");
-      document.getElementById("loginSection").classList.remove("hidden");
+      console.error(err);
+      errorMessage.textContent = "Something went wrong!";
     });
 }
 
-function openLeaveStatus() {
-  if (leaveStatusURL) {
-    window.open(leaveStatusURL, "_blank");
-  } else {
-    alert("Leave status link not available.");
+function showDashboard(data) {
+  document.getElementById("login-box").style.display = "none";
+  document.getElementById("dashboard").style.display = "flex";
+
+  document.getElementById("welcome-text").textContent = `Welcome, ${data.Name || ""}`;
+  document.getElementById("employee-img").src = `image/${data['Emp Code']}.png`;
+
+  const basicFields = ["Employee ID", "Emp Code", "Designation", "Status"];
+  const basicList = document.getElementById("basic-details");
+  basicList.innerHTML = "";
+  basicFields.forEach(field => {
+    const key = field.replace(" ", "");
+    const li = document.createElement("li");
+    li.textContent = `${field}: ${data[field] || ""}`;
+    basicList.appendChild(li);
+  });
+
+  const exclude = ["Name", "Emp Code", "Employee ID", "Designation", "Status", "LeaveApplyURL", "LeaveStatusURL"];
+  const otherList = document.getElementById("other-details");
+  otherList.innerHTML = "";
+  for (let key in data) {
+    if (!exclude.includes(key)) {
+      const li = document.createElement("li");
+      li.textContent = `${key}: ${data[key]}`;
+      otherList.appendChild(li);
+    }
   }
 }
 
 function logout() {
-  location.reload();
+  document.getElementById("dashboard").style.display = "none";
+  document.getElementById("login-box").style.display = "block";
+  document.getElementById("empId").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("error-message").textContent = "";
 }
