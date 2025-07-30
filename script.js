@@ -30,6 +30,10 @@ function login() {
         return;
       }
 
+      // Set image based on Emp Code
+      const empImage = document.getElementById("employeeImage");
+      empImage.src = `image/${data.empCode}.jpg`;
+
       // Set employee name
       document.getElementById("empName").textContent = data.name;
 
@@ -38,7 +42,7 @@ function login() {
         "Emp Code": data.empCode,
         "Designation": data.designation,
         "Father's Name": data.fatherName,
-        "Gender": data.gender,
+        "Gender": data.sex,
         "ESIC Number": data.esicNumber,
         "PF Number": data.pfNumber,
         "Date of Birth": data.dob,
@@ -47,7 +51,7 @@ function login() {
         "ID Proof": data.idProof,
         "Permanent Address": data.permanentAddress,
         "Local Address": data.localAddress,
-        "Joining Date": data.joiningDate,
+        "Joining Date": data.dateOfJoining,
         "Emergency Contact": data.emergencyContact,
         "Status": data.status
       };
@@ -57,7 +61,7 @@ function login() {
 
       for (let key in fields) {
         const li = document.createElement("li");
-        li.textContent = `${key}: ${fields[key]}`;
+        li.innerHTML = `<strong>${key}:</strong> ${fields[key] || 'N/A'}`;
         detailsList.appendChild(li);
       }
 
