@@ -2,6 +2,13 @@ const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_
 
 let leaveStatusURL = "";
 
+// Force hide all sections on initial page load
+window.onload = function () {
+  document.getElementById("employeeDetails").classList.add("hidden");
+  document.getElementById("loadingSpinner").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+};
+
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -89,5 +96,13 @@ function openLeaveStatus() {
 }
 
 function logout() {
-  location.reload();
+  // Force reload with clean UI
+  document.getElementById("employeeDetails").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("empId").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("detailsList").innerHTML = "";
+  document.getElementById("empName").textContent = "";
+  document.getElementById("employeeImage").src = "image/default.jpg";
+  leaveStatusURL = "";
 }
