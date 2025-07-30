@@ -31,22 +31,21 @@ function login() {
         return;
       }
 
-      document.getElementById("empName").textContent = data.name;
+      document.getElementById("empName").textContent = `Welcome, ${data.name}`;
 
-      const employeeImage = document.getElementById("employeeImage");
-      employeeImage.src = `image/${data.empId}.jpg`;
-      employeeImage.onerror = function () {
+      document.getElementById("employeeImage").src = `image/${data.empId}.jpg`;
+      document.getElementById("employeeImage").onerror = function () {
         this.src = "image/default.jpg";
       };
 
       leaveStatusURL = data.leaveStatusURL || "";
 
-      document.getElementById("basic-empId").textContent = data.empId;
-      document.getElementById("basic-empCode").textContent = data.empCode;
-      document.getElementById("basic-designation").textContent = data.designation;
-      document.getElementById("basic-status").textContent = data.status;
+      document.getElementById("empIdField").textContent = `Employee ID: ${data.empId}`;
+      document.getElementById("empCodeField").textContent = `Emp Code: ${data.empCode}`;
+      document.getElementById("designationField").textContent = `Designation: ${data.designation}`;
+      document.getElementById("statusField").textContent = `Status: ${data.status}`;
 
-      const fields = {
+      const otherDetails = {
         "Father's Name": data.fatherName,
         "Gender": data.gender,
         "ESIC Number": data.esicNumber,
@@ -58,15 +57,15 @@ function login() {
         "Permanent Address": data.permanentAddress,
         "Local Address": data.localAddress,
         "Joining Date": data.joiningDate,
-        "Emergency Contact": data.emergencyContact
+        "Emergency Contact": data.emergencyContact,
       };
 
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
 
-      for (let key in fields) {
+      for (let key in otherDetails) {
         const li = document.createElement("li");
-        li.textContent = `${key}: ${fields[key] || "N/A"}`;
+        li.textContent = `${key}: ${otherDetails[key] || "N/A"}`;
         detailsList.appendChild(li);
       }
 
