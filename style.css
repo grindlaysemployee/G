@@ -13,14 +13,15 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 20px;
+  overflow-x: auto; /* allow scrolling if screen is narrower */
 }
 
 /* Login / Details Box */
 .login-box {
   background: #fff;
   padding: 30px;
-  width: 100%;
-  max-width: 500px;
+  width: 500px;               /* fixed width for consistent view */
+  min-width: 500px;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   text-align: center;
@@ -28,7 +29,7 @@ body {
   overflow: hidden;
 }
 
-/* Logo or Employee Image Container */
+/* Sticky Image (Company or Employee) */
 .lens-container {
   margin-bottom: 20px;
   position: sticky;
@@ -36,7 +37,7 @@ body {
   z-index: 10;
 }
 
-/* Circle Image (Company or Employee) */
+/* Circle Image */
 .lens-image {
   width: 80px;
   height: 80px;
@@ -47,7 +48,7 @@ body {
   margin: 0 auto;
 }
 
-/* Inputs */
+/* Input Fields */
 input[type="text"],
 input[type="password"] {
   width: 100%;
@@ -58,7 +59,7 @@ input[type="password"] {
   font-size: 14px;
 }
 
-/* Button */
+/* Button Styling */
 button {
   width: 100%;
   padding: 12px;
@@ -96,7 +97,7 @@ button:hover {
   100% { transform: rotate(360deg); }
 }
 
-/* Employee Details List */
+/* Employee Details Styling */
 #employeeDetails {
   text-align: left;
 }
@@ -125,8 +126,21 @@ button:hover {
   word-break: break-word;
 }
 
-/* Responsive Tweaks */
+/* Responsive Fix: prevent mobile layout shift */
 @media (max-width: 600px) {
+  html {
+    overflow-x: auto;
+  }
+
+  body {
+    padding: 10px;
+  }
+
+  .login-box {
+    width: 500px;
+    min-width: 500px;
+  }
+
   .lens-image {
     width: 70px;
     height: 70px;
