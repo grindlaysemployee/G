@@ -51,8 +51,9 @@ button:hover {
   background-color: #0056b3;
 }
 
+/* ✅ Fix: Hidden class */
 .hidden {
-  display: none;
+  display: none !important;
 }
 
 /* Loading Spinner */
