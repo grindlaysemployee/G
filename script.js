@@ -1,5 +1,5 @@
 
-const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/execL"; // 🔁 Replace with your deployed Apps Script URL
+const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec"; // 🔁 Replace with your deployed Apps Script URL
 let currentEmployeeData = {};
 
 function login() {
