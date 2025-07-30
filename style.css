@@ -1,107 +1,141 @@
 body {
-  margin: 0;
   font-family: Arial, sans-serif;
-  background: #f4f4f4;
+  background: #f2f2f2;
+  margin: 0;
+  padding: 0;
 }
 
-.login-container {
-  max-width: 400px;
-  margin: 100px auto;
+.login-box {
+  max-width: 350px;
+  margin: 80px auto;
+  background: #fff;
   padding: 30px;
-  background: white;
-  box-shadow: 0 0 10px rgba(0,0,0,0.2);
-  border-radius: 10px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0,0,0,0.1);
   text-align: center;
 }
 
-.login-container input {
-  width: 80%;
-  padding: 10px;
-  margin: 10px;
-  font-size: 16px;
+.lens-container {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 20px;
 }
 
-.login-container button {
-  padding: 10px 20px;
-  font-size: 16px;
-  background-color: #4CAF50;
+.lens-image {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  border-radius: 50%;
+}
+
+input[type="text"], input[type="password"] {
+  width: 90%;
+  padding: 10px;
+  margin: 8px 0;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+}
+
+button {
+  width: 95%;
+  padding: 10px;
+  margin-top: 12px;
+  background-color: #007bff;
   color: white;
   border: none;
+  border-radius: 6px;
   cursor: pointer;
 }
 
-.error-message {
-  color: red;
-  margin-top: 10px;
+button:hover {
+  background-color: #0056b3;
 }
 
-.dashboard-container {
+.hidden {
+  display: none;
+}
+
+/* Loading Spinner */
+.spinner {
+  width: 40px;
+  height: 40px;
+  border: 4px solid #ccc;
+  border-top-color: #007bff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Employee Dashboard Layout */
+.dashboard {
   display: flex;
-  padding: 20px;
-  gap: 30px;
-  justify-content: space-between;
+  flex-direction: row;
+  padding: 30px;
+  max-width: 1000px;
+  margin: 40px auto;
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 0 20px rgba(0,0,0,0.1);
 }
 
-.left-section,
-.right-section {
-  width: 30%;
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+/* Left Column */
+.left-panel {
+  flex: 2;
+  padding-right: 30px;
 }
 
-.center-section {
-  width: 35%;
-  text-align: center;
+.left-panel h2 {
+  margin-top: 0;
+  font-size: 24px;
 }
 
-.employee-image {
-  width: 100px;
-  height: 100px;
+#detailsList {
+  list-style-type: none;
+  padding: 0;
+}
+
+#detailsList li {
+  margin: 10px 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+
+/* Right Column */
+.right-panel {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.employee-img {
+  width: 180px;
+  height: 180px;
   object-fit: cover;
   border-radius: 50%;
-  margin-bottom: 10px;
-}
-
-.detail-list {
-  list-style: none;
-  padding: 0;
-  text-align: left;
-}
-
-.detail-list li {
-  padding: 8px;
-  background: #eee;
-  border-left: 5px solid #007bff;
-  margin-bottom: 5px;
-  border-radius: 5px;
+  border: 4px solid #007bff;
+  margin-bottom: 20px;
 }
 
 .button-group {
-  margin-top: 20px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .button-group button {
-  margin: 5px;
-  padding: 10px 20px;
-  border-radius: 6px;
-  border: none;
-  cursor: pointer;
-  font-size: 14px;
+  width: 100%;
 }
 
-.green {
-  background-color: #28a745;
-  color: white;
-}
-
-.red {
+.logout {
   background-color: #dc3545;
-  color: white;
 }
 
-.attendance-box {
-  border: 3px solid black;
-  height: 400px;
+.logout:hover {
+  background-color: #a71d2a;
 }
