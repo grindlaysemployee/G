@@ -13,14 +13,13 @@ body {
   align-items: center;
   min-height: 100vh;
   padding: 20px;
-  overflow-x: auto; /* allow scrolling if screen is narrower */
+  overflow-x: auto;
 }
 
-/* Login / Details Box */
 .login-box {
   background: #fff;
   padding: 30px;
-  width: 500px;               /* fixed width for consistent view */
+  width: 500px;
   min-width: 500px;
   border-radius: 16px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
@@ -29,7 +28,6 @@ body {
   overflow: hidden;
 }
 
-/* Sticky Image (Company or Employee) */
 .lens-container {
   margin-bottom: 20px;
   position: sticky;
@@ -37,7 +35,6 @@ body {
   z-index: 10;
 }
 
-/* Circle Image */
 .lens-image {
   width: 80px;
   height: 80px;
@@ -48,7 +45,6 @@ body {
   margin: 0 auto;
 }
 
-/* Input Fields */
 input[type="text"],
 input[type="password"] {
   width: 100%;
@@ -59,7 +55,6 @@ input[type="password"] {
   font-size: 14px;
 }
 
-/* Button Styling */
 button {
   width: 100%;
   padding: 12px;
@@ -81,7 +76,6 @@ button:hover {
   display: none;
 }
 
-/* Spinner */
 .spinner {
   border: 6px solid #f3f3f3;
   border-top: 6px solid #007bff;
@@ -97,7 +91,6 @@ button:hover {
   100% { transform: rotate(360deg); }
 }
 
-/* Employee Details Styling */
 #employeeDetails {
   text-align: left;
 }
@@ -126,7 +119,7 @@ button:hover {
   word-break: break-word;
 }
 
-/* Responsive Fix: prevent mobile layout shift */
+/* Responsive Fix */
 @media (max-width: 600px) {
   html {
     overflow-x: auto;
@@ -153,4 +146,36 @@ button:hover {
   #detailsList li {
     font-size: 14px;
   }
+}
+
+/* New: Button Group */
+.button-group {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.action-button {
+  width: 100%;
+  padding: 12px;
+  background-color: #28a745;
+  color: white;
+  font-weight: bold;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.action-button:hover {
+  background-color: #218838;
+}
+
+.logout {
+  background-color: #dc3545;
+}
+
+.logout:hover {
+  background-color: #c82333;
 }
