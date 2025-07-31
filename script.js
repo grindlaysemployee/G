@@ -120,71 +120,16 @@ function openLeaveStatus() {
 // Helper: Format date to dd-mmm-yy
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  // Try to parse ISO or yyyy-mm-dd
   let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr; // fallback if not a date
+  if (isNaN(d)) return dateStr;
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-// Table render with filter
+// Table render with filter, date format, wrap, and row color
 function renderLeaveStatusTable(data) {
   const headers = Object.keys(data[0]);
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
   const finishDateCol = headers.find(h => h.toLowerCase().includes("finish date"));
-
-  let html = `<div class="leave-table-container">
-    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
-    <table class="leave-table" id="leaveStatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            // Date format for start/finish date columns
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("leaveStatusSection").innerHTML = html;
-
-  // Filter functionality
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) { // skip header
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
-}
-
-function closeLeaveStatus() {
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
-}
-
-function logout() {
-  document.getElementById("employeeDetails").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("empId").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("detailsList").innerHTML = "";
-  document.getElementById("empName").textContent = "";
-  document.getElementById("employeeImage").src = "image/default.jpg";
-  leaveStatusURL = "";
-  empIdGlobal = "";
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
-}
+  const reasonCol = headers.find(h => h.toLowerCase().includes("reason"));
+  const statusCol = headers.find(h => 
