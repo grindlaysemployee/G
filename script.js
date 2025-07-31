@@ -97,90 +97,52 @@ function openLeaveStatus() {
     return;
   }
 
-  // Show loading
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">Loading leave status...</div>`;
-  document.getElementById("leaveStatusSection").classList.remove("hidden");
-  document.getElementById("employeeDetails").classList.add("hidden");
-
   fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
+      console.log("Leave Status Data:", data); // Debug
       if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+        alert("Leave status not available.");
         return;
       }
+      document.getElementById("employeeDetails").classList.add("hidden");
       renderLeaveStatusTable(data);
+      document.getElementById("leaveStatusSection").classList.remove("hidden");
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+      alert("Something went wrong while fetching leave status.");
     });
 }
 
-// Helper: Format date to dd-mmm-yy
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
-}
-
-// Table render with filter, date format, wrap, and row color
+// Helper function to render professional table
 function renderLeaveStatusTable(data) {
+  if (!data || data.length === 0) {
+    document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+    return;
+  }
+
+  // Dynamically get headers from data
   const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("finish date"));
-  const reasonCol = headers.find(h => h.toLowerCase().includes("reason"));
-  const statusCol = headers.find(h => h.toLowerCase().includes("approve") || h.toLowerCase().includes("status"));
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
     <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
-    <table class="leave-table" id="leaveStatusTable">
+    <table class="leave-table">
       <thead>
         <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
       </thead>
-      <tbody>
-        ${data.map(row => {
-          // Row color if status is APPROVED or REJECTED
-          let rowClass = "";
-          if (statusCol) {
-            const status = (row[statusCol] || "").toString().toUpperCase();
-            if (status.includes("APPROVED")) rowClass = "approved-row";
-            else if (status.includes("REJECTED")) rowClass = "rejected-row";
-          }
-          return `<tr class="${rowClass}">
-            ${headers.map(h => {
-              // Date format for start/finish date columns
-              if (h === startDateCol || h === finishDateCol) {
-                return `<td>${formatDate(row[h])}</td>`;
-              }
-              // Wrap text for Reason column
-              if (h === reasonCol) {
-                return `<td class="wrap-text">${row[h] || ""}</td>`;
-              }
-              return `<td>${row[h] || ""}</td>`;
-            }).join('')}
-          </tr>`;
-        }).join('')}
-      </tbody>
-    </table>
-  </div>`;
+      <tbody>`;
+
+  data.forEach(row => {
+    html += `<tr>
+      ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
 
   document.getElementById("leaveStatusSection").innerHTML = html;
-
-  // Filter functionality
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) { // skip header
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
 }
 
 function closeLeaveStatus() {
