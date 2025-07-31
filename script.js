@@ -132,4 +132,73 @@ function renderLeaveStatusTable(data) {
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
   const finishDateCol = headers.find(h => h.toLowerCase().includes("finish date"));
   const reasonCol = headers.find(h => h.toLowerCase().includes("reason"));
-  const statusCol = headers.find(h => 
+  const statusCol = headers.find(h => h.toLowerCase().includes("approve") || h.toLowerCase().includes("status"));
+
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
+    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <table class="leave-table" id="leaveStatusTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => {
+          // Row color if status is APPROVED or REJECTED
+          let rowClass = "";
+          if (statusCol) {
+            const status = (row[statusCol] || "").toString().toUpperCase();
+            if (status.includes("APPROVED")) rowClass = "approved-row";
+            else if (status.includes("REJECTED")) rowClass = "rejected-row";
+          }
+          return `<tr class="${rowClass}">
+            ${headers.map(h => {
+              // Date format for start/finish date columns
+              if (h === startDateCol || h === finishDateCol) {
+                return `<td>${formatDate(row[h])}</td>`;
+              }
+              // Wrap text for Reason column
+              if (h === reasonCol) {
+                return `<td class="wrap-text">${row[h] || ""}</td>`;
+              }
+              return `<td>${row[h] || ""}</td>`;
+            }).join('')}
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("leaveStatusSection").innerHTML = html;
+
+  // Filter functionality
+  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("leaveStatusTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) { // skip header
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeLeaveStatus() {
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+function logout() {
+  document.getElementById("employeeDetails").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("empId").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("detailsList").innerHTML = "";
+  document.getElementById("empName").textContent = "";
+  document.getElementById("employeeImage").src = "image/default.jpg";
+  leaveStatusURL = "";
+  empIdGlobal = "";
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
+}
