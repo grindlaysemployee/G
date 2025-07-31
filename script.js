@@ -9,6 +9,7 @@ window.onload = function () {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("leaveStatusSection").classList.add("hidden");
 };
 
 function login() {
@@ -101,20 +102,59 @@ function openLeaveStatus() {
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        alert("Leave status link not available.");
+        alert("Leave status not available.");
         return;
       }
-      leaveStatusURL = data[0].URL || "";
-      if (leaveStatusURL) {
-        window.open(leaveStatusURL, "_blank");
-      } else {
-        alert("Leave status link not available.");
-      }
+      // Hide dashboard, show leave status section
+      document.getElementById("employeeDetails").classList.add("hidden");
+      renderLeaveStatusTable(data);
+      document.getElementById("leaveStatusSection").classList.remove("hidden");
     })
     .catch(err => {
       console.error("Error:", err);
       alert("Something went wrong while fetching leave status.");
     });
+}
+
+// Helper function to render professional table
+function renderLeaveStatusTable(data) {
+  // Table headers (change as per your sheet columns)
+  const headers = [
+    "What is the name of the employee?",
+    "What is the department of the employee?",
+    "Leave starting date?",
+    "Leave finish date?",
+    "Type of Leave",
+    "Reason of Leave",
+    "You want to Approve or Reject the Request?",
+    "Decision taken by?"
+  ];
+
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
+    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
+    <table class="leave-table">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>`;
+
+  data.forEach(row => {
+    html += `<tr>
+      ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+    </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  document.getElementById("leaveStatusSection").innerHTML = html;
+}
+
+// Close button function
+function closeLeaveStatus() {
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
 function logout() {
@@ -127,4 +167,6 @@ function logout() {
   document.getElementById("employeeImage").src = "image/default.jpg";
   leaveStatusURL = "";
   empIdGlobal = "";
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
 }
