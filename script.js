@@ -97,15 +97,14 @@ function openLeaveStatus() {
     return;
   }
 
-  // GET request to Leave Status API
   fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
+      console.log("Leave Status Data:", data); // Debug
       if (!data || data.length === 0) {
         alert("Leave status not available.");
         return;
       }
-      // Hide dashboard, show leave status section
       document.getElementById("employeeDetails").classList.add("hidden");
       renderLeaveStatusTable(data);
       document.getElementById("leaveStatusSection").classList.remove("hidden");
@@ -118,17 +117,13 @@ function openLeaveStatus() {
 
 // Helper function to render professional table
 function renderLeaveStatusTable(data) {
-  // Table headers (change as per your sheet columns)
-  const headers = [
-    "What is the name of the employee?",
-    "What is the department of the employee?",
-    "Leave starting date?",
-    "Leave finish date?",
-    "Type of Leave",
-    "Reason of Leave",
-    "You want to Approve or Reject the Request?",
-    "Decision taken by?"
-  ];
+  if (!data || data.length === 0) {
+    document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+    return;
+  }
+
+  // Dynamically get headers from data
+  const headers = Object.keys(data[0]);
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
@@ -150,7 +145,6 @@ function renderLeaveStatusTable(data) {
   document.getElementById("leaveStatusSection").innerHTML = html;
 }
 
-// Close button function
 function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
