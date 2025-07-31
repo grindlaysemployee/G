@@ -206,3 +206,16 @@ button:hover {
   color: #007bff;
   margin: 20px 0;
 }
+
+/* --- New for wrap and row color --- */
+.leave-table td.wrap-text {
+  white-space: pre-line;
+  word-break: break-word;
+  max-width: 220px;
+}
+.leave-table tr.approved-row {
+  background: #d4edda !important;
+}
+.leave-table tr.rejected-row {
+  background: #f8d7da !important;
+}
