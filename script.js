@@ -24,7 +24,6 @@ function login() {
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
-  // POST request to Employee Details API
   const formData = new FormData();
   formData.append("empId", empId);
   formData.append("password", password);
@@ -42,8 +41,7 @@ function login() {
         return;
       }
 
-      empIdGlobal = data.empId; // Store for leave status API
-
+      empIdGlobal = data.empId;
       document.getElementById("empName").textContent = data.name;
 
       const employeeImage = document.getElementById("employeeImage");
@@ -97,8 +95,7 @@ function openLeaveStatus() {
     return;
   }
 
-  // Show loading
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">Loading leave status...</div>`;
+  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -117,21 +114,18 @@ function openLeaveStatus() {
     });
 }
 
-// Helper: Format date to dd-mmm-yy
 function formatDate(dateStr) {
   if (!dateStr) return "";
-  // Try to parse ISO or yyyy-mm-dd
   let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr; // fallback if not a date
+  if (isNaN(d)) return dateStr;
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-// Table render with filter
 function renderLeaveStatusTable(data) {
   const headers = Object.keys(data[0]);
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("finish date"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
@@ -144,7 +138,6 @@ function renderLeaveStatusTable(data) {
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
-            // Date format for start/finish date columns
             if (h === startDateCol || h === finishDateCol) {
               return `<td>${formatDate(row[h])}</td>`;
             }
@@ -157,12 +150,11 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  // Filter functionality
   document.getElementById("leaveTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
     const table = document.getElementById("leaveStatusTable");
     const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) { // skip header
+    for (let i = 1; i < trs.length; i++) {
       const rowText = trs[i].innerText.toLowerCase();
       trs[i].style.display = rowText.includes(filter) ? "" : "none";
     }
