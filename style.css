@@ -150,16 +150,21 @@ button:hover {
   width: 100%;
   border-collapse: collapse;
   font-size: 15px;
+  min-width: 900px;
 }
 .leave-table th, .leave-table td {
   border: 1px solid #e0e0e0;
   padding: 10px 12px;
   text-align: left;
+  white-space: nowrap;
 }
 .leave-table th {
   background: #007bff;
   color: #fff;
   font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 1;
 }
 .leave-table tr:nth-child(even) {
   background: #f8f9fa;
@@ -186,4 +191,18 @@ button:hover {
 }
 #closeLeaveStatus:hover {
   background: #a71d2a;
+}
+#leaveTableFilter {
+  margin-bottom: 12px;
+  padding: 8px 12px;
+  width: 300px;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  font-size: 15px;
+}
+#leaveStatusLoading {
+  text-align: center;
+  font-size: 18px;
+  color: #007bff;
+  margin: 20px 0;
 }
