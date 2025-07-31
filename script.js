@@ -1,8 +1,10 @@
-const apiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
+const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
+const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 
+let empIdGlobal = "";
 let leaveStatusURL = "";
 
-// Force hide all sections on initial page load
+// Hide all sections on initial page load
 window.onload = function () {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
@@ -21,11 +23,12 @@ function login() {
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
+  // POST request to Employee Details API
   const formData = new FormData();
   formData.append("empId", empId);
   formData.append("password", password);
 
-  fetch(apiUrl, {
+  fetch(detailsApiUrl, {
     method: "POST",
     body: formData
   })
@@ -38,6 +41,8 @@ function login() {
         return;
       }
 
+      empIdGlobal = data.empId; // Store for leave status API
+
       document.getElementById("empName").textContent = data.name;
 
       const employeeImage = document.getElementById("employeeImage");
@@ -45,8 +50,6 @@ function login() {
       employeeImage.onerror = function () {
         this.src = "image/default.jpg";
       };
-
-      leaveStatusURL = data.leaveStatusURL || "";
 
       const fields = {
         "Employee ID": data.empId,
@@ -88,15 +91,33 @@ function login() {
 }
 
 function openLeaveStatus() {
-  if (leaveStatusURL) {
-    window.open(leaveStatusURL, "_blank");
-  } else {
-    alert("Leave status link not available.");
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
   }
+
+  // GET request to Leave Status API
+  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        alert("Leave status link not available.");
+        return;
+      }
+      leaveStatusURL = data[0].URL || "";
+      if (leaveStatusURL) {
+        window.open(leaveStatusURL, "_blank");
+      } else {
+        alert("Leave status link not available.");
+      }
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      alert("Something went wrong while fetching leave status.");
+    });
 }
 
 function logout() {
-  // Force reload with clean UI
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("empId").value = "";
@@ -105,4 +126,5 @@ function logout() {
   document.getElementById("empName").textContent = "";
   document.getElementById("employeeImage").src = "image/default.jpg";
   leaveStatusURL = "";
+  empIdGlobal = "";
 }
