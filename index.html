@@ -37,17 +37,17 @@
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
-        <button id="leaveapply">Leave Apply</button>
-        <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
-        <button id="Leave Balance" onclick="openLeaveStatus()">Leave Balance</button>
-        <button id="Attendance" onclick="openAttendanceStatus()">Current Month Attendance</button>
-        <button id="Salary Slip" onclick="openLeaveStatus()">Salary Slip</button>
+        <button id="leaveApplyBtn">Leave Apply</button>
+        <button onclick="openLeaveStatus()">Leave Status</button>
+        <button onclick="openLeaveBalance()">Leave Balance</button>
+        <button onclick="openAttendanceStatus()">Current Month Attendance</button>
+        <button onclick="openSalarySlip()">Salary Slip</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Leave Status Table Section (shared for leave/attendance/salary) -->
+  <!-- Shared Section for Leave/Attendance/Salary -->
   <div id="leaveStatusSection" class="hidden"></div>
 
   <script src="script.js"></script>
