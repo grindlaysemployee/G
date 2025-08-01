@@ -5,12 +5,12 @@ const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
-// Hide all sections on initial page load
 window.onload = function () {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("attendanceSection").classList.add("hidden");
 };
 
 function login() {
@@ -114,6 +114,7 @@ function openLeaveStatus() {
       document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
     });
 }
+
 function openAttendance() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
@@ -139,14 +140,21 @@ function openAttendance() {
     });
 }
 
-
-
 function formatDate(dateStr) {
   if (!dateStr) return "";
   let d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
   const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
+}
+
+function formatTime(timeStr) {
+  if (!timeStr) return "";
+  const date = new Date(timeStr);
+  if (isNaN(date)) return timeStr;
+  const hours = date.getHours().toString().padStart(2, '0');
+  const minutes = date.getMinutes().toString().padStart(2, '0');
+  return `${hours}:${minutes}`;
 }
 
 function renderLeaveStatusTable(data) {
@@ -177,9 +185,50 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+  document.getElementById("leaveTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
     const table = document.getElementById("leaveStatusTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function renderAttendanceTable(data) {
+  const headers = Object.keys(data[0]);
+  const dateCol = headers.find(h => h.toLowerCase().includes("date"));
+
+  let html = `<div class="leave-table-container">
+    <button id="closeAttendance" onclick="closeAttendance()">Close</button>
+    <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
+    <table class="leave-table" id="attendanceTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h.toLowerCase().includes("in time") || h.toLowerCase().includes("out time")) {
+              return `<td>${formatTime(row[h])}</td>`;
+            }
+            if (h === dateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("attendanceSection").innerHTML = html;
+
+  document.getElementById("attendanceTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("attendanceTable");
     const trs = table.getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
       const rowText = trs[i].innerText.toLowerCase();
@@ -193,51 +242,12 @@ function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
-function renderAttendanceTable(data) {
-  const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("date"));
-  
-  let html = `<div class="leave-table-container">
-    <button id="closeAttendance" onclick="closeAttendance()">Close</button>
-    <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
-    <table class="leave-table" id="attendanceTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-if (h.toLowerCase().includes("in time") || h.toLowerCase().includes("out time")) {
-  return `<td>${formatTime(row[h])}</td>`;
-}
-return `<td>${row[h] || ""}</td>`;
-
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("attendanceSection").innerHTML = html;
-
-  document.getElementById("attendanceTableFilter").addEventListener("input", function() {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("attendanceTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
-}
 
 function closeAttendance() {
   document.getElementById("attendanceSection").classList.add("hidden");
   document.getElementById("attendanceSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
-
 
 function logout() {
   document.getElementById("employeeDetails").classList.add("hidden");
@@ -251,4 +261,6 @@ function logout() {
   empIdGlobal = "";
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("attendanceSection").classList.add("hidden");
+  document.getElementById("attendanceSection").innerHTML = "";
 }
