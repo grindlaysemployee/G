@@ -1,131 +1,135 @@
+/* General */
 body {
-  font-family: Arial, sans-serif;
-  background: #f2f2f2;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(to right, #f0f2f5, #c2d4dd);
   margin: 0;
   padding: 0;
-}
-
-.login-box {
-  max-width: 350px;
-  margin: 80px auto;
-  background: #fff;
-  padding: 30px;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.1);
-  text-align: center;
-}
-
-.lens-container {
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
+  min-height: 100vh;
 }
 
-.lens-image {
-  width: 80px;
-  height: 80px;
-  object-fit: contain;
-  border-radius: 50%;
-}
-
-input[type="text"], input[type="password"] {
-  width: 90%;
-  padding: 10px;
-  margin: 8px 0;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-}
-
-button {
-  width: 95%;
-  padding: 10px;
-  margin-top: 12px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
+h2 {
+  margin: 20px 0;
+  color: #333;
 }
 
 .hidden {
-  display: none !important;
+  display: none;
 }
 
+/* Login Box */
+.login-box {
+  background: white;
+  padding: 30px 40px;
+  margin-top: 80px;
+  border-radius: 20px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.login-box input {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
+.login-box button {
+  padding: 12px 24px;
+  font-size: 16px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+  transition: background 0.3s ease;
+}
+
+.login-box button:hover {
+  background-color: #0056b3;
+}
+
+/* Spinner */
 .spinner {
-  width: 40px;
-  height: 40px;
-  border: 4px solid #ccc;
-  border-top-color: #007bff;
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #007bff;
   border-radius: 50%;
+  width: 50px;
+  height: 50px;
   animation: spin 1s linear infinite;
-  margin: 0 auto 10px;
+  margin: auto;
 }
 
 @keyframes spin {
-  to { transform: rotate(360deg); }
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
 }
 
+/* Dashboard */
 .dashboard {
   display: flex;
-  flex-direction: row;
-  padding: 30px;
-  max-width: 1000px;
-  margin: 40px auto;
+  margin-top: 30px;
   background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 0 20px rgba(0,0,0,0.1);
+  width: 90%;
+  max-width: 1000px;
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 }
 
-.left-panel {
-  flex: 2;
-  padding-right: 30px;
+.left-panel, .right-panel {
+  padding: 30px;
+  flex: 1;
 }
 
-.left-panel h2 {
-  margin-top: 0;
-  font-size: 24px;
-}
-
-#detailsList {
-  list-style-type: none;
+.left-panel ul {
+  list-style: none;
   padding: 0;
 }
 
-#detailsList li {
+.left-panel li {
   margin: 10px 0;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
+  padding: 8px;
+  background: #f4f4f4;
+  border-radius: 10px;
 }
 
 .right-panel {
-  flex: 1;
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
 .employee-img {
-  width: 180px;
-  height: 180px;
-  object-fit: cover;
+  width: 150px;
+  height: 150px;
   border-radius: 50%;
-  border: 4px solid #007bff;
+  object-fit: cover;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
   margin-bottom: 20px;
 }
 
-.button-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
+.button-group button {
+  display: block;
+  width: 200px;
+  padding: 12px;
+  margin: 8px 0;
+  font-size: 14px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: background 0.3s ease;
 }
 
-.button-group button {
-  width: 100%;
+.button-group button:hover {
+  background-color: #0056b3;
 }
 
 .logout {
@@ -133,76 +137,80 @@ button:hover {
 }
 
 .logout:hover {
-  background-color: #a71d2a;
+  background-color: #c82333;
 }
 
-/* Professional Leave Status Table */
+/* Leave Table */
 .leave-table-container {
+  margin: 40px auto;
+  background: white;
+  padding: 30px;
   max-width: 1000px;
-  margin: 30px auto;
-  background: #fff;
-  border-radius: 12px;
-  box-shadow: 0 0 15px rgba(0,0,0,0.08);
-  padding: 24px;
-  overflow-x: auto;
+  border-radius: 20px;
+  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
 }
+
+.leave-table-caption {
+  font-size: 18px;
+  margin-bottom: 20px;
+  font-weight: bold;
+  color: #333;
+  text-align: center;
+}
+
+#leaveTableFilter {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 20px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 16px;
+}
+
 .leave-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 15px;
-  min-width: 900px;
 }
+
 .leave-table th, .leave-table td {
-  border: 1px solid #e0e0e0;
-  padding: 10px 12px;
-  text-align: left;
-  white-space: nowrap;
-}
-.leave-table th {
-  background: #007bff;
-  color: #fff;
-  font-weight: 600;
-  position: sticky;
-  top: 0;
-  z-index: 1;
-}
-.leave-table tr:nth-child(even) {
-  background: #f8f9fa;
-}
-.leave-table tr:hover {
-  background: #e9f5ff;
-}
-.leave-table-caption {
-  font-size: 18px;
-  font-weight: bold;
-  margin-bottom: 12px;
-  color: #007bff;
-  text-align: left;
-}
-#closeLeaveStatus {
-  float: right;
-  background: #dc3545;
-  color: #fff;
-  border: none;
-  border-radius: 4px;
-  padding: 4px 12px;
-  cursor: pointer;
-  margin-bottom: 10px;
-}
-#closeLeaveStatus:hover {
-  background: #a71d2a;
-}
-#leaveTableFilter {
-  margin-bottom: 12px;
-  padding: 8px 12px;
-  width: 300px;
-  border: 1px solid #ccc;
-  border-radius: 6px;
-  font-size: 15px;
-}
-#leaveStatusLoading {
+  padding: 10px;
+  border: 1px solid #ddd;
   text-align: center;
-  font-size: 18px;
-  color: #007bff;
-  margin: 20px 0;
+  font-size: 14px;
+}
+
+.leave-table th {
+  background-color: #007bff;
+  color: white;
+}
+
+#closeLeaveStatus {
+  padding: 10px 20px;
+  margin-bottom: 20px;
+  background-color: #dc3545;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+}
+
+#closeLeaveStatus:hover {
+  background-color: #c82333;
+}
+
+/* Lens-style image */
+.lens-container {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
+}
+
+.lens-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
