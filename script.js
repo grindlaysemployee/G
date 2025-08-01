@@ -251,5 +251,3 @@ function logout() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
 }
-
-ye meri JS Script hain isme update kr do time format "hh:mm" wala format
