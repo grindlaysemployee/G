@@ -58,6 +58,7 @@ function login() {
       const fields = {
         "Employee ID": data.empId,
         "Emp Code": data.empCode,
+        "Name": data.name,
         "Designation": data.designation,
         "Father's Name": data.fatherName,
         "Gender": data.gender,
@@ -78,7 +79,8 @@ function login() {
       detailsList.innerHTML = "";
       for (let key in fields) {
         const li = document.createElement("li");
-        li.textContent = `${key}: ${fields[key] || "N/A"}`;
+        li.innerHTML = `<span class="detail-label">${key}:</span> <span class="detail-value">${fields[key] || "N/A"}</span>`;
+        li.classList.add("detail-item");
         detailsList.appendChild(li);
       }
 
@@ -102,20 +104,20 @@ function fetchAndRenderSection(apiUrl, sectionId, titleText) {
   hideAllSections();
   const section = document.getElementById("leaveStatusSection");
   section.classList.remove("hidden");
-  section.innerHTML = `<div style="text-align:center; padding:1em;">......Please Wait......</div>`;
+  section.innerHTML = `<div style="text-align:center; padding:1em; font-weight:bold">......Please Wait......</div>`;
 
   fetch(`${apiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        section.innerHTML = "<p>No records found.</p>";
+        section.innerHTML = "<p style='text-align:center;'>No records found.</p>";
         return;
       }
       renderDataTable(data, titleText);
     })
     .catch(err => {
       console.error("Error:", err);
-      section.innerHTML = "<p>Error loading data. Try again later.</p>";
+      section.innerHTML = "<p style='text-align:center;'>Error loading data. Try again later.</p>";
     });
 }
 
