@@ -4,7 +4,6 @@ const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0
 
 let empIdGlobal = "";
 
-// Hide all sections on page load
 window.onload = function () {
   hideAllSections();
   document.getElementById("loginSection").classList.remove("hidden");
@@ -88,56 +87,69 @@ function login() {
       document.getElementById("employeeDetails").classList.remove("hidden");
     })
     .catch(err => {
-      console.error("Error:", err);
+      console.error("Login Error:", err);
       alert("Something went wrong!");
       document.getElementById("loadingSpinner").classList.add("hidden");
       document.getElementById("loginSection").classList.remove("hidden");
     });
 }
 
-function fetchAndRenderSection(apiUrl, sectionId, titleText) {
+// Main handler for all buttons
+function fetchAndDisplayData(type, titleText) {
   if (!empIdGlobal) {
     alert("Please login first.");
     return;
   }
 
-  hideAllSections();
+  let apiUrl = "";
+  if (type === "LeaveStatusURL") apiUrl = leaveStatusApiUrl;
+  else if (type === "AttendanceURL") apiUrl = attendanceApiUrl;
+  else if (type === "LeaveBalanceURL") apiUrl = leaveStatusApiUrl; // adjust if separate
+  else if (type === "SalarySlipURL") apiUrl = leaveStatusApiUrl;   // adjust if separate
+  else return;
+
   const section = document.getElementById("leaveStatusSection");
+  const content = document.getElementById("leaveStatusContent");
+  const caption = document.getElementById("dataCaption");
+  const loader = document.getElementById("leaveStatusLoading");
+
+  hideAllSections();
   section.classList.remove("hidden");
-  section.innerHTML = `<div style="text-align:center; padding:1em; font-weight:bold">......Please Wait......</div>`;
+  loader.style.display = "block";
+  content.innerHTML = "";
+  caption.textContent = titleText;
 
   fetch(`${apiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
+      loader.style.display = "none";
       if (!data || data.length === 0) {
-        section.innerHTML = "<p style='text-align:center;'>No records found.</p>";
+        content.innerHTML = "<p style='text-align:center;'>No records found.</p>";
         return;
       }
-      renderDataTable(data, titleText);
+      renderDataTable(data, content);
     })
     .catch(err => {
-      console.error("Error:", err);
-      section.innerHTML = "<p style='text-align:center;'>Error loading data. Try again later.</p>";
+      loader.style.display = "none";
+      content.innerHTML = "<p style='text-align:center;'>Error loading data. Try again later.</p>";
+      console.error("Fetch Error:", err);
     });
 }
 
-function renderDataTable(data, title) {
+function renderDataTable(data, containerElement) {
   const headers = Object.keys(data[0]);
-
-  let html = `<div class="leave-table-container">
-    <button onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">${title}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
+  let html = `
+    <div class="table-tools">
+      <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
+    </div>
     <table class="leave-table" id="leaveStatusTable">
       <thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join("")}</tr>`).join("")}
       </tbody>
     </table>
-  </div>`;
-
-  const section = document.getElementById("leaveStatusSection");
-  section.innerHTML = html;
+  `;
+  containerElement.innerHTML = html;
 
   document.getElementById("leaveTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
@@ -149,17 +161,8 @@ function renderDataTable(data, title) {
   });
 }
 
-function openLeaveStatus() {
-  fetchAndRenderSection(leaveStatusApiUrl, "leaveStatusSection", "Leave Status");
-}
-
-function openAttendanceStatus() {
-  fetchAndRenderSection(attendanceApiUrl, "leaveStatusSection", "Current Month Attendance");
-}
-
 function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
@@ -173,5 +176,5 @@ function logout() {
   document.getElementById("empName").textContent = "";
   document.getElementById("employeeImage").src = "image/default.jpg";
   document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("leaveStatusContent").innerHTML = "";
 }
