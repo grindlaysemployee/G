@@ -94,7 +94,6 @@ function login() {
     });
 }
 
-// Main handler for all buttons
 function fetchAndDisplayData(type, titleText) {
   if (!empIdGlobal) {
     alert("Please login first.");
@@ -102,11 +101,18 @@ function fetchAndDisplayData(type, titleText) {
   }
 
   let apiUrl = "";
-  if (type === "LeaveStatusURL") apiUrl = leaveStatusApiUrl;
-  else if (type === "AttendanceURL") apiUrl = attendanceApiUrl;
-  else if (type === "LeaveBalanceURL") apiUrl = leaveStatusApiUrl; // adjust if separate
-  else if (type === "SalarySlipURL") apiUrl = leaveStatusApiUrl;   // adjust if separate
-  else return;
+  switch (type) {
+    case "LeaveStatus":
+    case "LeaveBalance":
+    case "SalarySlip":
+      apiUrl = leaveStatusApiUrl;
+      break;
+    case "Attendance":
+      apiUrl = attendanceApiUrl;
+      break;
+    default:
+      return;
+  }
 
   const section = document.getElementById("leaveStatusSection");
   const content = document.getElementById("leaveStatusContent");
@@ -123,10 +129,12 @@ function fetchAndDisplayData(type, titleText) {
     .then(res => res.json())
     .then(data => {
       loader.style.display = "none";
-      if (!data || data.length === 0) {
+
+      if (!data || !Array.isArray(data) || data.length === 0) {
         content.innerHTML = "<p style='text-align:center;'>No records found.</p>";
         return;
       }
+
       renderDataTable(data, content);
     })
     .catch(err => {
