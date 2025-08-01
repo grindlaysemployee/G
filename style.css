@@ -1,182 +1,123 @@
-/* General */
 body {
-  font-family: 'Segoe UI', sans-serif;
-  background: linear-gradient(to right, #f0f2f5, #c2d4dd);
+  font-family: Arial, sans-serif;
+  background-color: #f5f6fa;
   margin: 0;
   padding: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-height: 100vh;
-}
-
-h2 {
-  margin: 20px 0;
-  color: #333;
 }
 
 .hidden {
   display: none;
 }
 
-/* Login Box */
 .login-box {
-  background: white;
-  padding: 30px 40px;
-  margin-top: 80px;
-  border-radius: 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+  width: 360px;
+  margin: 80px auto;
+  padding: 2em;
+  background-color: #fff;
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+  border-radius: 10px;
   text-align: center;
 }
 
-.login-box input {
-  width: 100%;
-  padding: 12px;
-  margin: 10px 0;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
+.lens-container {
+  width: 120px;
+  height: 120px;
+  margin: 0 auto 20px;
+  overflow: hidden;
+  border-radius: 50%;
+  border: 5px solid #ddd;
 }
 
-.login-box button {
-  padding: 12px 24px;
-  font-size: 16px;
+.lens-image {
+  width: 100%;
+  height: auto;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
+button {
+  padding: 10px 15px;
+  margin: 8px 5px;
+  border: none;
   background-color: #007bff;
   color: white;
-  border: none;
-  border-radius: 10px;
+  border-radius: 5px;
   cursor: pointer;
-  margin-top: 10px;
-  transition: background 0.3s ease;
 }
 
-.login-box button:hover {
-  background-color: #0056b3;
+button.logout {
+  background-color: #dc3545;
 }
 
-/* Spinner */
-.spinner {
-  border: 6px solid #f3f3f3;
-  border-top: 6px solid #007bff;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  animation: spin 1s linear infinite;
-  margin: auto;
-}
-
-@keyframes spin {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-
-/* Dashboard */
 .dashboard {
   display: flex;
-  margin-top: 30px;
-  background: #fff;
-  width: 90%;
+  flex-direction: row;
+  padding: 20px;
   max-width: 1000px;
-  border-radius: 20px;
-  overflow: hidden;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  margin: auto;
+  gap: 30px;
 }
 
-.left-panel, .right-panel {
-  padding: 30px;
+.left-panel {
   flex: 1;
 }
 
-.left-panel ul {
+.right-panel {
+  flex: 1;
+  text-align: center;
+}
+
+.employee-img {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #007bff;
+  margin-bottom: 15px;
+}
+
+ul#detailsList {
   list-style: none;
   padding: 0;
 }
 
-.left-panel li {
-  margin: 10px 0;
-  padding: 8px;
-  background: #f4f4f4;
-  border-radius: 10px;
+.detail-item {
+  margin-bottom: 8px;
 }
 
-.right-panel {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.detail-label {
+  font-weight: bold;
 }
 
-.employee-img {
-  width: 150px;
-  height: 150px;
-  border-radius: 50%;
-  object-fit: cover;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-  margin-bottom: 20px;
-}
-
-.button-group button {
-  display: block;
-  width: 200px;
-  padding: 12px;
-  margin: 8px 0;
-  font-size: 14px;
-  background-color: #007bff;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.button-group button:hover {
-  background-color: #0056b3;
-}
-
-.logout {
-  background-color: #dc3545;
-}
-
-.logout:hover {
-  background-color: #c82333;
-}
-
-/* Leave Table */
 .leave-table-container {
-  margin: 40px auto;
-  background: white;
-  padding: 30px;
+  padding: 20px;
   max-width: 1000px;
-  border-radius: 20px;
-  box-shadow: 0 0 12px rgba(0, 0, 0, 0.2);
+  margin: auto;
 }
 
 .leave-table-caption {
-  font-size: 18px;
-  margin-bottom: 20px;
-  font-weight: bold;
-  color: #333;
   text-align: center;
-}
-
-#leaveTableFilter {
-  width: 100%;
-  padding: 10px;
-  margin-bottom: 20px;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  font-size: 16px;
+  font-weight: bold;
+  font-size: 20px;
+  margin-bottom: 15px;
 }
 
 .leave-table {
   width: 100%;
   border-collapse: collapse;
+  margin-top: 10px;
 }
 
 .leave-table th, .leave-table td {
-  padding: 10px;
   border: 1px solid #ddd;
-  text-align: center;
-  font-size: 14px;
+  padding: 8px;
+  text-align: left;
 }
 
 .leave-table th {
@@ -184,33 +125,9 @@ h2 {
   color: white;
 }
 
-#closeLeaveStatus {
-  padding: 10px 20px;
-  margin-bottom: 20px;
-  background-color: #dc3545;
-  color: white;
-  border: none;
-  border-radius: 10px;
-  cursor: pointer;
-}
-
-#closeLeaveStatus:hover {
-  background-color: #c82333;
-}
-
-/* Lens-style image */
-.lens-container {
-  width: 100px;
-  height: 100px;
-  margin: 0 auto 20px;
-  border-radius: 50%;
-  overflow: hidden;
-  box-shadow: 0 0 8px rgba(0, 0, 0, 0.3);
-}
-
-.lens-image {
+#leaveTableFilter {
+  margin-bottom: 10px;
+  padding: 8px;
   width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
+  box-sizing: border-box;
 }
