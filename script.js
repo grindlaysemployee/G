@@ -89,38 +89,35 @@ function login() {
 }
 
 function openLeaveStatus() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
-    return;
-  }
-  fetchDataAndRenderTable(`${leaveStatusApiUrl}?empid=${empIdGlobal}`, "Leave Status");
+  openDataTable("Leave Status", leaveStatusApiUrl);
 }
 
 function openAttendanceStatus() {
+  openDataTable("Current Month Attendance", attendanceApiUrl);
+}
+
+function openDataTable(title, apiUrl) {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
     return;
   }
-  fetchDataAndRenderTable(`${attendanceApiUrl}?empid=${empIdGlobal}`, "Current Month Attendance");
-}
 
-function fetchDataAndRenderTable(url, captionTitle) {
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
+  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">........Please Wait........</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  fetch(url)
+  fetch(`${apiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = `<p>No records found for ${captionTitle}.</p>`;
+        document.getElementById("leaveStatusSection").innerHTML = `<p>No ${title} records found.</p>`;
         return;
       }
-      renderDataTable(data, captionTitle);
+      renderDataTable(data, title);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = `<p>Something went wrong while fetching ${captionTitle.toLowerCase()}.</p>`;
+      document.getElementById("leaveStatusSection").innerHTML = `<p>Something went wrong while fetching ${title.toLowerCase()}.</p>`;
     });
 }
 
@@ -132,35 +129,31 @@ function formatDate(dateStr) {
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-function renderDataTable(data, captionTitle) {
+function renderDataTable(data, title) {
   const headers = Object.keys(data[0]);
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
   const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">${captionTitle} : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Present)">
+    <div class="leave-table-caption">${title} : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="leaveStatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
+        ${data.map(row => `<tr>${headers.map(h => {
+          if (h === startDateCol || h === finishDateCol) {
+            return `<td>${formatDate(row[h])}</td>`;
+          }
+          return `<td>${row[h] || ""}</td>`;
+        }).join('')}</tr>`).join('')}
       </tbody>
     </table>
   </div>`;
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  document.getElementById("leaveTableFilter").addEventListener("input", function () {
+  document.getElementById("leaveTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
     const table = document.getElementById("leaveStatusTable");
     const trs = table.getElementsByTagName("tr");
@@ -189,3 +182,9 @@ function logout() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
 }
+
+// Button binding
+window.addEventListener("DOMContentLoaded", () => {
+  const attendanceBtn = document.getElementById("Attendance");
+  if (attendanceBtn) attendanceBtn.onclick = openAttendanceStatus;
+});
