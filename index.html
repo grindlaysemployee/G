@@ -5,6 +5,17 @@
   <meta name="viewport" content="width=500, user-scalable=no" />
   <title>Employee Login</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    .detail-label { font-weight: bold; color: #333; margin-right: 5px; }
+    .detail-item { margin-bottom: 8px; }
+    .dashboard ul { list-style-type: none; padding: 0; }
+    .leave-table-container { padding: 20px; background: #f9f9f9; border-radius: 10px; }
+    .leave-table-caption { font-size: 20px; font-weight: bold; margin-bottom: 10px; color: #007bff; }
+    .leave-table { width: 100%; border-collapse: collapse; }
+    .leave-table th, .leave-table td { border: 1px solid #ccc; padding: 8px; text-align: left; }
+    .leave-table th { background-color: #007bff; color: white; }
+    .leave-table tr:nth-child(even) { background-color: #f2f2f2; }
+  </style>
 </head>
 <body>
 
@@ -27,28 +38,30 @@
 
   <!-- Employee Details Section -->
   <div id="employeeDetails" class="dashboard hidden">
-    <!-- Left: Details -->
     <div class="left-panel">
       <h2>Welcome, <span id="empName"></span></h2>
       <ul id="detailsList"></ul>
     </div>
-
-    <!-- Right: Image + Buttons -->
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
         <button id="leaveApplyBtn">Leave Apply</button>
-        <button onclick="openLeaveStatus()">Leave Status</button>
-        <button onclick="openLeaveBalance()">Leave Balance</button>
-        <button onclick="openAttendanceStatus()">Current Month Attendance</button>
-        <button onclick="openSalarySlip()">Salary Slip</button>
+        <button onclick="fetchAndDisplayData('LeaveStatusURL', 'Leave Status')">Leave Status</button>
+        <button onclick="fetchAndDisplayData('LeaveBalanceURL', 'Leave Balance')">Leave Balance</button>
+        <button onclick="fetchAndDisplayData('AttendanceURL', 'Current Month Attendance')">Current Month Attendance</button>
+        <button onclick="fetchAndDisplayData('SalarySlipURL', 'Salary Slip')">Salary Slip</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Shared Section for Leave/Attendance/Salary -->
-  <div id="leaveStatusSection" class="hidden"></div>
+  <!-- Section to display fetched data -->
+  <div id="leaveStatusSection" class="leave-table-container hidden">
+    <button id="closeLeaveStatus" onclick="document.getElementById('leaveStatusSection').classList.add('hidden')">Close</button>
+    <h3 class="leave-table-caption" id="dataCaption">Details</h3>
+    <div id="leaveStatusLoading">........Please Wait........</div>
+    <div id="leaveStatusContent"></div>
+  </div>
 
   <script src="script.js"></script>
 </body>
