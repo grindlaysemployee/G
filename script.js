@@ -180,5 +180,3 @@ function logout() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
 }
-
-ye JS
