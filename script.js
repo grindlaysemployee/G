@@ -195,17 +195,21 @@ function closeLeaveStatus() {
 }
 function renderAttendanceTable(data) {
   const headers = Object.keys(data[0]);
-  const dateCol = headers.find(h => h.toLowerCase().includes("date"));
-  const inTimeCol = headers.find(h => h.toLowerCase().includes("in"));
-  const outTimeCol = headers.find(h => h.toLowerCase().includes("out"));
+  const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
+  const inTimeCol = headers.find(h => h.toLowerCase().includes("in time"));
+  const outTimeCol = headers.find(h => h.toLowerCase().includes("out time"));
 
-  function formatTime(timeStr) {
-    if (!timeStr) return "";
-    const time = new Date(`1970-01-01T${timeStr}`);
-    if (isNaN(time)) return timeStr;
-    const hours = time.getHours().toString().padStart(2, "0");
-    const minutes = time.getMinutes().toString().padStart(2, "0");
-    return `${hours}:${minutes}`;
+  function formatTimeOnly(raw) {
+    if (!raw) return "";
+    try {
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return raw;
+      const hh = d.getHours().toString().padStart(2, "0");
+      const mm = d.getMinutes().toString().padStart(2, "0");
+      return `${hh}:${mm}`;
+    } catch {
+      return raw;
+    }
   }
 
   let html = `<div class="leave-table-container">
@@ -219,10 +223,8 @@ function renderAttendanceTable(data) {
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
-            if (h === dateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            } else if (h === inTimeCol || h === outTimeCol) {
-              return `<td>${formatTime(row[h])}</td>`;
+            if (h === inTimeCol || h === outTimeCol) {
+              return `<td>${formatTimeOnly(row[h])}</td>`;
             }
             return `<td>${row[h] || ""}</td>`;
           }).join('')}
