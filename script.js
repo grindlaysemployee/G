@@ -195,8 +195,19 @@ function closeLeaveStatus() {
 }
 function renderAttendanceTable(data) {
   const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("date"));
-  
+  const dateCol = headers.find(h => h.toLowerCase().includes("date"));
+  const inTimeCol = headers.find(h => h.toLowerCase().includes("in"));
+  const outTimeCol = headers.find(h => h.toLowerCase().includes("out"));
+
+  function formatTime(timeStr) {
+    if (!timeStr) return "";
+    const time = new Date(`1970-01-01T${timeStr}`);
+    if (isNaN(time)) return timeStr;
+    const hours = time.getHours().toString().padStart(2, "0");
+    const minutes = time.getMinutes().toString().padStart(2, "0");
+    return `${hours}:${minutes}`;
+  }
+
   let html = `<div class="leave-table-container">
     <button id="closeAttendance" onclick="closeAttendance()">Close</button>
     <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
@@ -208,8 +219,10 @@ function renderAttendanceTable(data) {
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
-            if (h === startDateCol) {
+            if (h === dateCol) {
               return `<td>${formatDate(row[h])}</td>`;
+            } else if (h === inTimeCol || h === outTimeCol) {
+              return `<td>${formatTime(row[h])}</td>`;
             }
             return `<td>${row[h] || ""}</td>`;
           }).join('')}
