@@ -89,14 +89,14 @@ function login() {
 }
 
 function openLeaveStatus() {
-  openDataTable("Leave Status", leaveStatusApiUrl);
+  openDataSection(leaveStatusApiUrl, "Leave Status");
 }
 
 function openAttendanceStatus() {
-  openDataTable("Current Month Attendance", attendanceApiUrl);
+  openDataSection(attendanceApiUrl, "Current Month Attendance");
 }
 
-function openDataTable(title, apiUrl) {
+function openDataSection(apiUrl, sectionTitle) {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
     return;
@@ -110,14 +110,14 @@ function openDataTable(title, apiUrl) {
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = `<p>No ${title} records found.</p>`;
+        document.getElementById("leaveStatusSection").innerHTML = "<p>No records found.</p>";
         return;
       }
-      renderDataTable(data, title);
+      renderLeaveStatusTable(data, sectionTitle);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = `<p>Something went wrong while fetching ${title.toLowerCase()}.</p>`;
+      document.getElementById("leaveStatusSection").innerHTML = `<p>Error loading ${sectionTitle.toLowerCase()} data.</p>`;
     });
 }
 
@@ -129,7 +129,7 @@ function formatDate(dateStr) {
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-function renderDataTable(data, title) {
+function renderLeaveStatusTable(data, title = "Leave Status") {
   const headers = Object.keys(data[0]);
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
   const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
@@ -139,14 +139,18 @@ function renderDataTable(data, title) {
     <div class="leave-table-caption">${title} : ${data[0][headers[0]] || ""}</div>
     <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="leaveStatusTable">
-      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
       <tbody>
-        ${data.map(row => `<tr>${headers.map(h => {
-          if (h === startDateCol || h === finishDateCol) {
-            return `<td>${formatDate(row[h])}</td>`;
-          }
-          return `<td>${row[h] || ""}</td>`;
-        }).join('')}</tr>`).join('')}
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h === startDateCol || h === finishDateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
       </tbody>
     </table>
   </div>`;
@@ -182,9 +186,3 @@ function logout() {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
 }
-
-// Button binding
-window.addEventListener("DOMContentLoaded", () => {
-  const attendanceBtn = document.getElementById("Attendance");
-  if (attendanceBtn) attendanceBtn.onclick = openAttendanceStatus;
-});
