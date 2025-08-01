@@ -34,23 +34,17 @@
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
-        <button id="leaveApplyBtn">Leave Apply</button>
-        <button onclick="fetchAndDisplayData('LeaveStatusURL', 'Leave Status')">Leave Status</button>
-        <button onclick="fetchAndDisplayData('LeaveBalanceURL', 'Leave Balance')">Leave Balance</button>
-        <button onclick="fetchAndDisplayData('AttendanceURL', 'Current Month Attendance')">Current Month Attendance</button>
-        <button onclick="fetchAndDisplayData('SalarySlipURL', 'Salary Slip')">Salary Slip</button>
+        <button onclick="fetchAndRenderSection('LeaveStatusURL', 'Leave Status')">Leave Status</button>
+        <button onclick="fetchAndRenderSection('LeaveBalanceURL', 'Leave Balance')">Leave Balance</button>
+        <button onclick="fetchAndRenderSection('AttendanceURL', 'Current Month Attendance')">Current Month Attendance</button>
+        <button onclick="fetchAndRenderSection('SalarySlipURL', 'Salary Slip')">Salary Slip</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
 
   <!-- Section to display fetched data -->
-  <div id="leaveStatusSection" class="leave-table-container hidden">
-    <button id="closeLeaveStatus" onclick="document.getElementById('leaveStatusSection').classList.add('hidden')">Close</button>
-    <h3 class="leave-table-caption" id="dataCaption">Details</h3>
-    <div id="leaveStatusLoading">........Please Wait........</div>
-    <div id="leaveStatusContent"></div>
-  </div>
+  <div id="leaveStatusSection" class="leave-table-container hidden"></div>
 
   <script src="script.js"></script>
 </body>
