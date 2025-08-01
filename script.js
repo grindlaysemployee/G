@@ -208,10 +208,11 @@ function renderAttendanceTable(data) {
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
-            if (h === startDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
+if (h.toLowerCase().includes("in time") || h.toLowerCase().includes("out time")) {
+  return `<td>${formatTime(row[h])}</td>`;
+}
+return `<td>${row[h] || ""}</td>`;
+
           }).join('')}
         </tr>`).join('')}
       </tbody>
