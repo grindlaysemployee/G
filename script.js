@@ -1,10 +1,9 @@
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
+const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 
 let empIdGlobal = "";
-let leaveStatusURL = "";
 
-// Hide all sections on initial page load
 window.onload = function () {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
@@ -94,23 +93,34 @@ function openLeaveStatus() {
     alert("Employee ID not found. Please login again.");
     return;
   }
+  fetchDataAndRenderTable(`${leaveStatusApiUrl}?empid=${empIdGlobal}`, "Leave Status");
+}
 
+function openAttendanceStatus() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+  fetchDataAndRenderTable(`${attendanceApiUrl}?empid=${empIdGlobal}`, "Current Month Attendance");
+}
+
+function fetchDataAndRenderTable(url, captionTitle) {
   document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+  fetch(url)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+        document.getElementById("leaveStatusSection").innerHTML = `<p>No records found for ${captionTitle}.</p>`;
         return;
       }
-      renderLeaveStatusTable(data);
+      renderDataTable(data, captionTitle);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+      document.getElementById("leaveStatusSection").innerHTML = `<p>Something went wrong while fetching ${captionTitle.toLowerCase()}.</p>`;
     });
 }
 
@@ -122,15 +132,15 @@ function formatDate(dateStr) {
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-function renderLeaveStatusTable(data) {
+function renderDataTable(data, captionTitle) {
   const headers = Object.keys(data[0]);
   const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
   const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <div class="leave-table-caption">${captionTitle} : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Present)">
     <table class="leave-table" id="leaveStatusTable">
       <thead>
         <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
@@ -150,7 +160,7 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+  document.getElementById("leaveTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
     const table = document.getElementById("leaveStatusTable");
     const trs = table.getElementsByTagName("tr");
@@ -175,7 +185,6 @@ function logout() {
   document.getElementById("detailsList").innerHTML = "";
   document.getElementById("empName").textContent = "";
   document.getElementById("employeeImage").src = "image/default.jpg";
-  leaveStatusURL = "";
   empIdGlobal = "";
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
