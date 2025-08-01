@@ -4,12 +4,18 @@ const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0
 
 let empIdGlobal = "";
 
+// Hide all sections on page load
 window.onload = function () {
+  hideAllSections();
+  document.getElementById("loginSection").classList.remove("hidden");
+};
+
+function hideAllSections() {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
-};
+}
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
@@ -20,7 +26,7 @@ function login() {
     return;
   }
 
-  document.getElementById("loginSection").classList.add("hidden");
+  hideAllSections();
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
   const formData = new FormData();
@@ -70,7 +76,6 @@ function login() {
 
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
-
       for (let key in fields) {
         const li = document.createElement("li");
         li.textContent = `${key}: ${fields[key] || "N/A"}`;
@@ -88,84 +93,66 @@ function login() {
     });
 }
 
-function openLeaveStatus() {
-  openDataSection(leaveStatusApiUrl, "Leave Status");
-}
-
-function openAttendanceStatus() {
-  openDataSection(attendanceApiUrl, "Current Month Attendance");
-}
-
-function openDataSection(apiUrl, sectionTitle) {
+function fetchAndRenderSection(apiUrl, sectionId, titleText) {
   if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
+    alert("Please login first.");
     return;
   }
 
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">........Please Wait........</div>`;
-  document.getElementById("leaveStatusSection").classList.remove("hidden");
-  document.getElementById("employeeDetails").classList.add("hidden");
+  hideAllSections();
+  const section = document.getElementById("leaveStatusSection");
+  section.classList.remove("hidden");
+  section.innerHTML = `<div style="text-align:center; padding:1em;">......Please Wait......</div>`;
 
   fetch(`${apiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = "<p>No records found.</p>";
+        section.innerHTML = "<p>No records found.</p>";
         return;
       }
-      renderLeaveStatusTable(data, sectionTitle);
+      renderDataTable(data, titleText);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = `<p>Error loading ${sectionTitle.toLowerCase()} data.</p>`;
+      section.innerHTML = "<p>Error loading data. Try again later.</p>";
     });
 }
 
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
-}
-
-function renderLeaveStatusTable(data, title = "Leave Status") {
+function renderDataTable(data, title) {
   const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
 
   let html = `<div class="leave-table-container">
-    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">${title} : ${data[0][headers[0]] || ""}</div>
+    <button onclick="closeLeaveStatus()">Close</button>
+    <div class="leave-table-caption">${title}</div>
     <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="leaveStatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr></thead>
       <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
+        ${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join("")}</tr>`).join("")}
       </tbody>
     </table>
   </div>`;
 
-  document.getElementById("leaveStatusSection").innerHTML = html;
+  const section = document.getElementById("leaveStatusSection");
+  section.innerHTML = html;
 
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+  document.getElementById("leaveTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
+    const rows = document.querySelectorAll("#leaveStatusTable tbody tr");
+    rows.forEach(row => {
+      const rowText = row.innerText.toLowerCase();
+      row.style.display = rowText.includes(filter) ? "" : "none";
+    });
   });
+}
+
+function openLeaveStatus() {
+  fetchAndRenderSection(leaveStatusApiUrl, "leaveStatusSection", "Leave Status");
+}
+
+function openAttendanceStatus() {
+  fetchAndRenderSection(attendanceApiUrl, "leaveStatusSection", "Current Month Attendance");
 }
 
 function closeLeaveStatus() {
@@ -175,6 +162,7 @@ function closeLeaveStatus() {
 }
 
 function logout() {
+  empIdGlobal = "";
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("empId").value = "";
@@ -182,7 +170,6 @@ function logout() {
   document.getElementById("detailsList").innerHTML = "";
   document.getElementById("empName").textContent = "";
   document.getElementById("employeeImage").src = "image/default.jpg";
-  empIdGlobal = "";
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
 }
