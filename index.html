@@ -36,16 +36,12 @@
     <!-- Right: Image + Buttons -->
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
-     <div class="button-group">
-  <button onclick="leaveApply()">Leave Apply</button>
-  <button onclick="showLeaveStatus()">Leave Status</button>
-  <div class="button-row">
-    <button onclick="showAttendance()">Attendance</button>
-    <button onclick="showTotalAttendance()">Total Attendance</button>
-  </div>
-  <button class="logout-button" onclick="logout()">Logout</button>
+      <div class="button-group">
+  <button id="leaveapply">Leave Apply</button>
+  <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
+  <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
+  <button onclick="logout()" class="logout">Logout</button>
 </div>
-
 
     </div>
   </div>
