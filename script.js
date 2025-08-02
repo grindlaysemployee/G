@@ -1,100 +1,70 @@
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
-const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
-const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
+const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbyz7o1gD3Ddp5sjUYiYIpjSAYNcEO0e6xZgq0eRD-6EWTtZFrAVi6oS8BdCn3Y1XJ2W/exec";
+const attendanceApiUrl = "https://script.google.com/macros/s/AKfycby-cVvSEUgI8JYlFZP58fvxI-NzM8Ku-xosWjoJCRvY2fAtV_GIElxAZ1GnvGz7d0eU/exec";
+const totalAttendanceApiUrl = "https://script.google.com/macros/s/AKfycbzs2Z8Pdt34Hbh1-mdBMYdT41PtH9UeI4MGNcmo67nPPUOkMRFGLOCi1J-F_2k3dzbh/exec";
 
 let empIdGlobal = "";
-let leaveStatusURL = "";
-
-// Hide all sections on initial page load
-window.onload = function () {
-  document.getElementById("employeeDetails").classList.add("hidden");
-  document.getElementById("loadingSpinner").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-};
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if (!empId || !password) {
-    alert("Please enter Employee ID and Password");
+    alert("Please enter both Employee ID and Password.");
     return;
   }
 
-  document.getElementById("loginSection").classList.add("hidden");
-  document.getElementById("loadingSpinner").classList.remove("hidden");
-
-  const formData = new FormData();
-  formData.append("empId", empId);
-  formData.append("password", password);
+  document.getElementById("spinner").classList.remove("hidden");
 
   fetch(detailsApiUrl, {
     method: "POST",
-    body: formData
+    body: JSON.stringify({ empId, password }),
+    headers: { "Content-Type": "application/json" }
   })
-    .then(res => res.json())
+    .then(response => response.json())
     .then(data => {
-      if (!data || !data.success) {
-        alert("Invalid Employee ID or Password");
-        document.getElementById("loadingSpinner").classList.add("hidden");
-        document.getElementById("loginSection").classList.remove("hidden");
+      document.getElementById("spinner").classList.add("hidden");
+
+      if (!data.success) {
+        alert("Invalid Employee ID or Password.");
         return;
       }
 
-      empIdGlobal = data.empId;
-      document.getElementById("empName").textContent = data.name;
+      empIdGlobal = empId;
 
-      const employeeImage = document.getElementById("employeeImage");
-      employeeImage.src = `image/${data.empId}.jpg`;
-      employeeImage.onerror = function () {
-        this.src = "image/default.jpg";
-      };
-
-      const fields = {
-        "Employee ID": data.empId,
-        "Emp Code": data.empCode,
-        "Designation": data.designation,
-        "Father's Name": data.fatherName,
-        "Gender": data.gender,
-        "ESIC Number": data.esicNumber,
-        "PF Number": data.pfNumber,
-        "Date of Birth": data.dob,
-        "Mobile": data.mobile,
-        "Aadhar": data.aadhar,
-        "ID Proof": data.idProof,
-        "Permanent Address": data.permanentAddress,
-        "Local Address": data.localAddress,
-        "Joining Date": data.joiningDate,
-        "Emergency Contact": data.emergencyContact,
-        "Status": data.status
-      };
+      document.getElementById("loginSection").classList.add("hidden");
+      document.getElementById("dashboard").classList.remove("hidden");
 
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
-
-      for (let key in fields) {
+      data.details.forEach(detail => {
         const li = document.createElement("li");
-        li.textContent = `${key}: ${fields[key] || "N/A"}`;
+        li.textContent = detail;
         detailsList.appendChild(li);
-      }
+      });
 
-      document.getElementById("loadingSpinner").classList.add("hidden");
-      document.getElementById("employeeDetails").classList.remove("hidden");
+      const employeeImg = document.getElementById("employeeImg");
+      employeeImg.src = `image/${empId}.png`;
+
+      const welcomeText = document.getElementById("welcomeText");
+      welcomeText.textContent = `Welcome, ${empId}`;
     })
-    .catch(err => {
-      console.error("Error:", err);
-      alert("Something went wrong!");
-      document.getElementById("loadingSpinner").classList.add("hidden");
-      document.getElementById("loginSection").classList.remove("hidden");
+    .catch(error => {
+      document.getElementById("spinner").classList.add("hidden");
+      console.error("Error during login:", error);
+      alert("Something went wrong. Please try again.");
     });
 }
 
+function logout() {
+  empIdGlobal = "";
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("dashboard").classList.add("hidden");
+  document.getElementById("attendanceSection").classList.add("hidden");
+}
+
 function openLeaveStatus() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
-    return;
-  }
+  if (!empIdGlobal) return alert("Please login again.");
 
   document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
@@ -102,23 +72,58 @@ function openLeaveStatus() {
 
   fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
-        return;
-      }
-      renderLeaveStatusTable(data);
-    })
+    .then(data => renderLeaveStatusTable(data))
     .catch(err => {
-      console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+      console.error("Leave Status Error:", err);
+      document.getElementById("leaveStatusSection").innerHTML = "<p>Error loading leave status.</p>";
     });
 }
+
+function renderLeaveStatusTable(data) {
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
+    <div class="leave-table-caption">Leave Status</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter leave...">
+    <table class="leave-table" id="leaveTable">
+      <thead>
+        <tr>
+          <th>Date</th>
+          <th>Leave Type</th>
+          <th>Status</th>
+          <th>Reason</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `
+          <tr>
+            <td>${row.date}</td>
+            <td>${row.type}</td>
+            <td>${row.status}</td>
+            <td>${row.reason}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("leaveStatusSection").innerHTML = html;
+
+  document.getElementById("leaveTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    document.querySelectorAll("#leaveTable tbody tr").forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
+  });
+}
+
+function closeLeaveStatus() {
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
 function openAttendance() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
-    return;
-  }
+  if (!empIdGlobal) return alert("Please login again.");
 
   document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
   document.getElementById("attendanceSection").classList.remove("hidden");
@@ -126,143 +131,116 @@ function openAttendance() {
 
   fetch(`${attendanceApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById("attendanceSection").innerHTML = "<p>No attendance records found.</p>";
-        return;
-      }
-      renderAttendanceTable(data);
-    })
+    .then(data => renderAttendanceTable(data))
     .catch(err => {
-      console.error("Error:", err);
-      document.getElementById("attendanceSection").innerHTML = "<p>Something went wrong while fetching attendance data.</p>";
+      console.error("Attendance Error:", err);
+      document.getElementById("attendanceSection").innerHTML = "<p>Error loading attendance.</p>";
     });
 }
 
-
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
-}
-
-function renderLeaveStatusTable(data) {
-  const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
-
-  let html = `<div class="leave-table-container">
-    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
-    <table class="leave-table" id="leaveStatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("leaveStatusSection").innerHTML = html;
-
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
-}
-
-function closeLeaveStatus() {
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
-}
 function renderAttendanceTable(data) {
-  const headers = Object.keys(data[0]);
-  const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
-  const inTimeCol = headers.find(h => h.toLowerCase().includes("in time"));
-  const outTimeCol = headers.find(h => h.toLowerCase().includes("out time"));
-
-  function formatTimeOnly(raw) {
-    if (!raw) return "";
-    try {
-      const d = new Date(raw);
-      if (isNaN(d.getTime())) return raw;
-      const hh = d.getHours().toString().padStart(2, "0");
-      const mm = d.getMinutes().toString().padStart(2, "0");
-      return `${hh}:${mm}`;
-    } catch {
-      return raw;
-    }
-  }
-
   let html = `<div class="leave-table-container">
     <button id="closeAttendance" onclick="closeAttendance()">Close</button>
-    <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
+    <div class="leave-table-caption">Current Month Attendance</div>
+    <input type="text" id="attendanceTableFilter" placeholder="Search date/time...">
     <table class="leave-table" id="attendanceTable">
       <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+        <tr>
+          <th>Date</th>
+          <th>In Time</th>
+          <th>Out Time</th>
+        </tr>
       </thead>
       <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === inTimeCol || h === outTimeCol) {
-              return `<td>${formatTimeOnly(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
+        ${data.map(row => `
+          <tr>
+            <td>${row.date}</td>
+            <td>${formatTime(row.inTime)}</td>
+            <td>${formatTime(row.outTime)}</td>
+          </tr>
+        `).join("")}
       </tbody>
     </table>
   </div>`;
 
   document.getElementById("attendanceSection").innerHTML = html;
 
-  document.getElementById("attendanceTableFilter").addEventListener("input", function() {
+  document.getElementById("attendanceTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("attendanceTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
+    document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
+  });
+}
+
+function openTotalAttendance() {
+  if (!empIdGlobal) return alert("Please login again.");
+
+  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
+  document.getElementById("attendanceSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${totalAttendanceApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => renderTotalAttendanceTable(data))
+    .catch(err => {
+      console.error("Total Attendance Error:", err);
+      document.getElementById("attendanceSection").innerHTML = "<p>Error loading total attendance.</p>";
+    });
+}
+
+function renderTotalAttendanceTable(data) {
+  let html = `<div class="leave-table-container">
+    <button id="closeAttendance" onclick="closeAttendance()">Close</button>
+    <div class="leave-table-caption">Total Attendance Summary</div>
+    <input type="text" id="attendanceTableFilter" placeholder="Search month...">
+    <table class="leave-table" id="attendanceTable">
+      <thead>
+        <tr>
+          <th>Month</th>
+          <th>Total Days</th>
+          <th>Present</th>
+          <th>Absent</th>
+          <th>Leaves</th>
+        </tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `
+          <tr>
+            <td>${row.month}</td>
+            <td>${row.totalDays}</td>
+            <td>${row.present}</td>
+            <td>${row.absent}</td>
+            <td>${row.leaves}</td>
+          </tr>
+        `).join("")}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("attendanceSection").innerHTML = html;
+
+  document.getElementById("attendanceTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    document.querySelectorAll("#attendanceTable tbody tr").forEach(row => {
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(filter) ? "" : "none";
+    });
   });
 }
 
 function closeAttendance() {
   document.getElementById("attendanceSection").classList.add("hidden");
-  document.getElementById("attendanceSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
-
-function logout() {
-  document.getElementById("employeeDetails").classList.add("hidden");
-  document.getElementById("loginSection").classList.remove("hidden");
-  document.getElementById("empId").value = "";
-  document.getElementById("password").value = "";
-  document.getElementById("detailsList").innerHTML = "";
-  document.getElementById("empName").textContent = "";
-  document.getElementById("employeeImage").src = "image/default.jpg";
-  leaveStatusURL = "";
-  empIdGlobal = "";
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
+function formatTime(datetimeStr) {
+  const date = new Date(datetimeStr);
+  if (isNaN(date)) return datetimeStr;
+  return date.toLocaleTimeString("en-IN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false
+  });
 }
