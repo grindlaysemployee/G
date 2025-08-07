@@ -1,9 +1,9 @@
 let empIdGlobal = "";
 
-const detailsApiUrl = "https://script.google.com/macros/s/AKfycbykq-pK1vSEb4L_7AZciR5rj_KK8yN2XUJPIz_mxOHk3GGxOv2p3ZjwPVE7qGfElTqH/exec";
-const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbyv3uwuEZqZqHgx3AucL-Y3vQmQMrNgYcMKYMX1ptlqkHuKM3FoW19eVj_V3m9_cbeE/exec";
-const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbzEbsFBklBCxO9lSB9OmHGAmAs5RRSU6LNeFX2j36pUvZ3o4CD0EEIqk0V8GoaD1FHp/exec";
-const salarySlipApiUrl = "https://script.google.com/macros/s/AKfycbyZHP7qZH3hR70DkC9PQY9svO_l9XcrcbTNs6cvZ-BN4NSmsQXL61J8A1qGqtG2O03c/exec";
+const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
+const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
+const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
+const salarySlipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
