@@ -2,10 +2,10 @@ const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
+
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
-// Hide all sections on initial page load
 window.onload = function () {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.add("hidden");
@@ -136,8 +136,46 @@ function opensalaryslip() {
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("salaryslipSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+      document.getElementById("salaryslipSection").innerHTML = "<p>Something went wrong while fetching salary slip data.</p>";
     });
+}
+
+function closesalaryslip() {
+  document.getElementById("salaryslipSection").classList.add("hidden");
+  document.getElementById("salaryslipSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+function rendersalaryslipTable(data) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button id="closesalaryslip" onclick="closesalaryslip()">Close</button>
+    <div class="leave-table-caption">Salary Slip : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="salaryslipTableFilter" placeholder="Search/filter...">
+    <table class="leave-table" id="salaryslipTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("salaryslipSection").innerHTML = html;
+
+  document.getElementById("salaryslipTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("salaryslipTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
 }
 
 function openAttendance() {
@@ -165,14 +203,10 @@ function openAttendance() {
     });
 }
 
-
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
+function closeAttendance() {
+  document.getElementById("attendanceSection").classList.add("hidden");
+  document.getElementById("attendanceSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
 function renderLeaveStatusTable(data) {
@@ -183,11 +217,9 @@ function renderLeaveStatusTable(data) {
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
     <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="leaveStatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
@@ -203,14 +235,12 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+  document.getElementById("leaveTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
+    const trs = document.querySelectorAll("#leaveStatusTable tbody tr");
+    trs.forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(filter) ? "" : "none";
+    });
   });
 }
 
@@ -219,56 +249,9 @@ function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
-
-function rendersalaryslipTable(data) {
-  const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
-
-  let html = `<div class="leave-table-container">
-    <button id="closesalsryslip" onclick="closesalaryslip()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="salaryslipTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
-    <table class="leave-table" id="salaryslipTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("salaryslipSection").innerHTML = html;
-
-  document.getElementById("salaryslipTableFilter").addEventListener("input", function() {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("salaryslipTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
-}
-
-function closeLeaveStatus() {
-  document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("leaveStatusSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
-}
-
 
 function renderAttendanceTable(data) {
   const headers = Object.keys(data[0]);
-  const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
   const inTimeCol = headers.find(h => h.toLowerCase().includes("in time"));
   const outTimeCol = headers.find(h => h.toLowerCase().includes("out time"));
 
@@ -277,9 +260,7 @@ function renderAttendanceTable(data) {
     try {
       const d = new Date(raw);
       if (isNaN(d.getTime())) return raw;
-      const hh = d.getHours().toString().padStart(2, "0");
-      const mm = d.getMinutes().toString().padStart(2, "0");
-      return `${hh}:${mm}`;
+      return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
     } catch {
       return raw;
     }
@@ -288,11 +269,9 @@ function renderAttendanceTable(data) {
   let html = `<div class="leave-table-container">
     <button id="closeAttendance" onclick="closeAttendance()">Close</button>
     <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
+    <input type="text" id="attendanceTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="attendanceTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
@@ -308,23 +287,22 @@ function renderAttendanceTable(data) {
 
   document.getElementById("attendanceSection").innerHTML = html;
 
-  document.getElementById("attendanceTableFilter").addEventListener("input", function() {
+  document.getElementById("attendanceTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("attendanceTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
+    const trs = document.querySelectorAll("#attendanceTable tbody tr");
+    trs.forEach(tr => {
+      tr.style.display = tr.innerText.toLowerCase().includes(filter) ? "" : "none";
+    });
   });
 }
 
-function closeAttendance() {
-  document.getElementById("attendanceSection").classList.add("hidden");
-  document.getElementById("attendanceSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
-
 
 function logout() {
   document.getElementById("employeeDetails").classList.add("hidden");
@@ -336,6 +314,11 @@ function logout() {
   document.getElementById("employeeImage").src = "image/default.jpg";
   leaveStatusURL = "";
   empIdGlobal = "";
+
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("attendanceSection").classList.add("hidden");
+  document.getElementById("attendanceSection").innerHTML = "";
+  document.getElementById("salaryslipSection").classList.add("hidden");
+  document.getElementById("salaryslipSection").innerHTML = "";
 }
