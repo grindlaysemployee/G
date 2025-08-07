@@ -1,139 +1,268 @@
-let empIdGlobal = "";
-
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
-const salarySlipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
+
+let empIdGlobal = "";
+let leaveStatusURL = "";
+
+// Hide all sections on initial page load
+window.onload = function () {
+  document.getElementById("employeeDetails").classList.add("hidden");
+  document.getElementById("loadingSpinner").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+};
 
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
 
   if (!empId || !password) {
-    alert("Please enter both Employee ID and Password.");
+    alert("Please enter Employee ID and Password");
     return;
   }
 
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
+  const formData = new FormData();
+  formData.append("empId", empId);
+  formData.append("password", password);
+
   fetch(detailsApiUrl, {
     method: "POST",
-    body: JSON.stringify({ empid: empId, password: password }),
-    headers: {
-      "Content-Type": "application/json",
-    },
+    body: formData
   })
     .then(res => res.json())
     .then(data => {
-      if (data.success) {
-        empIdGlobal = empId;
+      if (!data || !data.success) {
+        alert("Invalid Employee ID or Password");
         document.getElementById("loadingSpinner").classList.add("hidden");
-        document.getElementById("employeeDetails").classList.remove("hidden");
-
-        document.getElementById("empName").textContent = data.name;
-        const detailsList = document.getElementById("detailsList");
-        detailsList.innerHTML = "";
-
-        const imagePath = `image/${empId}.jpg`;
-        document.getElementById("employeeImage").src = imagePath;
-
-        for (let key in data) {
-          if (key !== "name") {
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${key}:</strong> ${data[key]}`;
-            detailsList.appendChild(li);
-          }
-        }
-      } else {
-        throw new Error(data.message || "Login failed");
-      }
-    })
-    .catch(err => {
-      console.error("Login Error:", err);
-      document.getElementById("loadingSpinner").classList.add("hidden");
-      document.getElementById("loginSection").classList.remove("hidden");
-      alert("Something went wrong during login. Please check your credentials or try again later.");
-    });
-}
-
-function logout() {
-  location.reload();
-}
-
-function openLeaveStatus() {
-  document.getElementById("leaveStatusSection").innerHTML = "";
-  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      const section = document.getElementById("leaveStatusSection");
-      section.classList.remove("hidden");
-
-      let html = `<h3>Leave Status <button onclick="closeSection('leaveStatusSection')">X</button></h3>`;
-      html += `<table><tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join("")}</tr>`;
-      data.forEach(row => {
-        html += `<tr>${Object.values(row).map(val => `<td>${val}</td>`).join("")}</tr>`;
-      });
-      html += `</table>`;
-      section.innerHTML = html;
-    })
-    .catch(err => {
-      console.error("Leave Status Error:", err);
-      alert("Failed to fetch leave status.");
-    });
-}
-
-function openAttendance() {
-  document.getElementById("attendanceSection").innerHTML = "";
-  fetch(`${attendanceApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      const section = document.getElementById("attendanceSection");
-      section.classList.remove("hidden");
-
-      let html = `<h3>Attendance <button onclick="closeSection('attendanceSection')">X</button></h3>`;
-      html += `<table><tr>${Object.keys(data[0]).map(key => `<th>${key}</th>`).join("")}</tr>`;
-      data.forEach(row => {
-        html += `<tr>${Object.values(row).map(val => `<td>${val}</td>`).join("")}</tr>`;
-      });
-      html += `</table>`;
-      section.innerHTML = html;
-    })
-    .catch(err => {
-      console.error("Attendance Error:", err);
-      alert("Failed to fetch attendance.");
-    });
-}
-
-function openSalarySlip() {
-  document.getElementById("salarySection").innerHTML = "";
-  fetch(`${salarySlipApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      const section = document.getElementById("salarySection");
-      section.classList.remove("hidden");
-
-      if (!data || data.length === 0) {
-        section.innerHTML = `<h3>Salary Slip <button onclick="closeSection('salarySection')">X</button></h3><p>No salary slip found.</p>`;
+        document.getElementById("loginSection").classList.remove("hidden");
         return;
       }
 
-      let html = `<h3>Salary Slip <button onclick="closeSection('salarySection')">X</button></h3>`;
-      html += `<table><tr><th>Month</th><th>File</th></tr>`;
-      data.forEach(row => {
-        const month = row["Month Slip"] || row["Month"] || "Unknown";
-        const fileUrl = row["File URL"] || row["URL"] || "#";
-        html += `<tr><td>${month}</td><td><a href="${fileUrl}" target="_blank">View PDF</a></td></tr>`;
-      });
-      html += `</table>`;
-      section.innerHTML = html;
+      empIdGlobal = data.empId;
+      document.getElementById("empName").textContent = data.name;
+
+      const employeeImage = document.getElementById("employeeImage");
+      employeeImage.src = `image/${data.empId}.jpg`;
+      employeeImage.onerror = function () {
+        this.src = "image/default.jpg";
+      };
+
+      const fields = {
+        "Employee ID": data.empId,
+        "Emp Code": data.empCode,
+        "Designation": data.designation,
+        "Father's Name": data.fatherName,
+        "Gender": data.gender,
+        "ESIC Number": data.esicNumber,
+        "PF Number": data.pfNumber,
+        "Date of Birth": data.dob,
+        "Mobile": data.mobile,
+        "Aadhar": data.aadhar,
+        "ID Proof": data.idProof,
+        "Permanent Address": data.permanentAddress,
+        "Local Address": data.localAddress,
+        "Joining Date": data.joiningDate,
+        "Emergency Contact": data.emergencyContact,
+        "Status": data.status
+      };
+
+      const detailsList = document.getElementById("detailsList");
+      detailsList.innerHTML = "";
+
+      for (let key in fields) {
+        const li = document.createElement("li");
+        li.textContent = `${key}: ${fields[key] || "N/A"}`;
+        detailsList.appendChild(li);
+      }
+
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("employeeDetails").classList.remove("hidden");
     })
     .catch(err => {
-      console.error("Salary Slip Error:", err);
-      alert("Failed to fetch salary slip.");
+      console.error("Error:", err);
+      alert("Something went wrong!");
+      document.getElementById("loadingSpinner").classList.add("hidden");
+      document.getElementById("loginSection").classList.remove("hidden");
     });
 }
 
-function closeSection(sectionId) {
-  document.getElementById(sectionId).classList.add("hidden");
+function openLeaveStatus() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
+  document.getElementById("leaveStatusSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+        return;
+      }
+      renderLeaveStatusTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+    });
+}
+function openAttendance() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
+  document.getElementById("attendanceSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${attendanceApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("attendanceSection").innerHTML = "<p>No attendance records found.</p>";
+        return;
+      }
+      renderAttendanceTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("attendanceSection").innerHTML = "<p>Something went wrong while fetching attendance data.</p>";
+    });
+}
+
+
+
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  let d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
+}
+
+function renderLeaveStatusTable(data) {
+  const headers = Object.keys(data[0]);
+  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
+
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
+    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <table class="leave-table" id="leaveStatusTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h === startDateCol || h === finishDateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("leaveStatusSection").innerHTML = html;
+
+  document.getElementById("leaveTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("leaveStatusTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeLeaveStatus() {
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+function renderAttendanceTable(data) {
+  const headers = Object.keys(data[0]);
+  const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
+  const inTimeCol = headers.find(h => h.toLowerCase().includes("in time"));
+  const outTimeCol = headers.find(h => h.toLowerCase().includes("out time"));
+
+  function formatTimeOnly(raw) {
+    if (!raw) return "";
+    try {
+      const d = new Date(raw);
+      if (isNaN(d.getTime())) return raw;
+      const hh = d.getHours().toString().padStart(2, "0");
+      const mm = d.getMinutes().toString().padStart(2, "0");
+      return `${hh}:${mm}`;
+    } catch {
+      return raw;
+    }
+  }
+
+  let html = `<div class="leave-table-container">
+    <button id="closeAttendance" onclick="closeAttendance()">Close</button>
+    <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
+    <table class="leave-table" id="attendanceTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h === inTimeCol || h === outTimeCol) {
+              return `<td>${formatTimeOnly(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("attendanceSection").innerHTML = html;
+
+  document.getElementById("attendanceTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("attendanceTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeAttendance() {
+  document.getElementById("attendanceSection").classList.add("hidden");
+  document.getElementById("attendanceSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+
+function logout() {
+  document.getElementById("employeeDetails").classList.add("hidden");
+  document.getElementById("loginSection").classList.remove("hidden");
+  document.getElementById("empId").value = "";
+  document.getElementById("password").value = "";
+  document.getElementById("detailsList").innerHTML = "";
+  document.getElementById("empName").textContent = "";
+  document.getElementById("employeeImage").src = "image/default.jpg";
+  leaveStatusURL = "";
+  empIdGlobal = "";
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
 }
