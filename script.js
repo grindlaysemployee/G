@@ -125,7 +125,7 @@ function opensalaryslip() {
   document.getElementById("salaryslipSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+  fetch(`${salaryslipApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
