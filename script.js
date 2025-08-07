@@ -1,7 +1,7 @@
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
-
+const salarySlipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -252,6 +252,76 @@ function closeAttendance() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
+// === SALARY SLIP FUNCTIONS ===
+
+function openSalarySlip() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("salarySection").innerHTML = `<div id="salaryLoading">......LOADING......</div>`;
+  document.getElementById("salarySection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${salarySlipApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("salarySection").innerHTML = "<p>No salary records found.</p>";
+        return;
+      }
+      renderSalarySlipTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("salarySection").innerHTML = "<p>Something went wrong while fetching salary slip data.</p>";
+    });
+}
+
+function renderSalarySlipTable(data) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button id="closeSalarySlip" onclick="closeSalarySlip()">Close</button>
+    <div class="leave-table-caption">Salary Slips : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="salaryTableFilter" placeholder="Search/filter... (e.g. Jan, 2024)">
+    <table class="leave-table" id="salaryTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (String(row[h]).includes("https://")) {
+              return `<td><a href="${row[h]}" target="_blank">View</a></td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("salarySection").innerHTML = html;
+
+  // Filter functionality
+  document.getElementById("salaryTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("salaryTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeSalarySlip() {
+  document.getElementById("salarySection").classList.add("hidden");
+  document.getElementById("salarySection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
 
 function logout() {
   document.getElementById("employeeDetails").classList.add("hidden");
