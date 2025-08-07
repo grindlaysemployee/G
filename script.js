@@ -1,7 +1,7 @@
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
-
+const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -114,6 +114,32 @@ function openLeaveStatus() {
       document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
     });
 }
+
+function opensalaryslip() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("salaryslipSection").innerHTML = `<div id="salaryslipLoading">......LOADING......</div>`;
+  document.getElementById("salaryslipSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("salaryslipSection").innerHTML = "<p>No Salary Slip records found.</p>";
+        return;
+      }
+      rendersalaryslipTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("salaryslipSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+    });
+}
+
 function openAttendance() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
@@ -193,6 +219,53 @@ function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
+
+function rendersalaryslipTable(data) {
+  const headers = Object.keys(data[0]);
+  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
+
+  let html = `<div class="leave-table-container">
+    <button id="closesalsryslip" onclick="closesalaryslip()">Close</button>
+    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="salaryslipTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <table class="leave-table" id="salaryslipTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h === startDateCol || h === finishDateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("salaryslipSection").innerHTML = html;
+
+  document.getElementById("salaryslipTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("salaryslipTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeLeaveStatus() {
+  document.getElementById("leaveStatusSection").classList.add("hidden");
+  document.getElementById("leaveStatusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+
 function renderAttendanceTable(data) {
   const headers = Object.keys(data[0]);
   const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
