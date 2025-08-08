@@ -282,10 +282,16 @@ function opensalaryslip() {
 function rendersalaryslipTable(data) {
   const headers = Object.keys(data[0]);
 
+  // Date format helper function
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', { month: 'short', year: '2-digit' }).replace(',', '-');
+  };
+
   let html = `<div class="leave-table-container">
     <button id="closeSalarySlip" onclick="closeSalarySlip()">Close</button>
     <div class="leave-table-caption">Salary Slips : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="salaryTableFilter" placeholder="Search/filter... (e.g. Jan, 2024)">
+    <input type="text" id="salaryTableFilter" placeholder="Search/filter... (e.g. Jan-24)">
     <table class="leave-table" id="salaryTable">
       <thead>
         <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
@@ -293,10 +299,13 @@ function rendersalaryslipTable(data) {
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
-            if (String(row[h]).includes("https://")) {
-              return `<td><a href="${row[h]}" target="_blank">View</a></td>`;
+            const value = row[h];
+            if (String(value).includes("https://")) {
+              return `<td><a href="${value}" target="_blank">View</a></td>`;
+            } else if (h.toLowerCase().includes("month")) {
+              return `<td>${formatDate(value)}</td>`;
             }
-            return `<td>${row[h] || ""}</td>`;
+            return `<td>${value || ""}</td>`;
           }).join('')}
         </tr>`).join('')}
       </tbody>
@@ -306,7 +315,7 @@ function rendersalaryslipTable(data) {
   document.getElementById("salarySection").innerHTML = html;
 
   // Filter functionality
-  document.getElementById("salaryTableFilter").addEventListener("input", function() {
+  document.getElementById("salaryTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
     const table = document.getElementById("salaryTable");
     const trs = table.getElementsByTagName("tr");
@@ -316,6 +325,7 @@ function rendersalaryslipTable(data) {
     }
   });
 }
+
 
 function closeSalarySlip() {
   document.getElementById("salarySection").classList.add("hidden");
