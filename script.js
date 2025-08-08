@@ -1,7 +1,7 @@
 const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4eIAOCj_VW-Ip9vW5js0zX04V88Fn56m7AeowSR3CXt9Buoy6A/exec";
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
-const salarySlipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
+const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -254,7 +254,7 @@ function closeAttendance() {
 
 // === SALARY SLIP FUNCTIONS ===
 
-function openSalarySlip() {
+function opensalaryslip() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
     return;
@@ -264,14 +264,14 @@ function openSalarySlip() {
   document.getElementById("salarySection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  fetch(`${salarySlipApiUrl}?empid=${empIdGlobal}`)
+  fetch(`${salaryslipApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
         document.getElementById("salarySection").innerHTML = "<p>No salary records found.</p>";
         return;
       }
-      renderSalarySlipTable(data);
+      rendersalaryslipTable(data);
     })
     .catch(err => {
       console.error("Error:", err);
@@ -279,7 +279,7 @@ function openSalarySlip() {
     });
 }
 
-function renderSalarySlipTable(data) {
+function rendersalaryslipTable(data) {
   const headers = Object.keys(data[0]);
 
   let html = `<div class="leave-table-container">
