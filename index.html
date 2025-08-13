@@ -16,7 +16,7 @@
     <h2>Employee Login</h2>
     <input type="text" id="empId" placeholder="Employee ID">
     <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <button class="btn primary" onclick="login()">Login</button>
   </div>
 
   <!-- Loading Spinner -->
@@ -30,18 +30,18 @@
     <!-- Left: Details -->
     <div class="left-panel">
       <h2>Welcome, <span id="empName"></span></h2>
-      <ul id="detailsList"></ul>
+      <ul id="detailsList" class="details-card"></ul>
     </div>
 
     <!-- Right: Image + Buttons -->
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
-        <button id="leaveapply">Leave Apply</button>
-        <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
-        <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
-        <button id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
-        <button onclick="logout()" class="logout">Logout</button>
+        <button id="leaveapply" class="btn secondary">Leave Apply</button>
+        <button id="leaveStatusBtn" class="btn secondary" onclick="openLeaveStatus()">Leave Status</button>
+        <button id="attendanceBtn" class="btn secondary" onclick="openAttendance()">Attendance</button>
+        <button id="salaryslipBtn" class="btn secondary" onclick="opensalaryslip()">Salary Slip</button>
+        <button onclick="logout()" class="btn logout">Logout</button>
       </div>
     </div>
   </div>
