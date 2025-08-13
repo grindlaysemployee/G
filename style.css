@@ -41,14 +41,16 @@ input[type="text"], input[type="password"] {
 }
 
 button {
-  width: 95%;
-  padding: 10px;
-  margin-top: 12px;
   background-color: #000; /* Reverse style */
   color: #FFD700;
   border: 1px solid #FFD700;
   border-radius: 6px;
   cursor: pointer;
+  font-weight: bold;
+  font-size: 15px;
+  height: 42px; /* Equal height */
+  width: 180px; /* Fixed width for professional look */
+  transition: all 0.3s ease; /* Smooth hover */
 }
 
 button:hover {
@@ -124,26 +126,28 @@ button:hover {
 }
 
 .button-group {
-  width: 80%;
+  width: 100%;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px; /* Equal spacing */
+  align-items: center; /* Center align */
 }
 
 .button-group button {
-  width: 80%;
+  width: 180px;
 }
 
 .logout {
-  background-color: #000;
-  color: #FFD700;
-  border: 1px solid #FFD700;
+  background-color: #dc3545; /* Red background */
+  color: #fff; /* White text */
+  border: none; /* No border */
 }
 
 .logout:hover {
-  background-color: #FFD700;
-  color: #000;
+  background-color: #a71d2a; /* Darker red on hover */
+  color: #fff;
 }
+
 
 /* Professional Leave Status Table */
 .leave-table-container {
@@ -197,7 +201,6 @@ button:hover {
 }
 
 #closeLeaveStatus {
-  float: right;
   background: #000;
   color: #FFD700;
   border: 1px solid #FFD700;
@@ -205,6 +208,7 @@ button:hover {
   padding: 4px 12px;
   cursor: pointer;
   margin-bottom: 10px;
+  transition: all 0.3s ease;
 }
 
 #closeLeaveStatus:hover {
