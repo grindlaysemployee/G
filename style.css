@@ -1,125 +1,125 @@
+/* General Styles */
 body {
-  background: #000;
-  color: #fff;
   font-family: Arial, sans-serif;
+  background-color: #000;
+  color: #FFD700;
   margin: 0;
+  padding: 0;
 }
 
 /* Login Box */
 .login-box {
-  max-width: 320px;
+  max-width: 350px;
   margin: 50px auto;
-  background: #111;
   padding: 20px;
-  border-radius: 10px;
+  background: #111;
+  border-radius: 12px;
   text-align: center;
-  border: 1px solid gold;
+  box-shadow: 0 0 15px rgba(255, 215, 0, 0.3);
 }
-.login-box h2 {
-  margin-bottom: 20px;
-  color: gold;
-}
+
 .login-box input {
   width: 90%;
   padding: 10px;
-  margin: 10px 0;
+  margin: 8px 0;
   border: none;
   border-radius: 5px;
-}
-.login-box button {
-  background: gold;
-  color: #000;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.login-box button:hover {
-  background: #e6c300;
 }
 
-/* Spinner */
-.spinner {
-  border: 4px solid rgba(255,255,255,0.1);
-  border-left-color: gold;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-  animation: spin 1s linear infinite;
-  margin: 20px auto;
+.btn {
+  width: 95%;
+  padding: 10px;
+  margin: 5px 0;
+  border: none;
+  border-radius: 6px;
+  font-size: 16px;
+  cursor: pointer;
+  font-weight: bold;
 }
-@keyframes spin {
-  to { transform: rotate(360deg); }
+
+.btn.primary {
+  background-color: #FFD700;
+  color: #000;
 }
-.hidden { display: none; }
+
+.btn.secondary {
+  background-color: #000;
+  color: #FFD700;
+  border: 1px solid #FFD700;
+}
+
+.btn.secondary:hover {
+  background-color: #FFD700;
+  color: #000;
+}
+
+.btn.logout {
+  background-color: #ff3b3b;
+  color: #fff;
+}
+
+.btn.logout:hover {
+  background-color: #d90000;
+}
 
 /* Dashboard Layout */
 .dashboard {
   display: flex;
+  justify-content: space-between;
   padding: 20px;
-}
-.left-panel {
-  flex: 1;
-  padding: 20px;
-  background: #111;
-  border-radius: 10px;
-  margin-right: 20px;
-  border: 1px solid gold;
-}
-.right-panel {
-  width: 250px;
-  background: #111;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-  border: 1px solid gold;
-}
-.employee-img {
-  width: 100%;
-  border-radius: 10px;
-  border: 2px solid gold;
-  margin-bottom: 15px;
-}
-.button-group button {
-  width: 100%;
-  margin: 5px 0;
-  padding: 10px;
-  background: gold;
-  border: none;
-  border-radius: 5px;
-  color: #000;
-  cursor: pointer;
-}
-.button-group button:hover {
-  background: #e6c300;
 }
 
-/* Premium Details List */
-#detailsList {
-  list-style-type: none;
-  padding: 0;
-  margin: 0;
+.left-panel {
+  flex: 1;
 }
-#detailsList li {
+
+.right-panel {
+  width: 250px;
+  text-align: center;
+}
+
+.employee-img {
+  width: 100%;
+  max-width: 180px;
+  border-radius: 50%;
+  border: 2px solid #FFD700;
+  margin-bottom: 15px;
+}
+
+.button-group {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: #0d0d0d;
-  padding: 10px 14px;
-  border: 1px solid rgba(255, 215, 0, 0.4);
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Details Card Style */
+.details-card {
+  list-style: none;
+  padding: 0;
+}
+
+.details-card li {
+  background: #111;
+  padding: 10px;
+  margin: 6px 0;
   border-radius: 6px;
-  margin-bottom: 10px;
-  transition: all 0.3s ease;
+  border: 1px solid rgba(255, 215, 0, 0.4);
+  box-shadow: 0 0 5px rgba(255, 215, 0, 0.2);
 }
-#detailsList li:hover {
-  background: #1f1f1f;
-  transform: translateY(-1px);
+
+/* Spinner */
+.spinner {
+  width: 30px;
+  height: 30px;
+  border: 4px solid #FFD700;
+  border-top: 4px solid transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 10px;
 }
-#detailsList li strong {
-  font-weight: 600;
-  color: #FFD700;
-}
-#detailsList li span {
-  font-weight: 500;
-  color: #fff;
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
 }
