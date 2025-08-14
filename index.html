@@ -41,30 +41,10 @@
         <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
         <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
         <button id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
-        <button id="documentBtn" onclick="opendocument()">Document</button>
-        <button id="complainBtn" onclick="openComplaint()">Compain</button>
+          <button id="documentBtn" onclick="opendocument()">Document</button>
+         <button id="complainBtn" onclick="opendocument()">Complain</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
-    </div>
-  </div>
-
-  <!-- Complaint Form Modal -->
-  <div id="complaintModal" class="modal hidden">
-    <div class="modal-content">
-      <span class="close" onclick="closeComplaint()">&times;</span>
-      <h2>Complaint Form</h2>
-      <form id="complaintForm">
-        <label>Employee ID</label>
-        <input type="text" id="complaintEmpId" name="empId" readonly>
-
-        <label>Complaint Subject</label>
-        <input type="text" name="subject" placeholder="Enter subject" required>
-
-        <label>Complaint Details</label>
-        <textarea name="details" placeholder="Enter details" required></textarea>
-
-        <button type="submit">Submit Complaint</button>
-      </form>
     </div>
   </div>
 
@@ -72,8 +52,8 @@
   <div id="leaveStatusSection" class="hidden"></div>
   <div id="attendanceSection" class="hidden"></div>
   <div id="salarySection" class="hidden"></div>
-  <div id="documentSection" class="hidden"></div>
-
+ <div id="documentSection" class="hidden"></div>
+  <div id="complainSection" class="hidden"></div>
   <script src="script.js"></script>
 </body>
 </html>
