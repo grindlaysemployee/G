@@ -2,8 +2,6 @@ const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
-
-const complaintApiUrl = "https://script.google.com/macros/s/AKfycbyVbcJNj_TKOpgaLOgX5E0r-XuIXwBFfJyAwcu3XsX1278xhDV1LETv8Ls2VBk7zQsi/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -13,7 +11,6 @@ window.onload = function () {
   document.getElementById("loadingSpinner").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
-  document.getElementById("compainSection").classList.add("hidden");
 };
 
 function login() {
@@ -93,13 +90,6 @@ function login() {
     });
 }
 
-// ==================== COMPLAINT FORM ====================
-function openComplain() {
-  if (!empIdGlobal) {
-    alert("Please login first!");
-    return;
-  }
-
 function openLeaveStatus() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
@@ -109,45 +99,7 @@ function openLeaveStatus() {
   document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
-  // Show complaint section
-  document.getElementById("compainSection").classList.remove("hidden");
 
-  // Auto-fill Employee ID
-  document.getElementById("complainEmpId").value = empIdGlobal;
-}
-
-function submitComplaint() {
-  let data = {
-    employeeId: document.getElementById("complainEmpId").value,
-    date: document.getElementById("complainDate").value,
-    againstPerson: document.getElementById("complainAgainst").value,
-    complaint: document.getElementById("complainText").value
-  };
-
-  if (!data.date || !data.againstPerson || !data.complaint) {
-    alert("Please fill all fields!");
-    return;
-  }
-
-  fetch(complaintApiUrl, {
-    method: "POST",
-    body: JSON.stringify(data),
-    headers: { "Content-Type": "application/json" }
-  })
-    .then(res => res.json())
-    .then(response => {
-      alert("Complaint submitted successfully!");
-      document.getElementById("complainDate").value = "";
-      document.getElementById("complainAgainst").value = "";
-      document.getElementById("complainText").value = "";
-    })
-    .catch(err => {
-      alert("Error submitting complaint!");
-      console.error(err);
-    });
-}
-
-  
   fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
