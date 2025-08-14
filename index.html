@@ -27,13 +27,11 @@
 
   <!-- Employee Details Section -->
   <div id="employeeDetails" class="dashboard hidden">
-    <!-- Left: Details -->
     <div class="left-panel">
       <h2>Welcome, <span id="empName"></span></h2>
       <ul id="detailsList"></ul>
     </div>
 
-    <!-- Right: Image + Buttons -->
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
@@ -42,87 +40,11 @@
         <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
         <button id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
         <button id="documentBtn" onclick="opendocument()">Document</button>
-        <button id="complainBtn" onclick="openComplaintForm()">Complaint</button>
+        <button onclick="window.location.href='com.html'">Complaint</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
-
-  <!-- Data Sections -->
-  <div id="leaveStatusSection" class="hidden"></div>
-  <div id="attendanceSection" class="hidden"></div>
-  <div id="salarySection" class="hidden"></div>
-  <div id="documentSection" class="hidden"></div>
-
-  <!-- Complaint Form Section -->
-  <div id="complainSection" class="hidden">
-    <h2>Submit a Complaint</h2>
-    <form id="complaintForm">
-      <label>Employee ID:</label>
-      <input type="text" id="complaintEmpId" readonly><br>
-
-      <label>Date:</label>
-      <input type="date" id="complaintDate" required><br>
-
-      <label>Against Person:</label>
-      <input type="text" id="againstPerson" required><br>
-
-      <label>Complaint:</label>
-      <textarea id="complaintText" rows="4" required></textarea><br>
-
-      <button type="submit">Submit Complaint</button>
-      <button type="button" onclick="closeComplaintForm()">Cancel</button>
-    </form>
-    <div id="complaintMessage"></div>
-  </div>
-
-  <script>
-    const complaintApiUrl = "YOUR_GOOGLE_SCRIPT_WEBAPP_URL"; // यहां अपना Apps Script WebApp URL डालो
-
-    function openComplaintForm() {
-      document.getElementById("employeeDetails").classList.add("hidden");
-      document.getElementById("complainSection").classList.remove("hidden");
-
-      // Auto-fill employee ID from global
-      document.getElementById("complaintEmpId").value = empIdGlobal || "";
-      document.getElementById("complaintDate").value = new Date().toISOString().split("T")[0];
-    }
-
-    function closeComplaintForm() {
-      document.getElementById("complainSection").classList.add("hidden");
-      document.getElementById("employeeDetails").classList.remove("hidden");
-    }
-
-    document.getElementById("complaintForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-
-      const payload = {
-        employeeId: document.getElementById("complaintEmpId").value,
-        date: document.getElementById("complaintDate").value,
-        againstPerson: document.getElementById("againstPerson").value,
-        complaint: document.getElementById("complaintText").value
-      };
-
-      fetch(complaintApiUrl, {
-        method: "POST",
-        body: JSON.stringify(payload),
-        headers: { "Content-Type": "application/json" }
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.status === "success") {
-          document.getElementById("complaintMessage").innerHTML = "<p style='color:green;'>Complaint submitted successfully!</p>";
-          document.getElementById("complaintForm").reset();
-        } else {
-          document.getElementById("complaintMessage").innerHTML = "<p style='color:red;'>Error submitting complaint.</p>";
-        }
-      })
-      .catch(err => {
-        console.error(err);
-        document.getElementById("complaintMessage").innerHTML = "<p style='color:red;'>Something went wrong.</p>";
-      });
-    });
-  </script>
 
   <script src="script.js"></script>
 </body>
