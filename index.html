@@ -5,6 +5,59 @@
   <meta name="viewport" content="width=500, user-scalable=no" />
   <title>Employee Login</title>
   <link rel="stylesheet" href="style.css">
+  <style>
+    /* Complaint Modal Styles */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      left: 0; top: 0;
+      width: 100%; height: 100%;
+      background-color: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 500px;
+      color: #ffd700;
+      box-shadow: 0 0 15px #ffd700;
+    }
+    .modal-content h2 {
+      margin-bottom: 15px;
+      border-bottom: 1px solid #ffd700;
+      padding-bottom: 10px;
+    }
+    .modal-content input, .modal-content textarea {
+      width: 100%;
+      padding: 8px;
+      margin-bottom: 10px;
+      border: 1px solid #ffd700;
+      border-radius: 5px;
+      background: #000;
+      color: #ffd700;
+    }
+    .modal-content button {
+      background: #ffd700;
+      color: #000;
+      padding: 8px 15px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    .modal-content button:hover {
+      background: #e6c200;
+    }
+    .close {
+      float: right;
+      cursor: pointer;
+      color: #ffd700;
+      font-size: 18px;
+    }
+  </style>
 </head>
 <body>
 
@@ -27,13 +80,10 @@
 
   <!-- Employee Details Section -->
   <div id="employeeDetails" class="dashboard hidden">
-    <!-- Left: Details -->
     <div class="left-panel">
       <h2>Welcome, <span id="empName"></span></h2>
       <ul id="detailsList"></ul>
     </div>
-
-    <!-- Right: Image + Buttons -->
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
@@ -41,19 +91,67 @@
         <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
         <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
         <button id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
-          <button id="documentBtn" onclick="opendocument()">Document</button>
-         <button id="complainBtn" onclick="opendocument()">Compain</button>
+        <button id="documentBtn" onclick="opendocument()">Document</button>
+        <button id="complainBtn" onclick="openComplaintForm()">Compain</button>
         <button onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
 
-  <!-- Data Sections -->
-  <div id="leaveStatusSection" class="hidden"></div>
-  <div id="attendanceSection" class="hidden"></div>
-  <div id="salarySection" class="hidden"></div>
- <div id="documentSection" class="hidden"></div>
-  <div id="compainSection" class="hidden"></div>
+  <!-- Complaint Modal -->
+  <div id="complaintModal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeComplaintForm()">&times;</span>
+      <h2>Complaint Form</h2>
+      <form id="complaintForm">
+        <label>Timestamp</label>
+        <input type="text" id="timestamp" name="Timestamp" readonly>
+
+        <label>Employee ID</label>
+        <input type="text" id="complaintEmpId" name="Employee ID" readonly>
+
+        <label>Against Person</label>
+        <input type="text" name="Against Person" required>
+
+        <label>Complaint</label>
+        <textarea name="Complaint" minlength="10" required></textarea>
+
+        <button type="submit">Submit</button>
+      </form>
+    </div>
+  </div>
+
   <script src="script.js"></script>
+  <script>
+    const sheetURL = "https://script.google.com/macros/s/AKfycbyVbcJNj_TKOpgaLOgX5E0r-XuIXwBFfJyAwcu3XsX1278xhDV1LETv8Ls2VBk7zQsi/exec";
+
+    function openComplaintForm() {
+      document.getElementById("complaintModal").style.display = "flex";
+      document.getElementById("timestamp").value = new Date().toLocaleString();
+      document.getElementById("complaintEmpId").value = document.getElementById("empId").value || loggedEmpId;
+    }
+
+    function closeComplaintForm() {
+      document.getElementById("complaintModal").style.display = "none";
+    }
+
+    // Submit complaint form
+    document.getElementById("complaintForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      fetch(sheetURL, {
+        method: "POST",
+        body: new FormData(this)
+      }).then(res => alert("Complaint submitted successfully!"))
+        .catch(err => alert("Error: " + err));
+      closeComplaintForm();
+    });
+
+    // Capture employee ID from login
+    let loggedEmpId = "";
+    function login() {
+      loggedEmpId = document.getElementById("empId").value;
+      // Your existing login logic...
+    }
+  </script>
 </body>
 </html>
