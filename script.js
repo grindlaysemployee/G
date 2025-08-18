@@ -3,7 +3,7 @@ const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpm
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 const leavebalanceApiUrl = "https://script.google.com/macros/s/AKfycbwJxuG5ka47LsFfvKi137u0vXKmOmY9icucmeGG_13hEdediyPlrbK6_ear0HfQIBby/exec";
-
+const complainstatusApiUrl = "https://script.google.com/macros/s/AKfycbyVbcJNj_TKOpgaLOgX5E0r-XuIXwBFfJyAwcu3XsX1278xhDV1LETv8Ls2VBk7zQsi/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -14,6 +14,7 @@ window.onload = function () {
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leavebalanceSection").classList.add("hidden");
+   document.getElementById("complainstatusSection").classList.add("hidden");
 };
 
 // ================= LOGIN =================
@@ -390,6 +391,84 @@ function closeSalarySlip() {
   document.getElementById("salarySection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
+
+// ================= COMPLAIN STATUS =================
+function opencomplainstatus() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("complainstatusSection").innerHTML = `<div id="complainstatusLoading">......LOADING......</div>`;
+  document.getElementById("complainstatusSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${complainstatusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("complainstatusSection").innerHTML = "<p>No leave records found.</p>";
+        return;
+      }
+      rendercomplainstatusTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("complainstatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+    });
+}
+
+function formatDate(dateStr) {
+  if (!dateStr) return "";
+  let d = new Date(dateStr);
+  if (isNaN(d)) return dateStr;
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
+}
+
+function rendercomplainstatusTable(data) {
+  const headers = Object.keys(data[0]);
+  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
+
+  let html = `<div class="leave-table-container">
+    <button id="closecomplainstatus" onclick="closecomplainstatus()">Close</button>
+    <div class="leave-table-caption">Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
+    <table class="leave-table" id="leaveStatusTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            if (h === startDateCol || h === finishDateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("complainstatusSection").innerHTML = html;
+
+  document.getElementById("complainstatusTableFilter").addEventListener("input", function() {
+    const filter = this.value.toLowerCase();
+    const trs = document.getElementById("complainstatusTable").getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closecomplainstatus() {
+  document.getElementById("complainstatusSection").classList.add("hidden");
+  document.getElementById("complainstatusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
 
 // ================= LOGOUT =================
 function logout() {
