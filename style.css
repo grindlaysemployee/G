@@ -128,25 +128,29 @@ button:hover {
 .button-group {
   width: 100%;
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap; /* allow wrapping to new line */
   gap: 12px; /* Equal spacing */
-  align-items: center; /* Center align */
+  justify-content: center; /* center align row */
 }
 
 .button-group button {
-  width: 180px;
+  flex: 1 1 calc(50% - 12px); /* 2 buttons per row */
+  max-width: 180px; /* same button size */
 }
+
 
 .logout {
   background-color: #dc3545; /* Red background */
   color: #fff; /* White text */
   border: none; /* No border */
+  margin-top: 20px;
 }
 
 .logout:hover {
   background-color: #a71d2a; /* Darker red on hover */
   color: #fff;
 }
+
 
 
 /* Professional Leave Status Table */
