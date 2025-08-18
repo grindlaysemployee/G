@@ -138,12 +138,10 @@
   </div>
 
   <script>
-    // Auto-fill today's date and disable editing
+    // Auto-fill today's date
     window.onload = function() {
       const today = new Date().toISOString().split("T")[0];
-      const dateField = document.getElementById("date");
-      dateField.value = today;
-      dateField.readOnly = true;
+      document.getElementById("date").value = today;
     };
 
     function submitComplaint() {
@@ -173,7 +171,6 @@
           statusMsg.className = "status success";
           document.getElementById("complaintForm").reset();
 
-          // reset date after form clear
           const today = new Date().toISOString().split("T")[0];
           document.getElementById("date").value = today;
         } else {
@@ -187,14 +184,12 @@
       });
     }
 
-    // Close button ka function
+    // Close button function
     function goBack() {
-      if (document.referrer) {
-        // pichhle page par le jao
-        window.location.href = document.referrer;
+      if (window.history.length > 1) {
+        window.history.back();  // 🔙 goes to previous page
       } else {
-        // agar referrer nahi hai to homepage ya koi default page
-        window.location.href = "index.html";
+        window.location.href = "index.html"; // fallback
       }
     }
   </script>
