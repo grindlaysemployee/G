@@ -3,6 +3,7 @@ const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpm
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 const leavebalanceApiUrl = "https://script.google.com/macros/s/AKfycbwJxuG5ka47LsFfvKi137u0vXKmOmY9icucmeGG_13hEdediyPlrbK6_ear0HfQIBby/exec";
+
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -12,9 +13,10 @@ window.onload = function () {
   document.getElementById("loadingSpinner").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
-    document.getElementById("leavebalanceSection").classList.add("hidden");
+  document.getElementById("leavebalanceSection").classList.add("hidden");
 };
 
+// ================= LOGIN =================
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -31,10 +33,7 @@ function login() {
   formData.append("empId", empId);
   formData.append("password", password);
 
-  fetch(detailsApiUrl, {
-    method: "POST",
-    body: formData
-  })
+  fetch(detailsApiUrl, { method: "POST", body: formData })
     .then(res => res.json())
     .then(data => {
       if (!data || !data.success) {
@@ -92,6 +91,7 @@ function login() {
     });
 }
 
+// ================= LEAVE STATUS =================
 function openLeaveStatus() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
@@ -116,87 +116,6 @@ function openLeaveStatus() {
       document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
     });
 }
-function openAttendance() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
-    return;
-  }
-
-  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
-  document.getElementById("attendanceSection").classList.remove("hidden");
-  document.getElementById("employeeDetails").classList.add("hidden");
-
-  fetch(`${attendanceApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById("attendanceSection").innerHTML = "<p>No attendance records found.</p>";
-        return;
-      }
-      renderAttendanceTable(data);
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      document.getElementById("attendanceSection").innerHTML = "<p>Something went wrong while fetching attendance data.</p>";
-    });
-}
-function openleavebalance() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
-    return;
-  }
-
-  document.getElementById("leavebalanceSection").innerHTML = `<div id="leavebalanceLoading">......LOADING......</div>`;
-  document.getElementById("leavebalanceSection").classList.remove("hidden");
-  document.getElementById("employeeDetails").classList.add("hidden");
-
-  fetch(`${leavebalanceApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById("leavebalanceSection").innerHTML = "<p>No leave records found.</p>";
-        return;
-      }
-function renderleavebalanceTable(data) {
-  const headers = Object.keys(data[0]);
-
-  let html = `<div class="leave-table-container">
-    <button id="closeLeaveBalance" onclick="closeLeaveBalance()">Close</button>
-    <div class="leave-table-caption">Leave Balance : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveBalanceTableFilter" placeholder="Search/filter... (e.g. Casual, Earned)">
-    <table class="leave-table" id="leaveBalanceTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("leavebalanceSection").innerHTML = html;
-
-  // Filter functionality
-  document.getElementById("leaveBalanceTableFilter").addEventListener("input", function () {
-    const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveBalanceTable");
-    const trs = table.getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
-    }
-  });
-}
-
-function closeLeaveBalance() {
-  document.getElementById("leavebalanceSection").classList.add("hidden");
-  document.getElementById("leavebalanceSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
-}
-
-
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
@@ -236,11 +155,9 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("leaveStatusTable");
-    const trs = table.getElementsByTagName("tr");
+    const trs = document.getElementById("leaveStatusTable").getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
     }
   });
 }
@@ -250,9 +167,35 @@ function closeLeaveStatus() {
   document.getElementById("leaveStatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
+
+// ================= ATTENDANCE =================
+function openAttendance() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
+  document.getElementById("attendanceSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${attendanceApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("attendanceSection").innerHTML = "<p>No attendance records found.</p>";
+        return;
+      }
+      renderAttendanceTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("attendanceSection").innerHTML = "<p>Something went wrong while fetching attendance data.</p>";
+    });
+}
+
 function renderAttendanceTable(data) {
   const headers = Object.keys(data[0]);
-  const dateCol = headers.find(h => h.toLowerCase().includes("date")); // for main "Date"
   const inTimeCol = headers.find(h => h.toLowerCase().includes("in time"));
   const outTimeCol = headers.find(h => h.toLowerCase().includes("out time"));
 
@@ -261,9 +204,7 @@ function renderAttendanceTable(data) {
     try {
       const d = new Date(raw);
       if (isNaN(d.getTime())) return raw;
-      const hh = d.getHours().toString().padStart(2, "0");
-      const mm = d.getMinutes().toString().padStart(2, "0");
-      return `${hh}:${mm}`;
+      return `${d.getHours().toString().padStart(2, "0")}:${d.getMinutes().toString().padStart(2, "0")}`;
     } catch {
       return raw;
     }
@@ -274,9 +215,7 @@ function renderAttendanceTable(data) {
     <div class="leave-table-caption">Attendance : ${data[0][headers[0]] || ""}</div>
     <input type="text" id="attendanceTableFilter" placeholder="Search/filter... (e.g. Present, Absent)">
     <table class="leave-table" id="attendanceTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
@@ -294,11 +233,9 @@ function renderAttendanceTable(data) {
 
   document.getElementById("attendanceTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("attendanceTable");
-    const trs = table.getElementsByTagName("tr");
+    const trs = document.getElementById("attendanceTable").getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
     }
   });
 }
@@ -309,8 +246,65 @@ function closeAttendance() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
-// === SALARY SLIP FUNCTIONS ===
+// ================= LEAVE BALANCE =================
+function openleavebalance() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
 
+  document.getElementById("leavebalanceSection").innerHTML = `<div id="leavebalanceLoading">......LOADING......</div>`;
+  document.getElementById("leavebalanceSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${leavebalanceApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("leavebalanceSection").innerHTML = "<p>No leave balance records found.</p>";
+        return;
+      }
+      renderleavebalanceTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("leavebalanceSection").innerHTML = "<p>Something went wrong while fetching leave balance.</p>";
+    });
+}
+
+function renderleavebalanceTable(data) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveBalance" onclick="closeLeaveBalance()">Close</button>
+    <div class="leave-table-caption">Leave Balance : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveBalanceTableFilter" placeholder="Search/filter... (e.g. Casual, Earned)">
+    <table class="leave-table" id="leaveBalanceTable">
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("leavebalanceSection").innerHTML = html;
+
+  document.getElementById("leaveBalanceTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const trs = document.getElementById("leaveBalanceTable").getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeLeaveBalance() {
+  document.getElementById("leavebalanceSection").classList.add("hidden");
+  document.getElementById("leavebalanceSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+// ================= SALARY SLIP =================
 function opensalaryslip() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
@@ -339,7 +333,6 @@ function opensalaryslip() {
 function rendersalaryslipTable(data) {
   const headers = Object.keys(data[0]);
 
-  // Date format helper function
   const formatDate = (dateStr) => {
     const date = new Date(dateStr);
     return date.toLocaleString('en-US', { month: 'short', year: '2-digit' }).replace(',', '-');
@@ -350,9 +343,7 @@ function rendersalaryslipTable(data) {
     <div class="leave-table-caption">Salary Slips : ${data[0][headers[0]] || ""}</div>
     <input type="text" id="salaryTableFilter" placeholder="Search/filter... (e.g. Jan-24)">
     <table class="leave-table" id="salaryTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
@@ -371,18 +362,14 @@ function rendersalaryslipTable(data) {
 
   document.getElementById("salarySection").innerHTML = html;
 
-  // Filter functionality
   document.getElementById("salaryTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const table = document.getElementById("salaryTable");
-    const trs = table.getElementsByTagName("tr");
+    const trs = document.getElementById("salaryTable").getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
-      const rowText = trs[i].innerText.toLowerCase();
-      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
     }
   });
 }
-
 
 function closeSalarySlip() {
   document.getElementById("salarySection").classList.add("hidden");
@@ -390,6 +377,7 @@ function closeSalarySlip() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
+// ================= LOGOUT =================
 function logout() {
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
