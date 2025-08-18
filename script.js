@@ -279,12 +279,25 @@ function renderleavebalanceTable(data) {
     <button id="closeLeaveBalance" onclick="closeLeaveBalance()">Close</button>
     <div class="leave-table-caption">Leave Balance : ${data[0][headers[0]] || ""}</div>
     <input type="text" id="leaveBalanceTableFilter" placeholder="Search/filter... (e.g. Casual, Earned)">
-    <table class="leave-table" id="leaveBalanceTable">
-      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-      <tbody>
-        ${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`).join('')}
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table class="leave-table" id="leaveBalanceTable">
+        <thead>
+          <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+        </thead>
+        <tbody>
+          ${data.map(row => `<tr>
+            ${headers.map(h => {
+              let val = row[h] || "";
+              // Format numbers
+              if (!isNaN(val) && val !== "") {
+                val = parseFloat(val).toFixed(2);
+              }
+              return `<td>${val}</td>`;
+            }).join('')}
+          </tr>`).join('')}
+        </tbody>
+      </table>
+    </div>
   </div>`;
 
   document.getElementById("leavebalanceSection").innerHTML = html;
@@ -297,6 +310,7 @@ function renderleavebalanceTable(data) {
     }
   });
 }
+
 
 function closeLeaveBalance() {
   document.getElementById("leavebalanceSection").classList.add("hidden");
