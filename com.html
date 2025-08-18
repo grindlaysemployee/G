@@ -131,7 +131,8 @@
       <textarea id="complaint" required></textarea>
 
       <button type="button" onclick="submitComplaint()">Submit</button>
-      <button type="button" class="close-btn" onclick="window.close()">Close</button>
+      <!-- Close button updated -->
+      <button type="button" class="close-btn" onclick="goBack()">Close</button>
     </form>
     <div class="status" id="statusMsg"></div>
   </div>
@@ -184,6 +185,17 @@
         statusMsg.textContent = "⚠️ Error: " + err;
         statusMsg.className = "status error";
       });
+    }
+
+    // Close button ka function
+    function goBack() {
+      if (document.referrer) {
+        // pichhle page par le jao
+        window.location.href = document.referrer;
+      } else {
+        // agar referrer nahi hai to homepage ya koi default page
+        window.location.href = "index.html";
+      }
     }
   </script>
 </body>
