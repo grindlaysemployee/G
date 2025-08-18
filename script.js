@@ -157,12 +157,43 @@ function openleavebalance() {
         document.getElementById("leavebalanceSection").innerHTML = "<p>No leave records found.</p>";
         return;
       }
-      renderleavebalanceTable(data);
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      document.getElementById("leavebalanceSection").innerHTML = "<p>Something went wrong while fetching leave data.</p>";
-    });
+function renderleavebalanceTable(data) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button id="closeLeaveBalance" onclick="closeLeaveBalance()">Close</button>
+    <div class="leave-table-caption">Leave Balance : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="leaveBalanceTableFilter" placeholder="Search/filter... (e.g. Casual, Earned)">
+    <table class="leave-table" id="leaveBalanceTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("leavebalanceSection").innerHTML = html;
+
+  // Filter functionality
+  document.getElementById("leaveBalanceTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const table = document.getElementById("leaveBalanceTable");
+    const trs = table.getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      const rowText = trs[i].innerText.toLowerCase();
+      trs[i].style.display = rowText.includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closeLeaveBalance() {
+  document.getElementById("leavebalanceSection").classList.add("hidden");
+  document.getElementById("leavebalanceSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
 
