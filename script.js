@@ -2,6 +2,7 @@ const detailsApiUrl = "https://script.google.com/macros/s/AKfycbwGn3vhTAKP1_CWn4
 const leaveStatusApiUrl = "https://script.google.com/macros/s/AKfycbzgIQeO71mZpmmXifTWkaZoCjd0gKtw_QrX3RWsvimvFkxdbAchPamTOdLxOSwfOpsG/exec";
 const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0VGKXOGXQ_7rG0Td-5q6iai0brnQpcmqfQ8Rfu7DHBkiKL7SsdUZM/exec";
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
+const leavebalanceApiUrl = "https://script.google.com/macros/s/AKfycbwJxuG5ka47LsFfvKi137u0vXKmOmY9icucmeGG_13hEdediyPlrbK6_ear0HfQIBby/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -11,6 +12,7 @@ window.onload = function () {
   document.getElementById("loadingSpinner").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("leaveStatusSection").classList.add("hidden");
+    document.getElementById("leavebalanceSection").classList.add("hidden");
 };
 
 function login() {
@@ -136,6 +138,30 @@ function openAttendance() {
     .catch(err => {
       console.error("Error:", err);
       document.getElementById("attendanceSection").innerHTML = "<p>Something went wrong while fetching attendance data.</p>";
+    });
+}
+function openleavebalance() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("leavebalanceSection").innerHTML = `<div id="leavebalanceLoading">......LOADING......</div>`;
+  document.getElementById("leavebalanceSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${leavebalanceApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("leavebalanceSection").innerHTML = "<p>No leave records found.</p>";
+        return;
+      }
+      renderleavebalanceTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("leavebalanceSection").innerHTML = "<p>Something went wrong while fetching leave data.</p>";
     });
 }
 
