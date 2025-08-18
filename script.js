@@ -272,30 +272,36 @@ function openleavebalance() {
     });
 }
 
-function renderleavebalanceTable(data) {
-  const headers = Object.keys(data[0]);
+function renderLeaveStatus(data) {
+  let html = `
+    <div class="leave-table-container">
+      <button onclick="closeSection('leaveStatusSection')">Close</button>
+      <h3>Leave Status</h3>
+      <table>
+        <thead><tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+  document.getElementById("leaveStatusSection").innerHTML = html;
+  document.getElementById("leaveStatusSection").style.display = "block";
+}
 
-  let html = `<div class="leave-table-container">
-    <button id="closeLeaveBalance" onclick="closeLeaveBalance()">Close</button>
-    <div class="leave-table-caption">Leave Balance : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveBalanceTableFilter" placeholder="Search/filter... (e.g. Casual, Earned)">
-    <table class="leave-table" id="leaveBalanceTable">
-      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-      <tbody>
-        ${data.map(row => `<tr>${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}</tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById("leavebalanceSection").innerHTML = html;
-
-  document.getElementById("leaveBalanceTableFilter").addEventListener("input", function () {
-    const filter = this.value.toLowerCase();
-    const trs = document.getElementById("leaveBalanceTable").getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
-    }
-  });
+function renderLeaveBalance(data) {
+  let html = `
+    <div class="leave-table-container">
+      <button onclick="closeSection('leaveBalanceSection')">Close</button>
+      <h3>Leave Balance</h3>
+      <table>
+        <thead><tr>${Object.keys(data[0]).map(h => `<th>${h}</th>`).join("")}</tr></thead>
+        <tbody>
+          ${data.map(row => `<tr>${Object.values(row).map(v => `<td>${v}</td>`).join("")}</tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
+  document.getElementById("leaveBalanceSection").innerHTML = html;
+  document.getElementById("leaveBalanceSection").style.display = "block";
 }
 
 function closeLeaveBalance() {
