@@ -421,15 +421,34 @@ function opencomplainstatus() {
 function rendercomplainstatusTable(data) {
   const headers = Object.keys(data[0]);
 
+  // Date format function
+  function formatDate(dateStr) {
+    if (!dateStr) return "";
+    const date = new Date(dateStr);
+    if (isNaN(date)) return dateStr; // agar valid date nahi hai to raw text return kare
+    const day = String(date.getDate()).padStart(2, "0");
+    const month = date.toLocaleString("en-US", { month: "short" });
+    const year = String(date.getFullYear()).slice(-2);
+    return `${day}-${month}-${year}`;
+  }
+
   let html = `<div class="leave-table-container">
-    <button onclick="closecomplainstatus()">Close</button>
-    <div class="leave-table-caption">Complaint Status</div>
-    <input type="text" id="complainstatusTableFilter" placeholder="Search/filter...">
+    <button id="closecomplainstatus" onclick="closecomplainstatus()">Close</button>
+    <div class="leave-table-caption">Complaint Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="complainstatusTableFilter" placeholder="Search/filter... (e.g. Pending, Resolved)">
     <table class="leave-table" id="complainstatusTable">
-      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
       <tbody>
         ${data.map(row => `<tr>
-          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+          ${headers.map(h => {
+            let value = row[h] || "";
+            if (h.toLowerCase().includes("date")) {
+              value = formatDate(value);
+            }
+            return `<td>${value}</td>`;
+          }).join('')}
         </tr>`).join('')}
       </tbody>
     </table>
@@ -445,6 +464,7 @@ function rendercomplainstatusTable(data) {
     }
   });
 }
+
 
 function closecomplainstatus() {
   document.getElementById("complainstatusSection").classList.add("hidden");
