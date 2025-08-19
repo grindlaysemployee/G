@@ -407,36 +407,26 @@ function opencomplainstatus() {
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("complainstatusSection").innerHTML = "<p>No leave records found.</p>";
+        document.getElementById("complainstatusSection").innerHTML = "<p>No complaint records found.</p>";
         return;
       }
       rendercomplainstatusTable(data);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("complainstatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+      document.getElementById("complainstatusSection").innerHTML = "<p>Something went wrong while fetching complaint status.</p>";
     });
-}
-
-function formatDate(dateStr) {
-  if (!dateStr) return "";
-  let d = new Date(dateStr);
-  if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
 function rendercomplainstatusTable(data) {
   const headers = Object.keys(data[0]);
 
   let html = `<div class="leave-table-container">
-    <button id="closecomplainstatus" onclick="closecomplainstatus()">Close</button>
-    <div class="leave-table-caption">Complaint Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="complainstatusTableFilter" placeholder="Search/filter... (e.g. Pending, Resolved)">
+    <button onclick="closecomplainstatus()">Close</button>
+    <div class="leave-table-caption">Complaint Status</div>
+    <input type="text" id="complainstatusTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="complainstatusTable">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
