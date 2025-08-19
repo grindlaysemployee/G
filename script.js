@@ -475,8 +475,8 @@ function closecomplainstatus() {
 }
 
 // ================= DOCUMENT STATUS =================
-function opendocumentstatus() {
-  document.getElementById("documentSection").innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT 7 SEC....</div>`;
+function opendocument() {
+  document.getElementById("documentSection").innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
   document.getElementById("documentSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -499,7 +499,7 @@ function renderdocumentTable(data) {
   const headers = Object.keys(data[0]);
 
   let html = `<div class="leave-table-container">
-    <button id="closedocumentstatus" onclick="closedocumentstatus()">Close</button>
+    <button id="closedocument" onclick="closedocument()">Close</button>
     <input type="text" id="documentTableFilter" placeholder="Search/filter...">
     <table class="leave-table" id="documentTable">
       <thead>
@@ -524,7 +524,7 @@ function renderdocumentTable(data) {
   });
 }
 
-function closedocumentstatus() {
+function closedocument() {
   document.getElementById("documentSection").classList.add("hidden");
   document.getElementById("documentSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
