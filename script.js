@@ -99,7 +99,7 @@ function openLeaveStatus() {
     return;
   }
 
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING......</div>`;
+  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING..PLEASE WAIT 5 SEC....</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -176,7 +176,7 @@ function openAttendance() {
     return;
   }
 
-  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING......</div>`;
+  document.getElementById("attendanceSection").innerHTML = `<div id="attendanceLoading">......LOADING..PLEASE WAIT 7 SEC  ....</div>`;
   document.getElementById("attendanceSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -254,7 +254,7 @@ function openleavebalance() {
     return;
   }
 
-  document.getElementById("leavebalanceSection").innerHTML = `<div id="leavebalanceLoading">......LOADING......</div>`;
+  document.getElementById("leavebalanceSection").innerHTML = `<div id="leavebalanceLoading">......LOADING...PLEASE WAIT 6 SEC...</div>`;
   document.getElementById("leavebalanceSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -326,7 +326,7 @@ function opensalaryslip() {
     return;
   }
 
-  document.getElementById("salarySection").innerHTML = `<div id="salaryLoading">......LOADING......</div>`;
+  document.getElementById("salarySection").innerHTML = `<div id="salaryLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
   document.getElementById("salarySection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -399,7 +399,7 @@ function opencomplainstatus() {
     return;
   }
 
-  document.getElementById("complainstatusSection").innerHTML = `<div id="complainstatusLoading">......LOADING......</div>`;
+  document.getElementById("complainstatusSection").innerHTML = `<div id="complainstatusLoading">......LOADING..PLEASE WAIT 7 SEC....</div>`;
   document.getElementById("complainstatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
