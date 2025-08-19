@@ -474,34 +474,43 @@ function closecomplainstatus() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
-// ================= DOCUMENT STATUS =================
+// ======== DOCUMENT =========
 function opendocument() {
-  document.getElementById("documentSection").innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
-  document.getElementById("documentSection").classList.remove("hidden");
+  const section = document.getElementById("documentSection");
+  section.innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT....</div>`;
+  section.classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
   fetch(`${documentApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
       if (!data || data.length === 0) {
-        document.getElementById("documentSection").innerHTML = "<p>No document records found.</p>";
+        section.innerHTML = "<p>No document records found.</p>";
         return;
       }
-      renderdocumentTable(data);
+      renderTable(data, "documentSection", "documentTable", "closedocument");
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("documentSection").innerHTML = "<p>Something went wrong while fetching document status.</p>";
+      section.innerHTML = "<p>Something went wrong while fetching document status.</p>";
     });
 }
 
-function renderdocumentTable(data) {
+function closedocument() {
+  const section = document.getElementById("documentSection");
+  section.classList.add("hidden");
+  section.innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+// ======== COMMON TABLE RENDERER =========
+function renderTable(data, sectionId, tableId, closeFnName) {
   const headers = Object.keys(data[0]);
 
   let html = `<div class="leave-table-container">
-    <button id="closedocument" onclick="closedocument()">Close</button>
-    <input type="text" id="documentTableFilter" placeholder="Search/filter...">
-    <table class="leave-table" id="documentTable">
+    <button onclick="${closeFnName}()">Close</button>
+    <input type="text" id="${tableId}Filter" placeholder="Search/filter...">
+    <table class="leave-table" id="${tableId}">
       <thead>
         <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
       </thead>
@@ -513,21 +522,16 @@ function renderdocumentTable(data) {
     </table>
   </div>`;
 
-  document.getElementById("documentSection").innerHTML = html;
+  document.getElementById(sectionId).innerHTML = html;
 
-  document.getElementById("documentTableFilter").addEventListener("input", function () {
+  // search filter
+  document.getElementById(`${tableId}Filter`).addEventListener("input", function () {
     const filter = this.value.toLowerCase();
-    const trs = document.getElementById("documentTable").getElementsByTagName("tr");
+    const trs = document.getElementById(tableId).getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
       trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
     }
   });
-}
-
-function closedocument() {
-  document.getElementById("documentSection").classList.add("hidden");
-  document.getElementById("documentSection").innerHTML = "";
-  document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
 
