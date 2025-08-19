@@ -428,25 +428,18 @@ function formatDate(dateStr) {
 
 function rendercomplainstatusTable(data) {
   const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
 
   let html = `<div class="leave-table-container">
     <button id="closecomplainstatus" onclick="closecomplainstatus()">Close</button>
-    <div class="leave-table-caption">Status : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
-    <table class="leave-table" id="leaveStatusTable">
+    <div class="leave-table-caption">Complaint Status : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="complainstatusTableFilter" placeholder="Search/filter... (e.g. Pending, Resolved)">
+    <table class="leave-table" id="complainstatusTable">
       <thead>
         <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
       </thead>
       <tbody>
         ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
+          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
         </tr>`).join('')}
       </tbody>
     </table>
@@ -454,7 +447,7 @@ function rendercomplainstatusTable(data) {
 
   document.getElementById("complainstatusSection").innerHTML = html;
 
-  document.getElementById("complainstatusTableFilter").addEventListener("input", function() {
+  document.getElementById("complainstatusTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
     const trs = document.getElementById("complainstatusTable").getElementsByTagName("tr");
     for (let i = 1; i < trs.length; i++) {
