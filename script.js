@@ -4,6 +4,7 @@ const attendanceApiUrl = "https://script.google.com/macros/s/AKfycbxxIX6YIb7Q5t0
 const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIEA1Pe5kbmmkSlMvX1nsDBGR0taJ1a3hohqRB6pFge1CJMfx-3n_I5r/exec";
 const leavebalanceApiUrl = "https://script.google.com/macros/s/AKfycbwJxuG5ka47LsFfvKi137u0vXKmOmY9icucmeGG_13hEdediyPlrbK6_ear0HfQIBby/exec";
 const complainstatusApiUrl = "https://script.google.com/macros/s/AKfycbyVbcJNj_TKOpgaLOgX5E0r-XuIXwBFfJyAwcu3XsX1278xhDV1LETv8Ls2VBk7zQsi/exec";
+const documentApiUrl = "https://script.google.com/macros/s/AKfycbxo0qwtJisSIzbmcO7oUfZTRfceWRvsucs_ZJg9-g5mu_yCKwJyKHDBBl0Q8eBlIlwxsg/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -15,6 +16,7 @@ window.onload = function () {
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leavebalanceSection").classList.add("hidden");
    document.getElementById("complainstatusSection").classList.add("hidden");
+     document.getElementById("documentSection").classList.add("hidden");
 };
 
 // ================= LOGIN =================
@@ -471,6 +473,64 @@ function closecomplainstatus() {
   document.getElementById("complainstatusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
+
+// ================= DOCUMENT STATUS =================
+function opendocumentstatus() {
+  document.getElementById("documentSection").innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT 7 SEC....</div>`;
+  document.getElementById("documentSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${documentApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("documentSection").innerHTML = "<p>No document records found.</p>";
+        return;
+      }
+      renderdocumentTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("documentSection").innerHTML = "<p>Something went wrong while fetching document status.</p>";
+    });
+}
+
+function renderdocumentTable(data) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button id="closedocumentstatus" onclick="closedocumentstatus()">Close</button>
+    <input type="text" id="documentTableFilter" placeholder="Search/filter...">
+    <table class="leave-table" id="documentTable">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("documentSection").innerHTML = html;
+
+  document.getElementById("documentTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const trs = document.getElementById("documentTable").getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closedocumentstatus() {
+  document.getElementById("documentSection").classList.add("hidden");
+  document.getElementById("documentSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
+
+
 
 
 // ================= LOGOUT =================
