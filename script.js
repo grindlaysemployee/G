@@ -495,10 +495,14 @@ function opendocument() {
         return;
       }
 
-      // Format date fields before rendering
+      // Format date fields + Convert URL to View link
       const formattedData = data.map(row => {
         if (row.Date) row.Date = formatDate(row.Date);
         if (row.SolutionDate) row.SolutionDate = formatDate(row.SolutionDate);
+
+        if (row.URL) {
+          row.URL = `<a href="${row.URL}" target="_blank" style="color:#007bff; text-decoration:underline;">View</a>`;
+        }
         return row;
       });
 
@@ -518,36 +522,7 @@ function closedocument() {
 }
 
 
-// ======== COMMON TABLE RENDERER =========
-function renderTable(data, sectionId, tableId, closeFnName) {
-  const headers = Object.keys(data[0]);
 
-  let html = `<div class="leave-table-container">
-    <button onclick="${closeFnName}()">Close</button>
-    <input type="text" id="${tableId}Filter" placeholder="Search/filter...">
-    <table class="leave-table" id="${tableId}">
-      <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
-      </thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
-
-  document.getElementById(sectionId).innerHTML = html;
-
-  // search filter
-  document.getElementById(`${tableId}Filter`).addEventListener("input", function () {
-    const filter = this.value.toLowerCase();
-    const trs = document.getElementById(tableId).getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
-    }
-  });
-}
 
 
 
