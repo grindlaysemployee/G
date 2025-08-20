@@ -496,10 +496,15 @@ function opendocument() {
         return;
       }
 
-      // Format date fields before rendering
+      // Format date fields + Convert URL column into View link
       const formattedData = data.map(row => {
         if (row.Date) row.Date = formatDate(row.Date);
         if (row.SolutionDate) row.SolutionDate = formatDate(row.SolutionDate);
+
+        if (row["File URL"]) {
+          row["File URL"] = `<a href="${row["File URL"]}" target="_blank" 
+            style="color:#00ffcc; font-weight:bold; text-decoration:underline;">View</a>`;
+        }
         return row;
       });
 
