@@ -597,23 +597,23 @@ function renderbonusTable(data) {
            !lower.includes("file");
   });
 
-  // Custom date formatter for dd-mm-yyyy → mmm-yy
-  const formatDate = (dateStr) => {
-    if (!dateStr) return "";
-    const parts = dateStr.split("-");
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      const date = new Date(year, month, day);
-      if (!isNaN(date)) {
-        return date.toLocaleString("en-GB", {
-          month: "short",
-          year: "2-digit",
-        }).replace(" ", "-"); // Apr-24
-      }
+  // Custom date formatter → mmm-yy
+  const formatDate = (value) => {
+    if (!value) return "";
+
+    // Agar API se number aaye (Google Sheets serial date)
+    if (!isNaN(value)) {
+      const date = new Date(Math.round((value - 25569) * 86400 * 1000)); 
+      return date.toLocaleString("en-GB", { month: "short", year: "2-digit" }).replace(" ", "-");
     }
-    return dateStr; // fallback if invalid
+
+    // Agar string date aaye
+    const date = new Date(value);
+    if (!isNaN(date)) {
+      return date.toLocaleString("en-GB", { month: "short", year: "2-digit" }).replace(" ", "-");
+    }
+
+    return value; // fallback
   };
 
   let html = `
@@ -661,7 +661,6 @@ function closebonus() {
   document.getElementById("bonusSection").innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
-
 
 
 
