@@ -477,22 +477,36 @@ function closecomplainstatus() {
 // ======== DOCUMENT =========
 function opendocument() {
   const section = document.getElementById("documentSection");
-  section.innerHTML = `<div id="documentLoading">......LOADING..PLEASE WAIT....</div>`;
+  section.innerHTML = `
+    <div id="documentLoading" style="padding:10px; font-weight:bold; color:#007bff;">
+      ......LOADING..PLEASE WAIT....
+    </div>`;
   section.classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
   fetch(`${documentApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
+    .then(res => {
+      if (!res.ok) throw new Error("Network response was not ok");
+      return res.json();
+    })
     .then(data => {
       if (!data || data.length === 0) {
-        section.innerHTML = "<p>No document records found.</p>";
+        section.innerHTML = "<p style='color:red;'>No document records found.</p>";
         return;
       }
-      renderTable(data, "documentSection", "documentTable", "closedocument");
+
+      // Format date fields before rendering
+      const formattedData = data.map(row => {
+        if (row.Date) row.Date = formatDate(row.Date);
+        if (row.SolutionDate) row.SolutionDate = formatDate(row.SolutionDate);
+        return row;
+      });
+
+      renderTable(formattedData, "documentSection", "documentTable", "closedocument");
     })
     .catch(err => {
       console.error("Error:", err);
-      section.innerHTML = "<p>Something went wrong while fetching document status.</p>";
+      section.innerHTML = "<p style='color:red;'>Something went wrong while fetching document status.</p>";
     });
 }
 
@@ -502,6 +516,7 @@ function closedocument() {
   section.innerHTML = "";
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
+
 
 // ======== COMMON TABLE RENDERER =========
 function renderTable(data, sectionId, tableId, closeFnName) {
