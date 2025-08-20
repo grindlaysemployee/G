@@ -571,6 +571,7 @@ function openbonus() {
   fetch(`${bonusApiUrl}?empid=${empIdGlobal}`)
     .then(res => res.json())
     .then(data => {
+      console.log("Bonus API Response:", data); // Debugging
       if (!data || data.length === 0) {
         document.getElementById("bonusSection").innerHTML = "<p>No bonus records found.</p>";
         return;
@@ -584,26 +585,36 @@ function openbonus() {
 }
 
 function renderbonusTable(data) {
-  const headers = Object.keys(data[0]);
+  // Table headings (empid aur url-type fields ko hata diya)
+  const headers = Object.keys(data[0]).filter(h => {
+    const lower = h.toLowerCase();
+    return lower !== "empid" && !lower.includes("url") && !lower.includes("link") && !lower.includes("file");
+  });
 
+  // Custom date formatter for dd-mm-yyyy
   const formatDate = (dateStr) => {
-    const date = new Date(dateStr);
-    return date.toLocaleString('en-US', { month: 'short', year: '2-digit' }).replace(',', '-');
+    if (!dateStr) return "";
+    const parts = dateStr.split("-");
+    if (parts.length === 3) {
+      // dd-mm-yyyy → new Date(year, month-1, day)
+      return new Date(parts[2], parts[1] - 1, parts[0])
+        .toLocaleString('en-GB', { month: 'short', year: '2-digit' }) // e.g. Apr-24
+        .replace(" ", "-");
+    }
+    return dateStr;
   };
 
   let html = `<div class="leave-table-container">
     <button id="closebonus" onclick="closebonus()">Close</button>
-    <div class="leave-table-caption">bonus : ${data[0][headers[0]] || ""}</div>
-    <input type="text" id="bonusTableFilter" placeholder="Search/filter... (e.g. Jan-24)">
+    <div class="leave-table-caption">Bonus Records</div>
+    <input type="text" id="bonusTableFilter" placeholder="Search/filter... (e.g. Apr-24)">
     <table class="leave-table" id="bonusTable">
       <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
       <tbody>
         ${data.map(row => `<tr>
           ${headers.map(h => {
             const value = row[h];
-            if (String(value).includes("https://")) {
-              return `<td><a href="${value}" target="_blank">View</a></td>`;
-            } else if (h.toLowerCase().includes("month")) {
+            if (h.toLowerCase().includes("month")) {
               return `<td>${formatDate(value)}</td>`;
             }
             return `<td>${value || ""}</td>`;
@@ -615,6 +626,7 @@ function renderbonusTable(data) {
 
   document.getElementById("bonusSection").innerHTML = html;
 
+  // Search filter
   document.getElementById("bonusTableFilter").addEventListener("input", function () {
     const filter = this.value.toLowerCase();
     const trs = document.getElementById("bonusTable").getElementsByTagName("tr");
