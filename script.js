@@ -558,7 +558,7 @@ function renderTable(data, sectionId, tableId, closeFnName) {
 }
 
 // ================= BONUS =================
-function openbonua() {
+function openbonus() {
   if (!empIdGlobal) {
     alert("Employee ID not found. Please login again.");
     return;
