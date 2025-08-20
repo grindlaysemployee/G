@@ -564,7 +564,8 @@ function openbonus() {
     return;
   }
 
-  document.getElementById("bonusSection").innerHTML = `<div id="bonusLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
+  document.getElementById("bonusSection").innerHTML =
+    `<div id="bonusLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
   document.getElementById("bonusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
@@ -573,67 +574,86 @@ function openbonus() {
     .then(data => {
       console.log("Bonus API Response:", data); // Debugging
       if (!data || data.length === 0) {
-        document.getElementById("bonusSection").innerHTML = "<p>No bonus records found.</p>";
+        document.getElementById("bonusSection").innerHTML =
+          "<p>No bonus records found.</p>";
         return;
       }
       renderbonusTable(data);
     })
     .catch(err => {
       console.error("Error:", err);
-      document.getElementById("bonusSection").innerHTML = "<p>Something went wrong while fetching bonus data.</p>";
+      document.getElementById("bonusSection").innerHTML =
+        "<p>Something went wrong while fetching bonus data.</p>";
     });
 }
 
 function renderbonusTable(data) {
-  // Table headings (empid aur url-type fields ko hata diya)
+  // Filter headers (empid / url-type fields remove)
   const headers = Object.keys(data[0]).filter(h => {
     const lower = h.toLowerCase();
-    return lower !== "empid" && !lower.includes("url") && !lower.includes("link") && !lower.includes("file");
+    return lower !== "empid" &&
+           !lower.includes("url") &&
+           !lower.includes("link") &&
+           !lower.includes("file");
   });
 
-  // Custom date formatter for dd-mm-yyyy
+  // Custom date formatter for dd-mm-yyyy → mmm-yy
   const formatDate = (dateStr) => {
     if (!dateStr) return "";
     const parts = dateStr.split("-");
     if (parts.length === 3) {
-      // dd-mm-yyyy → new Date(year, month-1, day)
-      return new Date(parts[2], parts[1] - 1, parts[0])
-        .toLocaleString('en-GB', { month: 'short', year: '2-digit' }) // e.g. Apr-24
-        .replace(" ", "-");
+      const day = parseInt(parts[0], 10);
+      const month = parseInt(parts[1], 10) - 1;
+      const year = parseInt(parts[2], 10);
+      const date = new Date(year, month, day);
+      if (!isNaN(date)) {
+        return date.toLocaleString("en-GB", {
+          month: "short",
+          year: "2-digit",
+        }).replace(" ", "-"); // Apr-24
+      }
     }
-    return dateStr;
+    return dateStr; // fallback if invalid
   };
 
-  let html = `<div class="leave-table-container">
-    <button id="closebonus" onclick="closebonus()">Close</button>
-    <div class="leave-table-caption">Bonus Records</div>
-    <input type="text" id="bonusTableFilter" placeholder="Search/filter... (e.g. Apr-24)">
-    <table class="leave-table" id="bonusTable">
-      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
-      <tbody>
-        ${data.map(row => `<tr>
-          ${headers.map(h => {
-            const value = row[h];
-            if (h.toLowerCase().includes("month")) {
-              return `<td>${formatDate(value)}</td>`;
-            }
-            return `<td>${value || ""}</td>`;
-          }).join('')}
-        </tr>`).join('')}
-      </tbody>
-    </table>
-  </div>`;
+  let html = `
+    <div class="leave-table-container">
+      <button id="closebonus" onclick="closebonus()">Close</button>
+      <div class="leave-table-caption">Bonus Records</div>
+      <input type="text" id="bonusTableFilter" placeholder="Search/filter... (e.g. Apr-24)">
+      <table class="leave-table" id="bonusTable">
+        <thead>
+          <tr>${headers.map(h => `<th>${h}</th>`).join("")}</tr>
+        </thead>
+        <tbody>
+          ${data.map(row => `
+            <tr>
+              ${headers.map(h => {
+                const value = row[h];
+                if (h.toLowerCase() === "month") {
+                  return `<td>${formatDate(value)}</td>`;
+                }
+                return `<td>${value || ""}</td>`;
+              }).join("")}
+            </tr>`).join("")}
+        </tbody>
+      </table>
+    </div>`;
 
   document.getElementById("bonusSection").innerHTML = html;
 
   // Search filter
-  document.getElementById("bonusTableFilter").addEventListener("input", function () {
-    const filter = this.value.toLowerCase();
-    const trs = document.getElementById("bonusTable").getElementsByTagName("tr");
-    for (let i = 1; i < trs.length; i++) {
-      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
-    }
-  });
+  document.getElementById("bonusTableFilter")
+    .addEventListener("input", function () {
+      const filter = this.value.toLowerCase();
+      const trs = document
+        .getElementById("bonusTable")
+        .getElementsByTagName("tr");
+      for (let i = 1; i < trs.length; i++) {
+        trs[i].style.display =
+          trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+      }
+    });
 }
 
 function closebonus() {
