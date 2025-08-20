@@ -521,6 +521,37 @@ function closedocument() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
+// ======== COMMON TABLE RENDERER =========
+function renderTable(data, sectionId, tableId, closeFnName) {
+  const headers = Object.keys(data[0]);
+
+  let html = `<div class="leave-table-container">
+    <button onclick="${closeFnName}()">Close</button>
+    <input type="text" id="${tableId}Filter" placeholder="Search/filter...">
+    <table class="leave-table" id="${tableId}">
+      <thead>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+      </thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => `<td>${row[h] || ""}</td>`).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById(sectionId).innerHTML = html;
+
+  // search filter
+  document.getElementById(`${tableId}Filter`).addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const trs = document.getElementById(tableId).getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+
 
 
 
