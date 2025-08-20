@@ -5,6 +5,7 @@ const salaryslipApiUrl = "https://script.google.com/macros/s/AKfycbwkqDU3D3tYmIE
 const leavebalanceApiUrl = "https://script.google.com/macros/s/AKfycbwJxuG5ka47LsFfvKi137u0vXKmOmY9icucmeGG_13hEdediyPlrbK6_ear0HfQIBby/exec";
 const complainstatusApiUrl = "https://script.google.com/macros/s/AKfycbyVbcJNj_TKOpgaLOgX5E0r-XuIXwBFfJyAwcu3XsX1278xhDV1LETv8Ls2VBk7zQsi/exec";
 const documentApiUrl = "https://script.google.com/macros/s/AKfycbxo0qwtJisSIzbmcO7oUfZTRfceWRvsucs_ZJg9-g5mu_yCKwJyKHDBBl0Q8eBlIlwxsg/exec";
+const bonusApiUrl = "https://script.google.com/macros/s/AKfycbzabVtIqK13X2IgL52uXcZi6O5Mrm_CwOj-7LBCl8d8XRonGBpQNB8-Gf7cCuwmQWZU/exec";
 let empIdGlobal = "";
 let leaveStatusURL = "";
 
@@ -556,6 +557,78 @@ function renderTable(data, sectionId, tableId, closeFnName) {
   });
 }
 
+// ================= BONUS =================
+function openbonua() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
+    return;
+  }
+
+  document.getElementById("bonusSection").innerHTML = `<div id="bonusLoading">......LOADING..PLEASE WAIT 6 SEC....</div>`;
+  document.getElementById("bonusSection").classList.remove("hidden");
+  document.getElementById("employeeDetails").classList.add("hidden");
+
+  fetch(`${bonusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("bonusSection").innerHTML = "<p>No bonus records found.</p>";
+        return;
+      }
+      renderbonusTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("bonusSection").innerHTML = "<p>Something went wrong while fetching bonus data.</p>";
+    });
+}
+
+function renderbonusTable(data) {
+  const headers = Object.keys(data[0]);
+
+  const formatDate = (dateStr) => {
+    const date = new Date(dateStr);
+    return date.toLocaleString('en-US', { month: 'short', year: '2-digit' }).replace(',', '-');
+  };
+
+  let html = `<div class="leave-table-container">
+    <button id="closebonus" onclick="closebonus()">Close</button>
+    <div class="leave-table-caption">bonus : ${data[0][headers[0]] || ""}</div>
+    <input type="text" id="bonusTableFilter" placeholder="Search/filter... (e.g. Jan-24)">
+    <table class="leave-table" id="bonusTable">
+      <thead><tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr></thead>
+      <tbody>
+        ${data.map(row => `<tr>
+          ${headers.map(h => {
+            const value = row[h];
+            if (String(value).includes("https://")) {
+              return `<td><a href="${value}" target="_blank">View</a></td>`;
+            } else if (h.toLowerCase().includes("month")) {
+              return `<td>${formatDate(value)}</td>`;
+            }
+            return `<td>${value || ""}</td>`;
+          }).join('')}
+        </tr>`).join('')}
+      </tbody>
+    </table>
+  </div>`;
+
+  document.getElementById("bonusSection").innerHTML = html;
+
+  document.getElementById("bonusTableFilter").addEventListener("input", function () {
+    const filter = this.value.toLowerCase();
+    const trs = document.getElementById("bonusTable").getElementsByTagName("tr");
+    for (let i = 1; i < trs.length; i++) {
+      trs[i].style.display = trs[i].innerText.toLowerCase().includes(filter) ? "" : "none";
+    }
+  });
+}
+
+function closebonus() {
+  document.getElementById("bonusSection").classList.add("hidden");
+  document.getElementById("bonusSection").innerHTML = "";
+  document.getElementById("employeeDetails").classList.remove("hidden");
+}
 
 
 
