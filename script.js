@@ -474,6 +474,7 @@ function closecomplainstatus() {
   document.getElementById("employeeDetails").classList.remove("hidden");
 }
 
+
 // ======== DOCUMENT =========
 function opendocument() {
   const section = document.getElementById("documentSection");
@@ -495,14 +496,10 @@ function opendocument() {
         return;
       }
 
-      // Format date fields + Convert URL to View link
+      // Format date fields before rendering
       const formattedData = data.map(row => {
         if (row.Date) row.Date = formatDate(row.Date);
         if (row.SolutionDate) row.SolutionDate = formatDate(row.SolutionDate);
-
-        if (row.URL) {
-          row.URL = `<a href="${row.URL}" target="_blank" style="color:#007bff; text-decoration:underline;">View</a>`;
-        }
         return row;
       });
 
@@ -513,6 +510,8 @@ function opendocument() {
       section.innerHTML = "<p style='color:red;'>Something went wrong while fetching document status.</p>";
     });
 }
+
+
 
 function closedocument() {
   const section = document.getElementById("documentSection");
