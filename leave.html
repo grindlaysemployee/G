@@ -2,262 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Leave Form</title>
+  <title>Leave Application Form</title>
   <style>
-    body {
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: #000; /* Black background */
-      margin: 0;
-      padding: 20px;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      min-height: 100vh;
-      color: #FFD700;
-    }
-
-    .container {
-      background: #1a1a1a;
-      border-radius: 12px;
-      box-shadow: 0 0 25px rgba(255, 215, 0, 0.2);
-      width: 90%;
-      max-width: 750px;
-      animation: fadeIn 0.6s ease-in-out;
-      overflow-y: auto;
-      max-height: 90vh;
-      border: 1px solid #FFD700;
-    }
-
-    h2 {
-      text-align: center;
-      background: #FFD700;
-      color: #000;
-      padding: 15px;
-      margin: 0;
-      font-size: 22px;
-      font-weight: bold;
-      border-radius: 12px 12px 0 0;
-      text-transform: uppercase;
-      letter-spacing: 1px;
-    }
-
-    .freeze-section {
-      position: sticky;
-      top: 0;
-      background: #1a1a1a;
-      padding: 15px;
-      border-bottom: 2px solid #FFD700;
-      z-index: 100;
-    }
-
-    form {
-      padding: 20px;
-    }
-
-    label {
-      font-weight: 600;
-      display: block;
-      margin-bottom: 6px;
-      color: #FFD700;
-    }
-
-    input, textarea {
-      width: 100%;
-      padding: 12px;
-      margin-bottom: 18px;
-      border: 1px solid #FFD700;
-      border-radius: 8px;
-      outline: none;
-      background: transparent;
-      color: #fff;
-      font-size: 14px;
-      transition: 0.3s;
-    }
-
-    input:focus, textarea:focus {
-      border-color: #fff;
-      box-shadow: 0 0 6px #FFD700;
-    }
-
-    textarea {
-      resize: none;
-      height: 90px;
-    }
-
-    .password-wrapper {
-      position: relative;
-      display: flex;
-      align-items: center;
-    }
-
-    .password-wrapper input {
-      padding-right: 40px;
-    }
-
-    .toggle-password {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      cursor: pointer;
-      font-size: 18px;
-      color: #FFD700;
-    }
-
-    /* Reason Options */
-    .reason-options {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 12px;
-      margin-bottom: 18px;
-    }
-
-    .reason-option {
-      flex: 1 1 45%;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      background: #111;
-      border: 2px solid #FFD700;
-      border-radius: 10px;
-      padding: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-
-    .reason-option:hover {
-      background: #222;
-      transform: scale(1.02);
-    }
-
-    .reason-option input {
-      display: none;
-    }
-
-    .reason-option img {
-      width: 32px;
-      height: 32px;
-      border-radius: 5px;
-    }
-
-    .reason-option span {
-      color: #FFD700;
-      font-size: 15px;
-      transition: 0.3s;
-    }
-
-    .reason-option input:checked ~ span {
-      color: #000;
-      background: #FFD700;
-      padding: 3px 8px;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-
-    .reason-option input:checked ~ img {
-      border: 2px solid #FFD700;
-      border-radius: 6px;
-    }
-
-    /* Type Section */
-    .type-options {
-      display: flex;
-      gap: 15px;
-      margin-bottom: 18px;
-    }
-    .type-options label {
-      flex: 1;
-      text-align: center;
-      background: #111;
-      border: 2px solid #FFD700;
-      border-radius: 10px;
-      padding: 10px;
-      cursor: pointer;
-      transition: 0.3s;
-    }
-    .type-options input {
-      display: none;
-    }
-    .type-options span {
-      color: #FFD700;
-      font-size: 15px;
-      font-weight: 500;
-    }
-    .type-options input:checked + span {
-      color: #000;
-      background: #FFD700;
-      padding: 6px 12px;
-      border-radius: 6px;
-      font-weight: bold;
-    }
-
-    button {
-      width: 100%;
-      padding: 14px;
-      background: #FFD700;
-      border: none;
-      border-radius: 8px;
-      color: #000;
-      font-size: 16px;
-      font-weight: bold;
-      cursor: pointer;
-      transition: 0.3s;
-      margin-top: 8px;
-    }
-
-    button:hover {
-      background: #000;
-      color: #FFD700;
-      border: 1px solid #FFD700;
-    }
-
-    .close-btn {
-      background: #dc3545;
-      color: #fff;
-    }
-
-    .close-btn:hover {
-      background: #a71d2a;
-      color: #fff;
-      border: none;
-    }
-
-    @keyframes fadeIn {
-      from { opacity: 0; transform: translateY(-10px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
-
-    @media (max-width: 768px) {
-      .container {
-        width: 100%;
-        border-radius: 0;
-        height: 100vh;
-      }
-      h2 {
-        font-size: 18px;
-      }
-    }
-
-    /* ✅ Status Box in Center */
-    .status-box {
-      position: fixed;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: #fff;
-      color: #333;
-      padding: 20px 30px;
-      border-radius: 10px;
-      box-shadow: 0px 4px 15px rgba(0,0,0,0.3);
-      font-size: 18px;
-      font-weight: bold;
-      text-align: center;
-      z-index: 9999;
-      display: none;
-    }
+    body { font-family: 'Segoe UI', sans-serif; background: #000; margin: 0; padding: 20px; color: #FFD700; display: flex; justify-content: center; align-items: flex-start; min-height: 100vh; }
+    .container { background: #1a1a1a; border-radius: 12px; box-shadow: 0 0 25px rgba(255, 215, 0, 0.2); width: 90%; max-width: 750px; animation: fadeIn 0.6s ease-in-out; overflow-y: auto; max-height: 90vh; border: 1px solid #FFD700; }
+    h2 { text-align: center; background: #FFD700; color: #000; padding: 15px; margin: 0; font-size: 22px; font-weight: bold; border-radius: 12px 12px 0 0; text-transform: uppercase; letter-spacing: 1px; }
+    .freeze-section { position: sticky; top: 0; background: #1a1a1a; padding: 15px; border-bottom: 2px solid #FFD700; z-index: 100; }
+    form { padding: 20px; }
+    label { font-weight: 600; display: block; margin-bottom: 6px; color: #FFD700; }
+    input, textarea { width: 100%; padding: 12px; margin-bottom: 18px; border: 1px solid #FFD700; border-radius: 8px; background: transparent; color: #fff; font-size: 14px; transition: 0.3s; }
+    input:focus, textarea:focus { border-color: #fff; box-shadow: 0 0 6px #FFD700; }
+    .password-wrapper { position: relative; display: flex; align-items: center; }
+    .password-wrapper input { padding-right: 40px; }
+    .toggle-password { position: absolute; right: 10px; top: 50%; transform: translateY(-50%); cursor: pointer; font-size: 18px; color: #FFD700; }
+    .type-options, .reason-options { display: flex; gap: 15px; margin-bottom: 18px; }
+    .type-options label, .reason-option { flex: 1; text-align: center; background: #111; border: 2px solid #FFD700; border-radius: 10px; padding: 10px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 10px; }
+    .type-options input, .reason-option input { display: none; }
+    .type-options span, .reason-option span { color: #FFD700; font-size: 15px; }
+    .type-options input:checked + span, .reason-option input:checked ~ span { color: #000; background: #FFD700; padding: 3px 8px; border-radius: 6px; font-weight: bold; }
+    .reason-option img { width: 32px; height: 32px; border-radius: 5px; }
+    button { width: 100%; padding: 14px; background: #FFD700; border: none; border-radius: 8px; color: #000; font-size: 16px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 8px; }
+    button:hover { background: #000; color: #FFD700; border: 1px solid #FFD700; }
+    .close-btn { background: #dc3545; color: #fff; }
+    .close-btn:hover { background: #a71d2a; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+    .status-box { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: #fff; color: #333; padding: 20px 30px; border-radius: 10px; box-shadow: 0px 4px 15px rgba(0,0,0,0.3); font-size: 18px; font-weight: bold; text-align: center; z-index: 9999; display: none; }
     .status-box.success { border: 2px solid #4CAF50; color: #4CAF50; }
-    .status-box.error   { border: 2px solid #F44336; color: #F44336; }
+    .status-box.error { border: 2px solid #F44336; color: #F44336; }
   </style>
 </head>
 <body>
@@ -267,7 +38,6 @@
       <div class="freeze-section">
         <label>Employee Name:</label>
         <input type="text" id="empName" required autocomplete="name">
-
         <label>Password:</label>
         <div class="password-wrapper">
           <input type="password" id="password" required autocomplete="current-password">
@@ -275,54 +45,24 @@
         </div>
       </div>
 
-      <!-- Type Section -->
       <label>Type:</label>
       <div class="type-options">
-        <label>
-          <input type="radio" name="leaveType" value="Full Day" required>
-          <span>Full Day</span>
-        </label>
-        <label>
-          <input type="radio" name="leaveType" value="Half Day">
-          <span>Half Day</span>
-        </label>
-        <label>
-          <input type="radio" name="leaveType" value="Short Leave">
-          <span>Short Leave</span>
-        </label>
+        <label><input type="radio" name="leaveType" value="Full Day" required><span>Full Day</span></label>
+        <label><input type="radio" name="leaveType" value="Half Day"><span>Half Day</span></label>
+        <label><input type="radio" name="leaveType" value="Short Leave"><span>Short Leave</span></label>
       </div>
 
       <label>Start Date:</label>
       <input type="date" id="startDate" readonly required>
-
       <label>End Date:</label>
       <input type="date" id="endDate" required onclick="this.showPicker()">
 
       <label>Reason:</label>
       <div class="reason-options">
-        <label class="reason-option">
-          <input type="checkbox" value="Medical Issue">
-          <img src="https://img.icons8.com/color/48/medical-doctor.png" alt="Medical">
-          <span>Medical Issue</span>
-        </label>
-
-        <label class="reason-option">
-          <input type="checkbox" value="Urgent Work">
-          <img src="https://img.icons8.com/color/48/work.png" alt="Work">
-          <span>Urgent Work</span>
-        </label>
-
-        <label class="reason-option">
-          <input type="checkbox" value="Personal Reason">
-          <img src="https://img.icons8.com/color/48/conference-call.png" alt="Personal">
-          <span>Personal Reason</span>
-        </label>
-
-        <label class="reason-option">
-          <input type="checkbox" value="Other">
-          <img src="https://img.icons8.com/color/48/help.png" alt="Other">
-          <span>Other</span>
-        </label>
+        <label class="reason-option"><input type="checkbox" value="Medical Issue"><img src="https://img.icons8.com/color/48/medical-doctor.png"><span>Medical Issue</span></label>
+        <label class="reason-option"><input type="checkbox" value="Urgent Work"><img src="https://img.icons8.com/color/48/work.png"><span>Urgent Work</span></label>
+        <label class="reason-option"><input type="checkbox" value="Personal Reason"><img src="https://img.icons8.com/color/48/conference-call.png"><span>Personal Reason</span></label>
+        <label class="reason-option"><input type="checkbox" value="Other"><img src="https://img.icons8.com/color/48/help.png"><span>Other</span></label>
       </div>
 
       <label>Other Remarks:</label>
@@ -333,7 +73,7 @@
     </form>
   </div>
 
-  <!-- ✅ Center Status Popup -->
+  <!-- Centralized Status Popup -->
   <div id="statusBox" class="status-box"></div>
 
   <script>
@@ -344,67 +84,45 @@
     };
 
     function togglePassword() {
-      const passwordInput = document.getElementById("password");
-      const icon = document.querySelector(".toggle-password");
-      if (passwordInput.type === "password") {
-        passwordInput.type = "text";
-        icon.textContent = "🙈";
-      } else {
-        passwordInput.type = "password";
-        icon.textContent = "👁";
-      }
+      const p = document.getElementById("password"), icon = document.querySelector(".toggle-password");
+      p.type = p.type === "password" ? "text" : "password";
+      icon.textContent = p.type === "password" ? "👁" : "🙈";
     }
 
-    function showStatus(message, type="success") {
-      const statusBox = document.getElementById("statusBox");
-      statusBox.textContent = message;
-      statusBox.className = `status-box ${type}`;
-      statusBox.style.display = "block";
-      setTimeout(() => {
-        statusBox.style.display = "none";
-      }, 3000);
+    function showStatus(msg, type) {
+      const sb = document.getElementById("statusBox");
+      sb.textContent = msg;
+      sb.className = `status-box ${type}`;
+      sb.style.display = "block";
+      setTimeout(() => sb.style.display = "none", 3000);
     }
 
-    function submitLeave() {
-      const url = "https://script.google.com/macros/s/AKfycbxnXe0gDFK4GMjkgqGUh3AFYSoPS6to6Is3c1SHEFuGq1lpgy2cx2McVDjlFjQC9r9e/exec"; // 🔗 Replace with your API
-
-      let selectedReasons = [];
-      document.querySelectorAll(".reason-options input:checked").forEach(cb => {
-        selectedReasons.push(cb.value);
-      });
-
-      let leaveType = document.querySelector('input[name="leaveType"]:checked')?.value || "";
-
-      let payload = {
+    async function submitLeave() {
+      const url = "https://script.google.com/macros/s/AKfycbxnXe0gDFK4GMjkgqGUh3AFYSoPS6to6Is3c1SHEFuGq1lpgy2cx2McVDjlFjQC9r9e/exec";
+      const payload = {
         empName: document.getElementById("empName").value,
         password: document.getElementById("password").value,
-        type: leaveType,
+        type: document.querySelector('input[name="leaveType"]:checked')?.value || "",
         startDate: document.getElementById("startDate").value,
         endDate: document.getElementById("endDate").value,
-        reason: selectedReasons.join(", "),
+        reason: Array.from(document.querySelectorAll(".reason-options input:checked")).map(cb => cb.value).join(", "),
         remarks: document.getElementById("remarks").value
       };
 
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload)
-      })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) {
-          showStatus("✅ Leave applied successfully!", "success");
-          document.getElementById("LeaveForm").reset();
-          const today = new Date().toISOString().split("T")[0];
-          document.getElementById("startDate").value = today;
-          document.getElementById("endDate").setAttribute("min", today);
-        } else {
-          showStatus("❌ Invalid password. Please try again.", "error");
-        }
-      })
-      .catch(err => {
-        showStatus("⚠️ Error: " + err, "error");
-      });
+      try {
+        const res = await fetch(url, {
+          method: "POST",
+          mode: "cors",         // Ensures browser allows cross-site requests
+          headers: { "Content-Type": "text/plain;charset=utf-8" }, // Avoids preflight issues :contentReference[oaicite:0]{index=0}
+          body: JSON.stringify(payload)
+        });
+        if (!res.ok) throw new Error(res.status);
+        const data = await res.json();
+        showStatus(data.success ? "✅ " + data.message : "❌ " + data.message, data.success ? "success" : "error");
+        if (data.success) document.getElementById("LeaveForm").reset();
+      } catch (err) {
+        showStatus("⚠️ Request Failed: " + err.message, "error");
+      }
     }
 
     function goBack() {
@@ -413,4 +131,3 @@
   </script>
 </body>
 </html>
-
