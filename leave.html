@@ -168,6 +168,38 @@
       border-radius: 6px;
     }
 
+    /* --- Type Section --- */
+    .type-options {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 18px;
+    }
+    .type-options label {
+      flex: 1;
+      text-align: center;
+      background: #111;
+      border: 2px solid #FFD700;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .type-options input {
+      display: none;
+    }
+    .type-options span {
+      color: #FFD700;
+      font-size: 15px;
+      font-weight: 500;
+    }
+    .type-options input:checked + span {
+      color: #000;
+      background: #FFD700;
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-weight: bold;
+    }
+
     button {
       width: 100%;
       padding: 14px;
@@ -247,6 +279,23 @@
         </div>
       </div>
 
+      <!-- ✅ New Type Section -->
+      <label>Type:</label>
+      <div class="type-options">
+        <label>
+          <input type="radio" name="leaveType" value="Full Day" required>
+          <span>Full Day</span>
+        </label>
+        <label>
+          <input type="radio" name="leaveType" value="Half Day">
+          <span>Half Day</span>
+        </label>
+        <label>
+          <input type="radio" name="leaveType" value="Short Leave">
+          <span>Short Leave</span>
+        </label>
+      </div>
+
       <!-- Scrollable Rest of Form -->
       <label>Start Date:</label>
       <input type="date" id="startDate" readonly required>
@@ -320,9 +369,13 @@
         selectedReasons.push(cb.value);
       });
 
+      // Collect selected type
+      let leaveType = document.querySelector('input[name="leaveType"]:checked')?.value || "";
+
       let payload = {
         empName: document.getElementById("empName").value,
         password: document.getElementById("password").value,
+        type: leaveType,
         startDate: document.getElementById("startDate").value,
         endDate: document.getElementById("endDate").value,
         reason: selectedReasons.join(", "),
