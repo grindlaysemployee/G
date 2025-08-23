@@ -128,36 +128,57 @@ async function fetchWithAuth(url, params = {}) {
 }
 
 // ================= LEAVE STATUS =================
-function openLeaveStatus() {
-  if (!empIdGlobal) {
-    alert("Employee ID not found. Please login again.");
+async function openLeaveStatus() {
+  if (!empIdGlobal || !authToken) {
+    alert("Session expired! Please login again.");
+    logout();
     return;
   }
 
-  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING..PLEASE WAIT 5 SEC....</div>`;
+  document.getElementById("leaveStatusSection").innerHTML =
+    `<div id="leaveStatusLoading">......LOADING..PLEASE WAIT 5 SEC....</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
-    .then(res => res.json())
-    .then(data => {
-      if (!data || data.length === 0) {
-        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
-        return;
-      }
-      renderLeaveStatusTable(data);
-    })
-    .catch(err => {
-      console.error("Error:", err);
-      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
+  try {
+    // ✅ Fetch with token
+    const res = await fetch(leaveStatusApiUrl, {
+      method: "POST",
+      body: new URLSearchParams({
+        empid: empIdGlobal,
+        token: authToken
+      })
     });
+
+    const data = await res.json();
+
+    // ✅ Token expired check
+    if (data.success === false && data.message === "Invalid or expired token") {
+      alert("Your session has expired. Please login again.");
+      logout();
+      return;
+    }
+
+    if (!data || data.length === 0) {
+      document.getElementById("leaveStatusSection").innerHTML =
+        "<p>No leave records found.</p>";
+      return;
+    }
+
+    renderLeaveStatusTable(data);
+  } catch (err) {
+    console.error("Error:", err);
+    document.getElementById("leaveStatusSection").innerHTML =
+      "<p>Something went wrong while fetching leave status.</p>";
+  }
 }
 
 function formatDate(dateStr) {
   if (!dateStr) return "";
   let d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
+                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
