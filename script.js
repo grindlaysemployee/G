@@ -20,20 +20,8 @@ window.onload = function () {
      document.getElementById("documentSection").classList.add("hidden");
 };
 
-// Global variable to store logged-in employee ID
-let empIdGlobal = "";
-
-// ---------------------- Hash Password ----------------------
-async function hashPassword(password) {
-  const encoder = new TextEncoder();
-  const data = encoder.encode(password);
-  const hashBuffer = await crypto.subtle.digest("SHA-256", data);
-  const hashArray = Array.from(new Uint8Array(hashBuffer));
-  return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
-}
-
 // ================= LOGIN =================
-async function login() {
+function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
 
@@ -45,12 +33,9 @@ async function login() {
   document.getElementById("loginSection").classList.add("hidden");
   document.getElementById("loadingSpinner").classList.remove("hidden");
 
-  // Hash the password before sending
-  const hashedPassword = await hashPassword(password);
-
   const formData = new FormData();
   formData.append("empId", empId);
-  formData.append("password", hashedPassword); // Send hashed password
+  formData.append("password", password);
 
   fetch(detailsApiUrl, { method: "POST", body: formData })
     .then(res => res.json())
