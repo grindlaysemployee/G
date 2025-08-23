@@ -141,11 +141,13 @@ async function openLeaveStatus() {
   document.getElementById("employeeDetails").classList.add("hidden");
 
   try {
-    // ✅ Fetch with token
+    // ✅ Fetch with token + action
     const res = await fetch(leaveStatusApiUrl, {
       method: "POST",
-      body: new URLSearchParams({
-        empid: empIdGlobal,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        action: "leaveStatus",
+        empName: empIdGlobal,
         token: authToken
       })
     });
@@ -153,19 +155,19 @@ async function openLeaveStatus() {
     const data = await res.json();
 
     // ✅ Token expired check
-    if (data.success === false && data.message === "Invalid or expired token") {
+    if (data.success === false && data.message.includes("Invalid or expired token")) {
       alert("Your session has expired. Please login again.");
       logout();
       return;
     }
 
-    if (!data || data.length === 0) {
+    if (!data.success || !data.rows || data.rows.length === 0) {
       document.getElementById("leaveStatusSection").innerHTML =
         "<p>No leave records found.</p>";
       return;
     }
 
-    renderLeaveStatusTable(data);
+    renderLeaveStatusTable(data.rows);
   } catch (err) {
     console.error("Error:", err);
     document.getElementById("leaveStatusSection").innerHTML =
@@ -183,9 +185,9 @@ function formatDate(dateStr) {
 }
 
 function renderLeaveStatusTable(data) {
-  const headers = Object.keys(data[0]);
-  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
+  const headers = Object.keys(data[0] || {});
+  const startDateCol = headers.find(h => h.toLowerCase().includes("start"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("end"));
 
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
@@ -210,6 +212,7 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
+  // ✅ Live search filter
   document.getElementById("leaveTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
     const trs = document.getElementById("leaveStatusTable").getElementsByTagName("tr");
