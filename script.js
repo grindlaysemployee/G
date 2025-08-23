@@ -20,7 +20,10 @@ window.onload = function () {
      document.getElementById("documentSection").classList.add("hidden");
 };
 
-// ================= LOGIN =================
+let empIdGlobal = "";
+let authToken = ""; // 🔑 token yahan save hoga
+
+// ========== LOGIN ==========
 function login() {
   const empId = document.getElementById("empId").value.trim();
   const password = document.getElementById("password").value.trim();
@@ -47,15 +50,22 @@ function login() {
         return;
       }
 
+      // ✅ Save token
       empIdGlobal = data.empId;
+      authToken = data.token;  
+      localStorage.setItem("authToken", authToken);
+      localStorage.setItem("empId", empIdGlobal);
+
       document.getElementById("empName").textContent = data.name;
 
+      // Employee image
       const employeeImage = document.getElementById("employeeImage");
       employeeImage.src = `image/${data.empId}.jpg`;
       employeeImage.onerror = function () {
         this.src = "image/default.jpg";
       };
 
+      // Employee details list
       const fields = {
         "Employee ID": data.empId,
         "Emp Code": data.empCode,
@@ -77,7 +87,6 @@ function login() {
 
       const detailsList = document.getElementById("detailsList");
       detailsList.innerHTML = "";
-
       for (let key in fields) {
         const li = document.createElement("li");
         li.textContent = `${key}: ${fields[key] || "N/A"}`;
@@ -93,6 +102,30 @@ function login() {
       document.getElementById("loadingSpinner").classList.add("hidden");
       document.getElementById("loginSection").classList.remove("hidden");
     });
+}
+
+// ========== UNIVERSAL FETCH with TOKEN ==========
+async function fetchWithAuth(url, params = {}) {
+  if (!authToken) {
+    alert("Session expired! Please login again.");
+    logout();
+    return;
+  }
+
+  const response = await fetch(url, {
+    method: "POST",
+    body: new URLSearchParams({ ...params, token: authToken })
+  });
+
+  const data = await response.json();
+
+  if (data.success === false && data.message === "Invalid or expired token") {
+    alert("Your session has expired. Please login again.");
+    logout();
+    return;
+  }
+
+  return data;
 }
 
 // ================= LEAVE STATUS =================
@@ -668,6 +701,11 @@ function closebonus() {
 
 // ================= LOGOUT =================
 function logout() {
+
+    empIdGlobal = "";
+  authToken = "";
+  localStorage.removeItem("authToken");
+  localStorage.removeItem("empId");
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("empId").value = "";
