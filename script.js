@@ -147,7 +147,7 @@ async function openLeaveStatus() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         action: "leaveStatus",
-        empName: empIdGlobal,
+        empName: empIdGlobal,   // Sheet2 ke "empName" se match karega
         token: authToken
       })
     });
@@ -175,6 +175,7 @@ async function openLeaveStatus() {
   }
 }
 
+// ✅ Date format helper (dd-MMM-yy)
 function formatDate(dateStr) {
   if (!dateStr) return "";
   let d = new Date(dateStr);
@@ -184,27 +185,29 @@ function formatDate(dateStr) {
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
+// ✅ Table rendering based on Sheet2 structure
 function renderLeaveStatusTable(data) {
-  const headers = Object.keys(data[0] || {});
-  const startDateCol = headers.find(h => h.toLowerCase().includes("start"));
-  const finishDateCol = headers.find(h => h.toLowerCase().includes("end"));
-
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
+    <div class="leave-table-caption">Leave Status : ${data[0].empName || ""}</div>
     <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
     <table class="leave-table" id="leaveStatusTable">
       <thead>
-        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
+        <tr>
+          <th>Leave Type</th>
+          <th>Start Date</th>
+          <th>End Date</th>
+          <th>Reason</th>
+          <th>Remarks</th>
+        </tr>
       </thead>
       <tbody>
         ${data.map(row => `<tr>
-          ${headers.map(h => {
-            if (h === startDateCol || h === finishDateCol) {
-              return `<td>${formatDate(row[h])}</td>`;
-            }
-            return `<td>${row[h] || ""}</td>`;
-          }).join('')}
+          <td>${row.type || ""}</td>
+          <td>${formatDate(row.startDate)}</td>
+          <td>${formatDate(row.endDate)}</td>
+          <td>${row.reason || ""}</td>
+          <td>${row.remarks || ""}</td>
         </tr>`).join('')}
       </tbody>
     </table>
