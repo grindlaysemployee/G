@@ -7,7 +7,7 @@ const complainstatusApiUrl = "https://script.google.com/macros/s/AKfycbyVbcJNj_T
 const documentApiUrl = "https://script.google.com/macros/s/AKfycbxo0qwtJisSIzbmcO7oUfZTRfceWRvsucs_ZJg9-g5mu_yCKwJyKHDBBl0Q8eBlIlwxsg/exec";
 const bonusApiUrl = "https://script.google.com/macros/s/AKfycbzabVtIqK13X2IgL52uXcZi6O5Mrm_CwOj-7LBCl8d8XRonGBpQNB8-Gf7cCuwmQWZU/exec";
 let empIdGlobal = "";
-let leaveStatusURL = "";
+let authToken = ""; // 🔑 token yahan save hoga
 
 // Hide all sections on initial page load
 window.onload = function () {
@@ -20,8 +20,7 @@ window.onload = function () {
      document.getElementById("documentSection").classList.add("hidden");
 };
 
-let empIdGlobal = "";
-let authToken = ""; // 🔑 token yahan save hoga
+
 
 // ========== LOGIN ==========
 function login() {
@@ -701,11 +700,14 @@ function closebonus() {
 
 // ================= LOGOUT =================
 function logout() {
-
-    empIdGlobal = "";
+  empIdGlobal = "";
   authToken = "";
+
+  // Clear local storage
   localStorage.removeItem("authToken");
   localStorage.removeItem("empId");
+
+  // Reset UI
   document.getElementById("employeeDetails").classList.add("hidden");
   document.getElementById("loginSection").classList.remove("hidden");
   document.getElementById("empId").value = "";
@@ -713,8 +715,20 @@ function logout() {
   document.getElementById("detailsList").innerHTML = "";
   document.getElementById("empName").textContent = "";
   document.getElementById("employeeImage").src = "image/default.jpg";
+
+  // Reset all sections
   leaveStatusURL = "";
-  empIdGlobal = "";
   document.getElementById("leaveStatusSection").classList.add("hidden");
   document.getElementById("leaveStatusSection").innerHTML = "";
+
+  // In case you add more later
+  if (document.getElementById("attendanceSection")) {
+    document.getElementById("attendanceSection").classList.add("hidden");
+    document.getElementById("attendanceSection").innerHTML = "";
+  }
+  if (document.getElementById("salarySection")) {
+    document.getElementById("salarySection").classList.add("hidden");
+    document.getElementById("salarySection").innerHTML = "";
+  }
 }
+
