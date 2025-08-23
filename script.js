@@ -128,86 +128,60 @@ async function fetchWithAuth(url, params = {}) {
 }
 
 // ================= LEAVE STATUS =================
-async function openLeaveStatus() {
-  if (!empIdGlobal || !authToken) {
-    alert("Session expired! Please login again.");
-    logout();
+function openLeaveStatus() {
+  if (!empIdGlobal) {
+    alert("Employee ID not found. Please login again.");
     return;
   }
 
-  document.getElementById("leaveStatusSection").innerHTML =
-    `<div id="leaveStatusLoading">......LOADING..PLEASE WAIT 5 SEC....</div>`;
+  document.getElementById("leaveStatusSection").innerHTML = `<div id="leaveStatusLoading">......LOADING..PLEASE WAIT 5 SEC....</div>`;
   document.getElementById("leaveStatusSection").classList.remove("hidden");
   document.getElementById("employeeDetails").classList.add("hidden");
 
-  try {
-    // ✅ Fetch with token + action
-    const res = await fetch(leaveStatusApiUrl, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        action: "leaveStatus",
-        empName: empIdGlobal,   // Sheet2 ke "empName" se match karega
-        token: authToken
-      })
+  fetch(`${leaveStatusApiUrl}?empid=${empIdGlobal}`)
+    .then(res => res.json())
+    .then(data => {
+      if (!data || data.length === 0) {
+        document.getElementById("leaveStatusSection").innerHTML = "<p>No leave records found.</p>";
+        return;
+      }
+      renderLeaveStatusTable(data);
+    })
+    .catch(err => {
+      console.error("Error:", err);
+      document.getElementById("leaveStatusSection").innerHTML = "<p>Something went wrong while fetching leave status.</p>";
     });
-
-    const data = await res.json();
-
-    // ✅ Token expired check
-    if (data.success === false && data.message.includes("Invalid or expired token")) {
-      alert("Your session has expired. Please login again.");
-      logout();
-      return;
-    }
-
-    if (!data.success || !data.rows || data.rows.length === 0) {
-      document.getElementById("leaveStatusSection").innerHTML =
-        "<p>No leave records found.</p>";
-      return;
-    }
-
-    renderLeaveStatusTable(data.rows);
-  } catch (err) {
-    console.error("Error:", err);
-    document.getElementById("leaveStatusSection").innerHTML =
-      "<p>Something went wrong while fetching leave status.</p>";
-  }
 }
 
-// ✅ Date format helper (dd-MMM-yy)
 function formatDate(dateStr) {
   if (!dateStr) return "";
   let d = new Date(dateStr);
   if (isNaN(d)) return dateStr;
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun",
-                  "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
   return `${d.getDate().toString().padStart(2, '0')}-${months[d.getMonth()]}-${d.getFullYear().toString().slice(-2)}`;
 }
 
-// ✅ Table rendering based on Sheet2 structure
 function renderLeaveStatusTable(data) {
+  const headers = Object.keys(data[0]);
+  const startDateCol = headers.find(h => h.toLowerCase().includes("starting date"));
+  const finishDateCol = headers.find(h => h.toLowerCase().includes("last date"));
+
   let html = `<div class="leave-table-container">
     <button id="closeLeaveStatus" onclick="closeLeaveStatus()">Close</button>
-    <div class="leave-table-caption">Leave Status : ${data[0].empName || ""}</div>
+    <div class="leave-table-caption">Leave Status : ${data[0][headers[0]] || ""}</div>
     <input type="text" id="leaveTableFilter" placeholder="Search/filter... (e.g. Jan, Approved, Full Day)">
     <table class="leave-table" id="leaveStatusTable">
       <thead>
-        <tr>
-          <th>Leave Type</th>
-          <th>Start Date</th>
-          <th>End Date</th>
-          <th>Reason</th>
-          <th>Remarks</th>
-        </tr>
+        <tr>${headers.map(h => `<th>${h}</th>`).join('')}</tr>
       </thead>
       <tbody>
         ${data.map(row => `<tr>
-          <td>${row.type || ""}</td>
-          <td>${formatDate(row.startDate)}</td>
-          <td>${formatDate(row.endDate)}</td>
-          <td>${row.reason || ""}</td>
-          <td>${row.remarks || ""}</td>
+          ${headers.map(h => {
+            if (h === startDateCol || h === finishDateCol) {
+              return `<td>${formatDate(row[h])}</td>`;
+            }
+            return `<td>${row[h] || ""}</td>`;
+          }).join('')}
         </tr>`).join('')}
       </tbody>
     </table>
@@ -215,7 +189,6 @@ function renderLeaveStatusTable(data) {
 
   document.getElementById("leaveStatusSection").innerHTML = html;
 
-  // ✅ Live search filter
   document.getElementById("leaveTableFilter").addEventListener("input", function() {
     const filter = this.value.toLowerCase();
     const trs = document.getElementById("leaveStatusTable").getElementsByTagName("tr");
