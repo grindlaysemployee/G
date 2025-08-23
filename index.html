@@ -14,9 +14,9 @@
       <img src="image/image3.png" alt="Company Logo" class="lens-image">
     </div>
     <h2>Employee Login</h2>
-    <input type="text" id="empId" placeholder="Employee ID">
-    <input type="password" id="password" placeholder="Password">
-    <button onclick="login()">Login</button>
+    <input type="text" id="empId" placeholder="Employee ID" autocomplete="off">
+    <input type="password" id="password" placeholder="Password" autocomplete="off">
+    <button type="button" onclick="login()">Login</button>
   </div>
 
   <!-- Loading Spinner -->
@@ -37,19 +37,16 @@
     <div class="right-panel">
       <img id="employeeImage" src="image/default.jpg" alt="Employee Photo" class="employee-img">
       <div class="button-group">
-       
-        <button onclick="window.location.href='leave.html'">Leave Apply</button>
-        <button id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
-        <button id="leavebalanceBtn" onclick="openleavebalance()">Leave Balance</button>
-        <button id="attendanceBtn" onclick="openAttendance()">Attendance</button>
-        
-        <button id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
-          <button id="documentBtn" onclick="opendocument()">Document</button>
-        <button onclick="window.location.href='com.html'">Complain</button>
-        <button id="complainstatusBtn" onclick="opencomplainstatus()">Complain Status</button>
-        <button id="bonusBtn" onclick="openbonus()">Bonus</button>
-
-        <button onclick="logout()" class="logout">Logout</button>
+        <button type="button" onclick="window.location.href='leave.html'">Leave Apply</button>
+        <button type="button" id="leaveStatusBtn" onclick="openLeaveStatus()">Leave Status</button>
+        <button type="button" id="leavebalanceBtn" onclick="openleavebalance()">Leave Balance</button>
+        <button type="button" id="attendanceBtn" onclick="openAttendance()">Attendance</button>
+        <button type="button" id="salaryslipBtn" onclick="opensalaryslip()">Salary Slip</button>
+        <button type="button" id="documentBtn" onclick="opendocument()">Document</button>
+        <button type="button" onclick="window.location.href='com.html'">Complain</button>
+        <button type="button" id="complainstatusBtn" onclick="opencomplainstatus()">Complain Status</button>
+        <button type="button" id="bonusBtn" onclick="openbonus()">Bonus</button>
+        <button type="button" onclick="logout()" class="logout">Logout</button>
       </div>
     </div>
   </div>
@@ -59,10 +56,11 @@
   <div id="leavebalanceSection" class="hidden"></div>
   <div id="attendanceSection" class="hidden"></div>
   <div id="salarySection" class="hidden"></div>
- <div id="documentSection" class="hidden"></div>
+  <div id="documentSection" class="hidden"></div>
   <div id="complainSection" class="hidden"></div>
-    <div id="complainstatusSection" class="hidden"></div>
-     <div id="bonusSection" class="hidden"></div>
+  <div id="complainstatusSection" class="hidden"></div>
+  <div id="bonusSection" class="hidden"></div>
+
   <script src="script.js"></script>
 </body>
 </html>
