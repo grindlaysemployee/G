@@ -1,0 +1,93 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Admin - Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#111315;--card:#1a1d20;--text:#eaeaea;--muted:#bcbcbc;--yellow:#ffd400;}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px;}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .title{font-weight:800;font-size:22px;}
+  .btn{padding:10px 12px;border:1px solid var(--yellow);border-radius:10px;background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
+  .btn.danger{background:#ff6b6b;color:#fff;border:none;}
+  .card{background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:14px;padding:14px;}
+  .controls{display:flex;gap:8px;align-items:center;margin-bottom:8px;}
+  select{padding:8px;background:#0f1113;border:1px solid rgba(255,212,0,.4);border-radius:10px;color:var(--text);}
+  .table{width:100%;border-collapse:collapse;font-size:14px;}
+  .table th,.table td{border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 6px;text-align:left;}
+  .table th{color:var(--yellow)}
+  .small{font-size:12px;color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div class="title">Admin - All Orders</div>
+    <div>
+      <button class="btn" onclick="window.location.href='sales.html'">Sales Page</button>
+      <button class="btn danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <select id="salesFilter"><option value="">All Sales</option></select>
+      <button class="btn" onclick="loadAll()">Refresh</button>
+    </div>
+    <div id="list" class="small">Loading…</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  let ORDERS=[], LINES=[];
+  async function init(){
+    try{
+      const p = await me();
+      if (p.Role !== 'ADMIN') { alert('Admins only'); return window.location.href='sales.html'; }
+    } catch(e){ alert('Session expired'); return logout(); }
+    loadAll();
+  }
+
+  async function loadAll(){
+    const list = document.getElementById('list'); list.textContent='Loading…';
+    try{
+      const r = await allOrders();
+      ORDERS = r.orders || []; LINES = r.lines || [];
+      const salesSet = Array.from(new Set(ORDERS.map(o => `${o.SalesID} - ${o.SalesName}`)));
+      const sf = document.getElementById('salesFilter');
+      const cur = sf.value; sf.innerHTML='<option value="">All Sales</option>' + salesSet.map(s=>`<option>${s}</option>`).join(''); sf.value = cur || '';
+
+      render();
+      sf.onchange = render;
+    } catch(e){ list.textContent = e.message || 'Failed'; }
+  }
+
+  function render(){
+    const list = document.getElementById('list');
+    const sf = document.getElementById('salesFilter').value;
+    let filtered = ORDERS;
+    if (sf){
+      const id = sf.split(' - ')[0];
+      filtered = ORDERS.filter(o => o.SalesID === id);
+    }
+    if (!filtered.length) { list.textContent='No orders'; return; }
+
+    const byId = {}; LINES.forEach(l => (byId[l.OrderID]=byId[l.OrderID]||[]).push(l));
+    const rows = filtered.slice().reverse().map(o=>{
+      const items = (byId[o.OrderID]||[]).map(l=>`${l.ItemName} (${l.Qty})`).join(', ');
+      return `<tr><td>${o.OrderID}</td><td>${o.Timestamp}</td><td>${o.SalesID}</td><td>${o.SalesName}</td><td>${o.CustomerName||''}</td><td>${o.CustomerMobile||''}</td><td>${o.TotalLines}</td><td>${o.TotalQty}</td><td>${o.MapLink?`<a href="${o.MapLink}" target="_blank">Map</a>`:''}</td><td>${items}</td></tr>`;
+    }).join('');
+    list.innerHTML = `<table class="table">
+      <tr><th>OrderID</th><th>Time</th><th>SalesID</th><th>Sales Name</th><th>Customer</th><th>Mobile</th><th>Lines</th><th>Qty</th><th>Loc</th><th>Items</th></tr>
+      ${rows}
+    </table>`;
+  }
+  init();
+</script>
+</body>
+</html>
