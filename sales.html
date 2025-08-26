@@ -68,8 +68,9 @@
       <div class="title">Sales Order</div>
       <div class="muted" id="who"></div>
     </div>
-    <div style="display:flex;gap:8px;">
+    <div style="display:flex;gap:8px;flex-wrap:wrap;">
       <button class="btn" onclick="window.location.href='myorders.html'">My Orders</button>
+      <button class="btn" onclick="window.location.href='attendance.html'">Attendance</button>
       <button class="btn" id="adminBtn" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
       <button class="btn danger" onclick="logout()">Logout</button>
     </div>
@@ -141,14 +142,12 @@
   let CODEMAP = {};  // code -> {category, name, price}
 
   async function init(){
-    // Auth + profile
     try{
       const p = await me();
       document.getElementById('who').textContent = `${p.Name} (${p.UserID}) — Role: ${p.Role}`;
       if (p.Role === 'ADMIN') document.getElementById('adminBtn').style.display = 'inline-block';
     } catch(e){ alert('Session expired'); return logout(); }
 
-    // Catalog via Apps Script
     CATALOG = await fetchCatalog();
     normalizeCategories(CATALOG);
     buildMaps(CATALOG);
@@ -157,7 +156,6 @@
     wireSearch();
     loadMyOrders();
 
-    // Required field listeners
     document.getElementById('custName').addEventListener('input', updateSaveState);
     updateSaveState();
   }
@@ -175,31 +173,20 @@
     if (x === 'liner kit') return 'Liner Kit';
     if (x === 'liner') return 'Liner';
     if (x === 'piston') return 'Piston';
-    // Title-case fallback
     return String(c||'').replace(/\s+/g,' ').replace(/\b\w/g,s=>s.toUpperCase());
   }
 
   function buildMaps(items){
-    CODEMAP = {};
-    items.forEach(it => { CODEMAP[it.ItemCode] = { category: it.Category, name: it.ItemName, price: it.Price }; });
+    CODEMAP = {}; items.forEach(it => { CODEMAP[it.ItemCode] = { category: it.Category, name: it.ItemName, price: it.Price }; });
   }
 
-  // Build separate dropdowns
   function buildCategoryDropdowns(items){
-    const byCat = {};
-    items.forEach(it => { (byCat[it.Category] = byCat[it.Category] || []).push(it); });
+    const byCat = {}; items.forEach(it => { (byCat[it.Category] = byCat[it.Category] || []).push(it); });
     Object.keys(byCat).forEach(k => byCat[k].sort((a,b)=> String(a.ItemName).localeCompare(String(b.ItemName)) ));
 
-    const container = document.getElementById('multiDD');
-    container.innerHTML = '';
-
-    // Create rows in preferred order
+    const container = document.getElementById('multiDD'); container.innerHTML = '';
     ORDERED_CATS.forEach(cat => { if (byCat[cat]?.length) container.appendChild(makeCatRow(cat, byCat[cat])); });
-
-    // Any extra categories also show (optional)
-    Object.keys(byCat).forEach(cat => {
-      if (!ORDERED_CATS.includes(cat)) container.appendChild(makeCatRow(cat, byCat[cat]));
-    });
+    Object.keys(byCat).forEach(cat => { if (!ORDERED_CATS.includes(cat)) container.appendChild(makeCatRow(cat, byCat[cat])); });
   }
 
   function makeCatRow(cat, arr){
@@ -210,9 +197,7 @@
     const sel = document.createElement('select'); sel.id = `dd_${safe}`;
     arr.forEach(it => {
       const opt = document.createElement('option');
-      opt.value = it.ItemCode;
-      opt.textContent = `${it.ItemName} (${it.ItemCode})`;
-      opt.dataset.price = it.Price || '';
+      opt.value = it.ItemCode; opt.textContent = `${it.ItemName} (${it.ItemCode})`; opt.dataset.price = it.Price || '';
       sel.appendChild(opt);
     });
 
@@ -222,54 +207,29 @@
     const btn = document.createElement('button'); btn.className='btn'; btn.textContent='Add';
     btn.addEventListener('click', () => addFromCat(safe, cat));
 
-    sel.addEventListener('change', ()=> {
-      const p = sel.selectedOptions[0]?.dataset.price || '';
-      price.value = p;
-    });
-    // set initial price
+    sel.addEventListener('change', ()=> { const p = sel.selectedOptions[0]?.dataset.price || ''; price.value = p; });
     price.value = sel.options[0]?.dataset.price || '';
 
-    // Layout: title above select (mobile friendly)
     const left = document.createElement('div'); left.appendChild(title); left.appendChild(sel);
-    row.appendChild(left);
-    row.appendChild(price);
-    row.appendChild(qty);
-    row.appendChild(btn);
-
+    row.appendChild(left); row.appendChild(price); row.appendChild(qty); row.appendChild(btn);
     return row;
   }
 
   function addFromCat(safe, catLabel){
-    const sel = document.getElementById(`dd_${safe}`);
-    if (!sel || !sel.value) return alert(`Select ${catLabel} item`);
+    const sel = document.getElementById(`dd_${safe}`); if (!sel || !sel.value) return alert(`Select ${catLabel} item`);
     const code = sel.value;
-    const qtyEl = document.getElementById(`qty_${safe}`);
-    const priceEl = document.getElementById(`price_${safe}`);
-    const qty = Number(qtyEl.value || 0);
-    if (qty <= 0) return alert('Enter a valid quantity');
-
+    const qtyEl = document.getElementById(`qty_${safe}`); const priceEl = document.getElementById(`price_${safe}`);
+    const qty = Number(qtyEl.value || 0); if (qty <= 0) return alert('Enter a valid quantity');
     const meta = CODEMAP[code] || { category: catLabel, name: sel.selectedOptions[0]?.textContent, price: '' };
     const price = priceEl.value || meta.price || '';
-
-    const line = {
-      id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(),
-      category: meta.category || catLabel,
-      itemCode: code,
-      itemName: meta.name || code,
-      qty, price
-    };
-    CART.push(line);
-    qtyEl.value = 1; // reset qty
-    renderCart();
+    const line = { id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(), category: meta.category || catLabel, itemCode: code, itemName: meta.name || code, qty, price };
+    CART.push(line); qtyEl.value = 1; renderCart();
   }
 
   // ---------- Search (multi-select) ----------
   function buildSearchIndex(items){
     INDEX = items.map(it => ({
-      code: String(it.ItemCode||''),
-      name: String(it.ItemName||''),
-      category: String(it.Category||''),
-      price: it.Price || '',
+      code: String(it.ItemCode||''), name: String(it.ItemName||''), category: String(it.Category||''), price: it.Price || '',
       hay: (String(it.ItemCode||'') + ' ' + String(it.ItemName||'') + ' ' + String(it.Category||'')).toLowerCase()
     }));
   }
@@ -277,11 +237,9 @@
     const input = document.getElementById('search');
     input.addEventListener('input', onSearchInput);
     input.addEventListener('keydown', (e)=>{
-      if (e.key === 'Enter'){
-        const count = Object.keys(SELECTED).length;
-        if (count > 0) { addSelected(); e.preventDefault(); }
-        else if (SEARCH_RESULTS.length){ quickAdd(SEARCH_RESULTS[0].code); e.preventDefault(); }
-      } else if (e.key === 'Escape'){ hideSuggestions(); }
+      const count = Object.keys(SELECTED).length;
+      if (e.key === 'Enter'){ if (count > 0) { addSelected(); e.preventDefault(); } }
+      else if (e.key === 'Escape'){ hideSuggestions(); }
     });
     document.addEventListener('click', (e)=>{
       const wrap = document.querySelector('.searchWrap');
@@ -294,10 +252,7 @@
     const terms = q.split(/\s+/).filter(Boolean);
     const res = [];
     for (const it of INDEX){
-      let score = 0;
-      if (it.code.toLowerCase().startsWith(q)) score += 5;
-      if (it.hay.includes(q)) score += 2;
-      for (const t of terms){ if (it.hay.includes(t)) score += 1; }
+      let score = 0; if (it.code.toLowerCase().startsWith(q)) score += 5; if (it.hay.includes(q)) score += 2; for (const t of terms){ if (it.hay.includes(t)) score += 1; }
       if (score>0) res.push({ ...it, score });
     }
     res.sort((a,b)=> b.score - a.score || a.name.localeCompare(b.name));
@@ -305,90 +260,56 @@
     renderSuggestions();
   }
   function renderSuggestions(){
-    const box = document.getElementById('suggestions'); box.innerHTML = '';
-    if (!SEARCH_RESULTS.length){ box.style.display='none'; return; }
-
-    // Header
+    const box = document.getElementById('suggestions'); box.innerHTML = ''; if (!SEARCH_RESULTS.length){ box.style.display='none'; return; }
     const top = document.createElement('div'); top.className='sugTop';
-    const left = document.createElement('div'); left.className='left';
-    left.id = 'selInfo'; left.textContent = `Results: ${SEARCH_RESULTS.length} • Selected: ${Object.keys(SELECTED).length}`;
+    const left = document.createElement('div'); left.className='left'; left.id = 'selInfo'; left.textContent = `Results: ${SEARCH_RESULTS.length} • Selected: ${Object.keys(SELECTED).length}`;
     const actions = document.createElement('div'); actions.className='actions';
     const addSelBtn = document.createElement('button'); addSelBtn.className='mini'; addSelBtn.id='addSelBtn'; addSelBtn.textContent='Add Selected (0)'; addSelBtn.disabled = Object.keys(SELECTED).length===0;
     addSelBtn.onclick = (e)=>{ e.stopPropagation(); addSelected(); };
     const closeBtn = document.createElement('button'); closeBtn.className='mini'; closeBtn.textContent='Close'; closeBtn.onclick=(e)=>{ e.stopPropagation(); hideSuggestions(); };
-    actions.appendChild(addSelBtn); actions.appendChild(closeBtn);
-    top.appendChild(left); top.appendChild(actions);
-    box.appendChild(top);
-
-    // Rows
+    actions.appendChild(addSelBtn); actions.appendChild(closeBtn); top.appendChild(left); top.appendChild(actions); box.appendChild(top);
     SEARCH_RESULTS.forEach(r=>{
       const row = document.createElement('div'); row.className='sug';
       const cb = document.createElement('input'); cb.type='checkbox'; cb.checked = !!SELECTED[r.code]; cb.addEventListener('change', (ev)=>{ toggleSelect(r.code, ev.target.checked, Number(qty.value||1), r.price); });
       const main = document.createElement('div'); main.innerHTML = `<b>${r.name}</b><div class="tag">${r.category} • ${r.code} ${r.price?('• ₹ '+r.price):''}</div>`;
       main.addEventListener('click', ()=>{ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); });
       const qty = document.createElement('input'); qty.type='number'; qty.min='1'; qty.value = SELECTED[r.code]?.qty || 1; qty.className='qty';
-      qty.addEventListener('click', ev=>ev.stopPropagation());
-      qty.addEventListener('input', ()=>{ setQty(r.code, Number(qty.value||1)); });
+      qty.addEventListener('click', ev=>ev.stopPropagation()); qty.addEventListener('input', ()=>{ setQty(r.code, Number(qty.value||1)); });
       const addBtn = document.createElement('button'); addBtn.className='addBtn'; addBtn.textContent='Add';
       addBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); quickAdd(r.code); });
-
-      row.appendChild(cb); row.appendChild(main); row.appendChild(qty); row.appendChild(addBtn);
-      box.appendChild(row);
+      row.appendChild(cb); row.appendChild(main); row.appendChild(qty); row.appendChild(addBtn); box.appendChild(row);
     });
-
-    box.style.display='block';
-    updateAddSelectedUI();
+    box.style.display='block'; updateAddSelectedUI();
   }
   function updateAddSelectedUI(){
-    const n = Object.keys(SELECTED).length;
-    const btn = document.getElementById('addSelBtn');
-    const info = document.getElementById('selInfo');
+    const n = Object.keys(SELECTED).length; const btn = document.getElementById('addSelBtn'); const info = document.getElementById('selInfo');
     if (btn){ btn.disabled = n===0; btn.textContent = `Add Selected (${n})`; }
     if (info){ const resN = SEARCH_RESULTS.length || 0; info.textContent = `Results: ${resN} • Selected: ${n}`; }
   }
   function hideSuggestions(){ document.getElementById('suggestions').style.display='none'; }
-  function toggleSelect(code, checked, qty=1, price=''){
-    if (checked) SELECTED[code] = { qty: Math.max(1, qty|0), price };
-    else delete SELECTED[code];
-    updateAddSelectedUI();
-  }
+  function toggleSelect(code, checked, qty=1, price=''){ if (checked) SELECTED[code] = { qty: Math.max(1, qty|0), price }; else delete SELECTED[code]; updateAddSelectedUI(); }
   function setQty(code, qty){ if (SELECTED[code]) { SELECTED[code].qty = Math.max(1, qty|0); } }
   function quickAdd(code){
     const meta = CODEMAP[code]; if (!meta) return alert('Item not found');
-    CART.push({
-      id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(),
-      category: meta.category, itemCode: code, itemName: meta.name, qty: 1, price: meta.price || ''
-    });
-    renderCart();
-    document.getElementById('search').value = '';
-    hideSuggestions();
+    CART.push({ id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(), category: meta.category, itemCode: code, itemName: meta.name, qty: 1, price: meta.price || '' });
+    renderCart(); document.getElementById('search').value = ''; hideSuggestions();
   }
   function addSelected(){
-    const codes = Object.keys(SELECTED);
-    if (!codes.length) return;
+    const codes = Object.keys(SELECTED); if (!codes.length) return;
     for (const code of codes){
       const meta = CODEMAP[code]; if (!meta) continue;
-      const qty = Math.max(1, Number(SELECTED[code].qty)||1);
-      const price = meta.price || '';
-      CART.push({
-        id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(),
-        category: meta.category, itemCode: code, itemName: meta.name, qty, price
-      });
+      const qty = Math.max(1, Number(SELECTED[code].qty)||1); const price = meta.price || '';
+      CART.push({ id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(), category: meta.category, itemCode: code, itemName: meta.name, qty, price });
     }
-    SELECTED = {};
-    renderCart();
-    hideSuggestions();
-    document.getElementById('search').value = '';
+    SELECTED = {}; renderCart(); hideSuggestions(); document.getElementById('search').value = '';
   }
   // ---------- /Search ----------
 
   function renderCart(){
-    const ul = document.getElementById('cart'); ul.innerHTML='';
-    let totQty=0;
+    const ul = document.getElementById('cart'); ul.innerHTML=''; let totQty=0;
     CART.forEach(l=>{
       totQty += Number(l.qty)||0;
-      const li = document.createElement('li');
-      li.className='line';
+      const li = document.createElement('li'); li.className='line';
       li.innerHTML = `<div><b>${l.itemName}</b><div class="small">${l.category} • ${l.itemCode} • Qty: ${l.qty} ${l.price?('• Rs '+l.price):''}</div></div>
                       <button class="btn" onclick="removeLine('${l.id}')">Remove</button>`;
       ul.appendChild(li);
@@ -397,81 +318,48 @@
     document.getElementById('totQty').textContent = totQty;
     updateSaveState();
   }
-
   function removeLine(id){ CART = CART.filter(l=>l.id!==id); renderCart(); }
 
   function getLoc(){
     const el = document.getElementById('locText'); el.textContent='Getting location…';
     if (!navigator.geolocation) { el.textContent='Not supported'; return; }
     navigator.geolocation.getCurrentPosition(pos=>{
-      LAT = pos.coords.latitude.toFixed(6);
-      LNG = pos.coords.longitude.toFixed(6);
+      LAT = pos.coords.latitude.toFixed(6); LNG = pos.coords.longitude.toFixed(6);
       el.innerHTML = `Lat: ${LAT}, Lng: ${LNG} • <a href="https://maps.google.com/?q=${LAT},${LNG}" target="_blank">Maps</a>`;
       updateSaveState();
     }, err=>{
-      el.innerHTML = '<span class="error">Location denied or unavailable — required to save.</span>';
-      LAT=''; LNG='';
-      updateSaveState();
+      LAT=''; LNG=''; el.innerHTML = '<span class="error">Location denied or unavailable — required to save.</span>'; updateSaveState();
     }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
   }
 
   function updateSaveState(){
-    const canSave = CART.length>0
-      && document.getElementById('custName').value.trim().length>0
-      && LAT && LNG;
-    const btn = document.getElementById('saveBtn');
-    btn.disabled = !canSave;
-  }
-
-  function pulse(el){
-    el.style.boxShadow='0 0 0 3px rgba(231,76,60,.35)';
-    setTimeout(()=>{ el.style.boxShadow=''; }, 1200);
+    const canSave = CART.length>0 && document.getElementById('custName').value.trim().length>0 && LAT && LNG;
+    document.getElementById('saveBtn').disabled = !canSave;
   }
 
   async function saveOrder(){
     const msg = document.getElementById('saveMsg'); msg.textContent='';
-
-    // Mandatory checks
     const customerName = document.getElementById('custName').value.trim();
-    if (!customerName){
-      msg.textContent = 'Customer name is required.';
-      pulse(document.getElementById('custName'));
-      updateSaveState();
-      return;
-    }
-    if (!LAT || !LNG){
-      msg.innerHTML = 'Live location is required. Tap "Get Live Location" and allow permission.';
-      pulse(document.getElementById('locText'));
-      updateSaveState();
-      return;
-    }
-    if (CART.length===0){
-      msg.textContent='Add at least 1 item';
-      return;
-    }
+    if (!customerName){ msg.textContent = 'Customer name is required.'; return; }
+    if (!LAT || !LNG){ msg.innerHTML = 'Live location is required. Tap "Get Live Location" and allow permission.'; return; }
+    if (CART.length===0){ msg.textContent='Add at least 1 item'; return; }
 
-    // Proceed
     const customerMobile = document.getElementById('custMobile').value.trim();
     const notes = document.getElementById('notes').value.trim();
     try{
-      document.getElementById('saveBtn').disabled = true;
-      msg.textContent='Saving…';
+      document.getElementById('saveBtn').disabled = true; msg.textContent='Saving…';
       const r = await submitOrder({ customerName, customerMobile, notes, lat:LAT, lng:LNG, lines: CART });
       msg.innerHTML = `Saved! OrderID: <b>${r.orderId}</b>`;
       CART = []; renderCart(); document.getElementById('notes').value='';
       loadMyOrders();
-    } catch(e){
-      msg.textContent = e.message || 'Save failed';
-    } finally {
-      updateSaveState();
-    }
+    } catch(e){ msg.textContent = e.message || 'Save failed'; }
+    finally{ updateSaveState(); }
   }
 
   async function loadMyOrders(){
     const wrap = document.getElementById('ordersWrap'); wrap.textContent='Loading…';
     try{
-      const r = await myOrders();
-      const orders = r.orders || []; const lines = r.lines || [];
+      const r = await myOrders(); const orders = r.orders || []; const lines = r.lines || [];
       if (!orders.length) { wrap.textContent='No orders yet'; return; }
       const byId = {}; lines.forEach(l=>{ (byId[l.OrderID]=byId[l.OrderID]||[]).push(l); });
       const rows = orders.slice(-20).reverse().map(o=>{
