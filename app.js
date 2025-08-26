@@ -50,7 +50,7 @@ async function allOrders(){
 }
 async function attendanceStatus(days=15){
   const token = getToken(); if (!token) throw new Error('No token');
-  return api('attendanceStatus', { token, days });
+  return api('attendancestatus', { token, days });
 }
 async function attend(event, { lat, lng, note='' }={}){
   const token = getToken(); if (!token) throw new Error('No token');
