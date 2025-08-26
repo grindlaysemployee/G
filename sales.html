@@ -15,15 +15,18 @@
   .muted{color:var(--muted)} .btn{padding:10px 12px;border:1px solid var(--yellow);border-radius:10px;background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
   .btn.primary{background:var(--yellow);color:#000;border-color:var(--yellow);}
   .btn.danger{background:var(--danger);border:none;color:#fff;}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.2);}
   .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;}
   .card{background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:14px;padding:14px;}
   label{font-size:13px;color:var(--muted);display:block;margin:8px 2px;}
+  .req::after{content:" *"; color: var(--danger); font-weight:800;}
   select,input,textarea{width:100%;padding:10px;background:#0f1113;border:1px solid rgba(255,212,0,.4);border-radius:10px;color:var(--text);outline:none;}
   .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
   ul{list-style:none;padding:0;margin:0;}
   .line{display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 0;}
   .line b{color:var(--yellow)}
   .small{font-size:12px;color:var(--muted)}
+  .error{color:var(--danger)}
   .table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
   .table th,.table td{border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 6px;text-align:left;}
   .table th{color:var(--yellow)}
@@ -42,8 +45,7 @@
   .sugTop .actions{display:flex;gap:8px;}
   .sugTop .actions .mini{padding:6px 8px;border-radius:8px;border:1px solid var(--yellow);background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
   .sugTop .actions .mini[disabled]{opacity:.5;cursor:not-allowed}
-  .sug{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px; padding:8px;
-       border-radius:8px;}
+  .sug{display:grid;grid-template-columns:auto 1fr auto auto;align-items:center;gap:10px; padding:8px;border-radius:8px;}
   .sug:hover{background:rgba(255,212,0,.08);}
   .sug b{color:var(--yellow)}
   .sug .tag{font-size:12px;color:var(--muted)}
@@ -77,7 +79,7 @@
         <div id="suggestions" class="suggestions"></div>
       </div>
 
-      <!-- Combined dropdown (category-wise optgroup) -->
+      <!-- Combined dropdown (category-wise) -->
       <label style="margin-top:8px;">Item (Category-wise)</label>
       <select id="item"></select>
 
@@ -95,7 +97,7 @@
 
       <h3 style="margin:14px 0 6px;">Customer</h3>
       <div class="row">
-        <div><label>Name</label><input id="custName" placeholder="Customer name"></div>
+        <div><label class="req">Name</label><input id="custName" placeholder="Customer name"></div>
         <div><label>Mobile</label><input id="custMobile" placeholder="10-digit"></div>
       </div>
       <label style="margin-top:8px;">Notes</label>
@@ -103,7 +105,7 @@
 
       <div class="row" style="margin-top:8px; align-items:end;">
         <div>
-          <label>Location</label>
+          <label class="req">Location</label>
           <div class="small" id="locText">Not captured</div>
         </div>
         <div><button class="btn" onclick="getLoc()">Get Live Location</button></div>
@@ -116,7 +118,7 @@
       <ul id="cart"></ul>
       <div class="line"><div>Total Items</div><div><b id="totLines">0</b></div></div>
       <div class="line"><div>Total Qty</div><div><b id="totQty">0</b></div></div>
-      <button class="btn primary" style="margin-top:10px;width:100%;" onclick="saveOrder()">Save Order</button>
+      <button id="saveBtn" class="btn primary" style="margin-top:10px;width:100%;" onclick="saveOrder()" disabled>Save Order</button>
       <div id="saveMsg" class="small" style="margin-top:8px;"></div>
     </div>
   </div>
@@ -152,6 +154,10 @@
     buildSearchIndex(CATALOG);
     wireSearch();
     loadMyOrders();
+
+    // Required field listeners
+    document.getElementById('custName').addEventListener('input', updateSaveState);
+    updateSaveState();
   }
 
   function buildMaps(items){
@@ -247,16 +253,12 @@
     // Rows
     SEARCH_RESULTS.forEach(r=>{
       const row = document.createElement('div'); row.className='sug';
-      // checkbox
       const cb = document.createElement('input'); cb.type='checkbox'; cb.checked = !!SELECTED[r.code]; cb.addEventListener('change', (ev)=>{ toggleSelect(r.code, ev.target.checked, Number(qty.value||1), r.price); });
-      // main text
       const main = document.createElement('div'); main.innerHTML = `<b>${r.name}</b><div class="tag">${r.category} • ${r.code} ${r.price?('• ₹ '+r.price):''}</div>`;
       main.addEventListener('click', ()=>{ cb.checked = !cb.checked; cb.dispatchEvent(new Event('change')); });
-      // qty
       const qty = document.createElement('input'); qty.type='number'; qty.min='1'; qty.value = SELECTED[r.code]?.qty || 1; qty.className='qty';
       qty.addEventListener('click', ev=>ev.stopPropagation());
       qty.addEventListener('input', ()=>{ setQty(r.code, Number(qty.value||1)); });
-      // quick add
       const addBtn = document.createElement('button'); addBtn.className='addBtn'; addBtn.textContent='Add';
       addBtn.addEventListener('click', (ev)=>{ ev.stopPropagation(); quickAdd(r.code); });
 
@@ -295,7 +297,6 @@
     return false;
   }
   function quickAdd(code){
-    // select in dropdown to reuse addLine() logic (price field etc.)
     setSelectedByCode(code);
     document.getElementById('qty').value = 1;
     addLine();
@@ -355,6 +356,7 @@
     });
     document.getElementById('totLines').textContent = CART.length;
     document.getElementById('totQty').textContent = totQty;
+    updateSaveState();
   }
 
   function removeLine(id){ CART = CART.filter(l=>l.id!==id); renderCart(); }
@@ -366,22 +368,65 @@
       LAT = pos.coords.latitude.toFixed(6);
       LNG = pos.coords.longitude.toFixed(6);
       el.innerHTML = `Lat: ${LAT}, Lng: ${LNG} • <a href="https://maps.google.com/?q=${LAT},${LNG}" target="_blank">Maps</a>`;
-    }, err=>{ el.textContent = 'Location denied or unavailable'; }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+      updateSaveState();
+    }, err=>{
+      el.innerHTML = '<span class="error">Location denied or unavailable — required to save.</span>';
+      LAT=''; LNG='';
+      updateSaveState();
+    }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+  }
+
+  function updateSaveState(){
+    const canSave = CART.length>0
+      && document.getElementById('custName').value.trim().length>0
+      && LAT && LNG;
+    const btn = document.getElementById('saveBtn');
+    btn.disabled = !canSave;
+  }
+
+  function pulse(el){
+    el.style.boxShadow='0 0 0 3px rgba(231,76,60,.35)';
+    setTimeout(()=>{ el.style.boxShadow=''; }, 1200);
   }
 
   async function saveOrder(){
     const msg = document.getElementById('saveMsg'); msg.textContent='';
-    if (CART.length===0) { msg.textContent='Add at least 1 item'; return; }
+
+    // Mandatory checks
     const customerName = document.getElementById('custName').value.trim();
+    if (!customerName){
+      msg.textContent = 'Customer name is required.';
+      pulse(document.getElementById('custName'));
+      updateSaveState();
+      return;
+    }
+    if (!LAT || !LNG){
+      msg.innerHTML = 'Live location is required. Tap "Get Live Location" and allow permission.';
+      pulse(document.getElementById('locText'));
+      updateSaveState();
+      return;
+    }
+    if (CART.length===0){
+      msg.textContent='Add at least 1 item';
+      return;
+    }
+
+    // Proceed
     const customerMobile = document.getElementById('custMobile').value.trim();
     const notes = document.getElementById('notes').value.trim();
     try{
+      document.getElementById('saveBtn').disabled = true;
       msg.textContent='Saving…';
       const r = await submitOrder({ customerName, customerMobile, notes, lat:LAT, lng:LNG, lines: CART });
       msg.innerHTML = `Saved! OrderID: <b>${r.orderId}</b>`;
       CART = []; renderCart(); document.getElementById('notes').value='';
+      // Keep location so user can place next order nearby
       loadMyOrders();
-    } catch(e){ msg.textContent = e.message || 'Save failed'; }
+    } catch(e){
+      msg.textContent = e.message || 'Save failed';
+    } finally {
+      updateSaveState();
+    }
   }
 
   async function loadMyOrders(){
