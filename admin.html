@@ -61,9 +61,7 @@
       const salesSet = Array.from(new Set(ORDERS.map(o => `${o.SalesID} - ${o.SalesName}`)));
       const sf = document.getElementById('salesFilter');
       const cur = sf.value; sf.innerHTML='<option value="">All Sales</option>' + salesSet.map(s=>`<option>${s}</option>`).join(''); sf.value = cur || '';
-
-      render();
-      sf.onchange = render;
+      render(); sf.onchange = render;
     } catch(e){ list.textContent = e.message || 'Failed'; }
   }
 
