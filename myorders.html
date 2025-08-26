@@ -1,0 +1,162 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>My Orders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#111315;--card:#1a1d20;--text:#eaeaea;--muted:#bcbcbc;--yellow:#ffd400;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;}
+  .wrap{max-width:1200px;margin:0 auto;padding:16px;}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .title{font-weight:800;font-size:22px;}
+  .btn{padding:10px 12px;border:1px solid var(--yellow);border-radius:10px;background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
+  .btn.danger{background:#ff6b6b;color:#fff;border:none;}
+  .card{background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:14px;padding:14px;}
+  .controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px;}
+  input,select{padding:8px;background:#0f1113;border:1px solid rgba(255,212,0,.4);border-radius:10px;color:var(--text);}
+  .table{width:100%;border-collapse:collapse;font-size:14px;}
+  .table th,.table td{border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 6px;text-align:left;vertical-align:top;}
+  .table th{color:var(--yellow)}
+  .muted{color:var(--muted)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="title">My Orders</div>
+      <div class="muted" id="who"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="window.location.href='sales.html'">Back to Sales</button>
+      <button class="btn danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="controls">
+      <label>From <input type="date" id="from"></label>
+      <label>To <input type="date" id="to"></label>
+      <input id="q" placeholder="Search (OrderID, Customer, Item)">
+      <button class="btn" onclick="load()">Refresh</button>
+      <button class="btn" onclick="exportCSV()">Export CSV</button>
+    </div>
+    <div id="list" class="muted">Loading…</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  let ORDERS=[], LINES=[], MAP={};
+
+  function parseTs(ts){ return new Date(String(ts||'').replace(' ','T')); }
+
+  async function init(){
+    try{
+      const p = await me();
+      document.getElementById('who').textContent = `${p.Name} (${p.UserID})`;
+    } catch(e){ alert('Session expired'); return logout(); }
+    await load();
+  }
+
+  async function load(){
+    const list = document.getElementById('list');
+    list.textContent = 'Loading…';
+    try{
+      const r = await myOrders();
+      ORDERS = r.orders || [];
+      LINES = r.lines || [];
+      MAP = {}; LINES.forEach(l => (MAP[l.OrderID]=MAP[l.OrderID]||[]).push(l));
+      render();
+    } catch(e){ list.textContent = e.message || 'Failed'; }
+  }
+
+  function render(){
+    const list = document.getElementById('list');
+    let rows = ORDERS.slice();
+
+    // Filters
+    const f = document.getElementById('from').value;
+    const t = document.getElementById('to').value;
+    const q = document.getElementById('q').value.trim().toLowerCase();
+
+    if (f){
+      const fd = new Date(f + 'T00:00:00');
+      rows = rows.filter(o => parseTs(o.Timestamp) >= fd);
+    }
+    if (t){
+      const td = new Date(t + 'T23:59:59');
+      rows = rows.filter(o => parseTs(o.Timestamp) <= td);
+    }
+    if (q){
+      rows = rows.filter(o => {
+        const items = (MAP[o.OrderID]||[]).map(l=> (l.ItemName||'') + ' ' + (l.ItemCode||'')).join(' ').toLowerCase();
+        return (o.OrderID||'').toLowerCase().includes(q)
+            || (o.CustomerName||'').toLowerCase().includes(q)
+            || (o.CustomerMobile||'').toLowerCase().includes(q)
+            || items.includes(q);
+      });
+    }
+
+    if (!rows.length){ list.textContent = 'No orders found'; return; }
+
+    // Build HTML
+    const html = rows.slice().reverse().map(o => {
+      const lines = MAP[o.OrderID] || [];
+      const itemsText = lines.map(l => `${l.ItemName} (${l.Qty})`).join(', ');
+      const amount = lines.reduce((s,l)=>{
+        const sub = parseFloat(l.Subtotal || '') || ( (parseFloat(l.Price||'')||0) * (parseFloat(l.Qty||'')||0) );
+        return s + (isNaN(sub)?0:sub);
+      },0);
+      return `<tr>
+        <td>${o.OrderID}</td>
+        <td>${o.Timestamp}</td>
+        <td>${o.CustomerName||''}</td>
+        <td>${o.CustomerMobile||''}</td>
+        <td>${o.TotalLines}</td>
+        <td>${o.TotalQty}</td>
+        <td>${amount ? '₹ '+amount.toFixed(2) : ''}</td>
+        <td>${o.MapLink ? `<a href="${o.MapLink}" target="_blank">Map</a>` : ''}</td>
+        <td>${itemsText}</td>
+      </tr>`;
+    }).join('');
+
+    list.innerHTML = `<table class="table">
+      <tr><th>OrderID</th><th>Time</th><th>Customer</th><th>Mobile</th><th>Lines</th><th>Qty</th><th>Amount</th><th>Loc</th><th>Items</th></tr>
+      ${html}
+    </table>`;
+  }
+
+  function exportCSV(){
+    const table = document.querySelector('#list table');
+    if (!table){ alert('No data'); return; }
+    let csv = [];
+    const rows = table.querySelectorAll('tr');
+    rows.forEach(tr => {
+      const cols = [...tr.children].map(td => {
+        let t = td.innerText.replace(/\n/g,' ').trim();
+        if (t.includes(',') || t.includes('"')) t = '"' + t.replace(/"/g,'""') + '"';
+        return t;
+      });
+      csv.push(cols.join(','));
+    });
+    const blob = new Blob([csv.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'my_orders.csv';
+    a.click();
+    URL.revokeObjectURL(a.href);
+  }
+
+  document.addEventListener('input', (e)=>{
+    if (['from','to','q'].includes(e.target.id)) render();
+  });
+
+  init();
+</script>
+</body>
+</html>
