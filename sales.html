@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales - Create Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#111315;--card:#1a1d20;--text:#eaeaea;--muted:#bcbcbc;--yellow:#ffd400;--danger:#ff6b6b;--ok:#1ed760;}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;}
+  .wrap{max-width:1100px;margin:0 auto;padding:16px;}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .title{font-weight:800;font-size:22px;}
+  .muted{color:var(--muted)} .btn{padding:10px 12px;border:1px solid var(--yellow);border-radius:10px;background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
+  .btn.primary{background:var(--yellow);color:#000;border-color:var(--yellow);}
+  .btn.danger{background:var(--danger);border:none;color:#fff;}
+  .grid{display:grid;grid-template-columns:1.2fr .8fr;gap:16px;}
+  .card{background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:14px;padding:14px;}
+  label{font-size:13px;color:var(--muted);display:block;margin:8px 2px;}
+  select,input,textarea{width:100%;padding:10px;background:#0f1113;border:1px solid rgba(255,212,0,.4);border-radius:10px;color:var(--text);outline:none;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  ul{list-style:none;padding:0;margin:0;}
+  .line{display:flex;align-items:center;justify-content:space-between;border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 0;}
+  .line b{color:var(--yellow)}
+  .small{font-size:12px;color:var(--muted)}
+  .table{width:100%;border-collapse:collapse;margin-top:10px;font-size:14px;}
+  .table th,.table td{border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 6px;text-align:left;}
+  .table th{color:var(--yellow)}
+  @media (max-width:900px){ .grid{grid-template-columns:1fr;} .row{grid-template-columns:1fr;} }
+
+  /* Search suggestions */
+  .searchWrap{position:relative;}
+  .suggestions{
+    position:absolute; top:100%; left:0; right:0; z-index:50;
+    background:#0f1113; border:1px solid rgba(255,212,0,.35); border-radius:10px;
+    padding:6px; margin-top:4px; max-height:260px; overflow:auto; display:none;
+    box-shadow:0 8px 24px rgba(0,0,0,.45);
+  }
+  .sug{display:flex;align-items:center;justify-content:space-between;gap:10px; padding:8px;
+       border-radius:8px; cursor:pointer;}
+  .sug:hover{background:rgba(255,212,0,.08);}
+  .sug b{color:var(--yellow)}
+  .sug .tag{font-size:12px;color:var(--muted)}
+  .sug .add{border:1px solid var(--yellow);background:transparent;color:var(--yellow);
+            border-radius:8px;padding:6px 8px;font-weight:800;cursor:pointer;}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="title">Sales Order</div>
+      <div class="muted" id="who"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="window.location.href='myorders.html'">My Orders</button>
+      <button class="btn" id="adminBtn" style="display:none;" onclick="window.location.href='admin.html'">Admin</button>
+      <button class="btn danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="grid">
+    <!-- Left: add items -->
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Add Items</h3>
+
+      <!-- Search + suggestions -->
+      <div class="searchWrap">
+        <label>Search item</label>
+        <input id="search" placeholder="Search by name, code or category (e.g., PR-100, piston ring)" autocomplete="off">
+        <div id="suggestions" class="suggestions"></div>
+      </div>
+
+      <!-- Category-wise dropdown (fallback/manual select) -->
+      <label style="margin-top:8px;">Item (Category-wise)</label>
+      <select id="item"></select>
+
+      <div class="row" style="margin-top:8px;">
+        <div>
+          <label>Price</label>
+          <input id="price" type="number" step="0.01" placeholder="Auto from catalog (editable)">
+        </div>
+        <div>
+          <label>Quantity</label>
+          <input id="qty" type="number" min="1" value="1">
+        </div>
+      </div>
+      <button class="btn primary" style="margin-top:10px;" onclick="addLine()">Add to Cart</button>
+
+      <h3 style="margin:14px 0 6px;">Customer</h3>
+      <div class="row">
+        <div><label>Name</label><input id="custName" placeholder="Customer name"></div>
+        <div><label>Mobile</label><input id="custMobile" placeholder="10-digit"></div>
+      </div>
+      <label style="margin-top:8px;">Notes</label>
+      <textarea id="notes" rows="3" placeholder="Optional"></textarea>
+
+      <div class="row" style="margin-top:8px; align-items:end;">
+        <div>
+          <label>Location</label>
+          <div class="small" id="locText">Not captured</div>
+        </div>
+        <div><button class="btn" onclick="getLoc()">Get Live Location</button></div>
+      </div>
+    </div>
+
+    <!-- Right: cart and save -->
+    <div class="card">
+      <h3 style="margin:0 0 8px;">Cart</h3>
+      <ul id="cart"></ul>
+      <div class="line"><div>Total Items</div><div><b id="totLines">0</b></div></div>
+      <div class="line"><div>Total Qty</div><div><b id="totQty">0</b></div></div>
+      <button class="btn primary" style="margin-top:10px;width:100%;" onclick="saveOrder()">Save Order</button>
+      <div id="saveMsg" class="small" style="margin-top:8px;"></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:16px;">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;">My Recent Orders</h3>
+      <button class="btn" onclick="loadMyOrders()">Refresh</button>
+    </div>
+    <div id="ordersWrap" class="small muted" style="margin-top:6px;">No data</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  let CATALOG = []; let CART = []; let LAT='', LNG='';
+  let INDEX = []; let SEARCH_RESULTS = [];
+
+  async function init(){
+    // Auth + profile
+    try{
+      const p = await me();
+      document.getElementById('who').textContent = `${p.Name} (${p.UserID}) — Role: ${p.Role}`;
+      if (p.Role === 'ADMIN') document.getElementById('adminBtn').style.display = 'inline-block';
+    } catch(e){ alert('Session expired'); return logout(); }
+
+    // Catalog via Apps Script
+    CATALOG = await fetchCatalog();
+    fillItemDropdownGrouped(CATALOG);
+    buildSearchIndex(CATALOG);
+    wireSearch();
+    loadMyOrders();
+  }
+
+  // Build single dropdown with <optgroup> by Category
+  function fillItemDropdownGrouped(items){
+    const byCat = {};
+    items.forEach(it => { const k = it.Category || 'Other'; (byCat[k]=byCat[k]||[]).push(it); });
+    const cats = Object.keys(byCat).sort((a,b)=>a.localeCompare(b));
+    cats.forEach(cat => byCat[cat].sort((a,b)=> String(a.ItemName).localeCompare(String(b.ItemName)) ));
+
+    const sel = document.getElementById('item'); sel.innerHTML = '';
+    cats.forEach(cat => {
+      const og = document.createElement('optgroup'); og.label = cat;
+      byCat[cat].forEach(it => {
+        const opt = document.createElement('option');
+        opt.value = it.ItemCode; opt.textContent = `${it.ItemName} (${it.ItemCode})`;
+        opt.dataset.price = it.Price || ''; opt.dataset.category = it.Category || ''; opt.dataset.itemname = it.ItemName || '';
+        og.appendChild(opt);
+      });
+      sel.appendChild(og);
+    });
+    if (sel.options.length){
+      const opt = sel.options[0];
+      document.getElementById('price').value = opt.dataset.price || '';
+    }
+    sel.onchange = () => {
+      const opt = sel.selectedOptions[0];
+      document.getElementById('price').value = opt ? (opt.dataset.price || '') : '';
+    };
+  }
+
+  // ---------- Search ----------
+  function buildSearchIndex(items){
+    INDEX = items.map(it => ({
+      code: String(it.ItemCode||''),
+      name: String(it.ItemName||''),
+      category: String(it.Category||''),
+      price: it.Price || '',
+      hay: (String(it.ItemCode||'') + ' ' + String(it.ItemName||'') + ' ' + String(it.Category||'')).toLowerCase()
+    }));
+  }
+  function wireSearch(){
+    const input = document.getElementById('search');
+    input.addEventListener('input', onSearchInput);
+    input.addEventListener('keydown', (e)=>{
+      if (e.key === 'Enter'){
+        if (SEARCH_RESULTS.length){
+          quickAdd(SEARCH_RESULTS[0].code);
+          e.preventDefault();
+        }
+      } else if (e.key === 'Escape'){ hideSuggestions(); }
+    });
+    document.addEventListener('click', (e)=>{
+      const wrap = document.querySelector('.searchWrap');
+      if (!wrap.contains(e.target)) hideSuggestions();
+    });
+  }
+  function onSearchInput(){
+    const q = document.getElementById('search').value.trim().toLowerCase();
+    if (!q){ hideSuggestions(); return; }
+    const terms = q.split(/\s+/).filter(Boolean);
+    const res = [];
+    for (const it of INDEX){
+      let score = 0;
+      if (it.code.toLowerCase().startsWith(q)) score += 5;
+      if (it.hay.includes(q)) score += 2;
+      for (const t of terms){ if (it.hay.includes(t)) score += 1; }
+      if (score>0) res.push({ ...it, score });
+    }
+    res.sort((a,b)=> b.score - a.score || a.name.localeCompare(b.name));
+    SEARCH_RESULTS = res.slice(0,12);
+    renderSuggestions();
+  }
+  function renderSuggestions(){
+    const box = document.getElementById('suggestions'); box.innerHTML = '';
+    if (!SEARCH_RESULTS.length){ box.style.display='none'; return; }
+    SEARCH_RESULTS.forEach(r=>{
+      const row = document.createElement('div');
+      row.className='sug';
+      row.innerHTML = `<div><b>${r.name}</b><div class="tag">${r.category} • ${r.code} ${r.price?('• ₹ '+r.price):''}</div></div><button class="add">Add</button>`;
+      row.addEventListener('click', ()=>{
+        setSelectedByCode(r.code);
+        document.getElementById('price').value = r.price || '';
+        document.getElementById('qty').focus();
+        hideSuggestions();
+      });
+      row.querySelector('.add').addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        quickAdd(r.code);
+      });
+      box.appendChild(row);
+    });
+    box.style.display='block';
+  }
+  function hideSuggestions(){ document.getElementById('suggestions').style.display='none'; }
+  function setSelectedByCode(code){
+    const sel = document.getElementById('item');
+    for (let i=0;i<sel.options.length;i++){
+      if (sel.options[i].value === code){
+        sel.selectedIndex = i;
+        document.getElementById('price').value = sel.options[i].dataset.price || '';
+        return true;
+      }
+    }
+    return false;
+  }
+  function quickAdd(code){
+    setSelectedByCode(code);
+    document.getElementById('qty').value = 1;
+    addLine();
+    document.getElementById('search').value = '';
+    hideSuggestions();
+  }
+  // ---------- /Search ----------
+
+  function addLine(){
+    const sel = document.getElementById('item');
+    const opt = sel.selectedOptions[0];
+    if (!opt) return alert('Select an item');
+    const qty = Number(document.getElementById('qty').value || 0);
+    if (qty <= 0) return alert('Enter a valid quantity');
+    const price = document.getElementById('price').value;
+    const line = {
+      id: (crypto && crypto.randomUUID) ? crypto.randomUUID() : String(Date.now())+Math.random(),
+      category: opt.dataset.category || '',
+      itemCode: opt.value,
+      itemName: opt.dataset.itemname || opt.textContent,
+      qty, price
+    };
+    CART.push(line); renderCart();
+  }
+
+  function renderCart(){
+    const ul = document.getElementById('cart'); ul.innerHTML='';
+    let totQty=0;
+    CART.forEach(l=>{
+      totQty += Number(l.qty)||0;
+      const li = document.createElement('li');
+      li.className='line';
+      li.innerHTML = `<div><b>${l.itemName}</b><div class="small">${l.category} • ${l.itemCode} • Qty: ${l.qty} ${l.price?('• Rs '+l.price):''}</div></div>
+                      <button class="btn" onclick="removeLine('${l.id}')">Remove</button>`;
+      ul.appendChild(li);
+    });
+    document.getElementById('totLines').textContent = CART.length;
+    document.getElementById('totQty').textContent = totQty;
+  }
+
+  function removeLine(id){ CART = CART.filter(l=>l.id!==id); renderCart(); }
+
+  function getLoc(){
+    const el = document.getElementById('locText'); el.textContent='Getting location…';
+    if (!navigator.geolocation) { el.textContent='Not supported'; return; }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      LAT = pos.coords.latitude.toFixed(6);
+      LNG = pos.coords.longitude.toFixed(6);
+      el.innerHTML = `Lat: ${LAT}, Lng: ${LNG} • <a href="https://maps.google.com/?q=${LAT},${LNG}" target="_blank">Maps</a>`;
+    }, err=>{ el.textContent = 'Location denied or unavailable'; }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+  }
+
+  async function saveOrder(){
+    const msg = document.getElementById('saveMsg'); msg.textContent='';
+    if (CART.length===0) { msg.textContent='Add at least 1 item'; return; }
+    const customerName = document.getElementById('custName').value.trim();
+    const customerMobile = document.getElementById('custMobile').value.trim();
+    const notes = document.getElementById('notes').value.trim();
+    try{
+      msg.textContent='Saving…';
+      const r = await submitOrder({ customerName, customerMobile, notes, lat:LAT, lng:LNG, lines: CART });
+      msg.innerHTML = `Saved! OrderID: <b>${r.orderId}</b>`;
+      CART = []; renderCart(); document.getElementById('notes').value='';
+      loadMyOrders();
+    } catch(e){ msg.textContent = e.message || 'Save failed'; }
+  }
+
+  async function loadMyOrders(){
+    const wrap = document.getElementById('ordersWrap'); wrap.textContent='Loading…';
+    try{
+      const r = await myOrders();
+      const orders = r.orders || []; const lines = r.lines || [];
+      if (!orders.length) { wrap.textContent='No orders yet'; return; }
+      const byId = {}; lines.forEach(l=>{ (byId[l.OrderID]=byId[l.OrderID]||[]).push(l); });
+      const rows = orders.slice(-20).reverse().map(o=>{
+        const items = (byId[o.OrderID]||[]).map(l=>`${l.ItemName} (${l.Qty})`).join(', ');
+        return `<tr><td>${o.OrderID}</td><td>${o.Timestamp}</td><td>${o.CustomerName||''}</td><td>${o.CustomerMobile||''}</td><td>${o.TotalLines}</td><td>${o.TotalQty}</td><td>${o.MapLink?`<a href="${o.MapLink}" target="_blank">Map</a>`:''}</td><td>${items}</td></tr>`;
+      }).join('');
+      wrap.innerHTML = `<table class="table">
+        <tr><th>OrderID</th><th>Time</th><th>Customer</th><th>Mobile</th><th>Lines</th><th>Qty</th><th>Loc</th><th>Items</th></tr>
+        ${rows}
+      </table>`;
+    } catch(e){ wrap.textContent = e.message || 'Failed'; }
+  }
+
+  init();
+</script>
+</body>
+</html>
