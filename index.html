@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Sales Portal Login</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#111315;--card:#1a1d20;--text:#eaeaea;--muted:#bcbcbc;--yellow:#ffd400;--danger:#e74c3c;}
+  *{box-sizing:border-box} body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;min-height:100vh;display:flex;align-items:center;justify-content:center;}
+  .card{width:min(520px,92vw);background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:16px;padding:28px;box-shadow:0 0 40px rgba(255,212,0,.15),0 10px 30px rgba(0,0,0,.6);}
+  .logo{width:80px;height:80px;border-radius:50%;background:radial-gradient(circle at 30% 30%, var(--yellow), #ffea80);color:#000;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:36px;margin:0 auto 16px;box-shadow:0 0 22px rgba(255,212,0,.6);}
+  h1{text-align:center;margin:8px 0 22px;font-size:26px;font-weight:800;}
+  label{display:block;font-size:14px;color:var(--muted);margin:10px 2px;}
+  input{width:100%;padding:14px;background:#0f1113;color:var(--text);border:1px solid rgba(255,212,0,.4);border-radius:10px;outline:none;}
+  input:focus{border-color:var(--yellow);box-shadow:0 0 0 3px rgba(255,212,0,.15);}
+  button{width:100%;padding:14px;border-radius:12px;border:1px solid var(--yellow);background:linear-gradient(#111,#0d0d0d) padding-box,linear-gradient(90deg,var(--yellow),#fff08a) border-box;color:#000;font-weight:800;font-size:16px;margin-top:16px;cursor:pointer;}
+  .error{color:var(--danger);margin-top:12px;text-align:center;min-height:1.2em;}
+  .foot{text-align:center;color:var(--muted);font-size:12px;margin-top:10px;}
+</style>
+</head>
+<body>
+  <div class="card">
+    <div class="logo">S</div>
+    <h1>Sales Portal Login</h1>
+    <label>User ID (e.g., S01 or ADMIN)</label>
+    <input id="uid" placeholder="S01" autocomplete="username">
+    <label>Password</label>
+    <input id="pwd" type="password" placeholder="•••••••" autocomplete="current-password">
+    <button id="btn">Login</button>
+    <div id="msg" class="error"></div>
+    <div class="foot">Secure • Google Sheets + Apps Script</div>
+  </div>
+<script src="app.js"></script>
+<script>
+  const uid = document.getElementById('uid'); const pwd = document.getElementById('pwd'); const btn = document.getElementById('btn'); const msg = document.getElementById('msg');
+  btn.onclick = async () => {
+    msg.textContent=''; const u=uid.value.trim(); const p=pwd.value;
+    if(!u||!p){ msg.textContent='Enter ID and Password'; return; }
+    btn.disabled=true; btn.textContent='Please wait…';
+    try{
+      const r = await login(u,p);
+      const role = (r.profile && r.profile.Role) || '';
+      window.location.href = role==='ADMIN' ? 'admin.html' : 'sales.html';
+    } catch(e){ msg.textContent = e.message || 'Login failed'; }
+    btn.disabled=false; btn.textContent='Login';
+  };
+  document.addEventListener('keydown', e => { if(e.key==='Enter') btn.click(); });
+</script>
+</body>
+</html>
