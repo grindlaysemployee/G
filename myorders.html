@@ -56,10 +56,8 @@
   function parseTs(ts){ return new Date(String(ts||'').replace(' ','T')); }
 
   async function init(){
-    try{
-      const p = await me();
-      document.getElementById('who').textContent = `${p.Name} (${p.UserID})`;
-    } catch(e){ alert('Session expired'); return logout(); }
+    try{ const p = await me(); document.getElementById('who').textContent = `${p.Name} (${p.UserID})`; }
+    catch(e){ alert('Session expired'); return logout(); }
     await load();
   }
 
@@ -68,8 +66,7 @@
     list.textContent = 'Loading…';
     try{
       const r = await myOrders();
-      ORDERS = r.orders || [];
-      LINES = r.lines || [];
+      ORDERS = r.orders || []; LINES = r.lines || [];
       MAP = {}; LINES.forEach(l => (MAP[l.OrderID]=MAP[l.OrderID]||[]).push(l));
       render();
     } catch(e){ list.textContent = e.message || 'Failed'; }
