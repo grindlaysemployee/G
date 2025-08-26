@@ -1,5 +1,5 @@
 // ====== CONFIG ======
-const API_URL = '1YWtmI2u2sHdF-Qd-r4zmF19Dm_VQrSoWbilvv5p9nqU'; // Apps Script Web App URL
+const API_URL = 'https://script.google.com/macros/s/AKfycbzFt2EnE7G9ZS4aeBvcCSzjgDQluwn_vB-cVmh1SaE1ABwBafMooM4k3_FIUdq6gspv/exec'; // Apps Script Web App URL
 
 async function api(action, data = {}) {
   const body = new URLSearchParams({ action, ...data });
