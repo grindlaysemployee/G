@@ -78,20 +78,12 @@
   function render(){
     const list = document.getElementById('list');
     let rows = ORDERS.slice();
-
-    // Filters
     const f = document.getElementById('from').value;
     const t = document.getElementById('to').value;
     const q = document.getElementById('q').value.trim().toLowerCase();
 
-    if (f){
-      const fd = new Date(f + 'T00:00:00');
-      rows = rows.filter(o => parseTs(o.Timestamp) >= fd);
-    }
-    if (t){
-      const td = new Date(t + 'T23:59:59');
-      rows = rows.filter(o => parseTs(o.Timestamp) <= td);
-    }
+    if (f){ const fd = new Date(f + 'T00:00:00'); rows = rows.filter(o => parseTs(o.Timestamp) >= fd); }
+    if (t){ const td = new Date(t + 'T23:59:59'); rows = rows.filter(o => parseTs(o.Timestamp) <= td); }
     if (q){
       rows = rows.filter(o => {
         const items = (MAP[o.OrderID]||[]).map(l=> (l.ItemName||'') + ' ' + (l.ItemCode||'')).join(' ').toLowerCase();
@@ -101,10 +93,8 @@
             || items.includes(q);
       });
     }
-
     if (!rows.length){ list.textContent = 'No orders found'; return; }
 
-    // Build HTML
     const html = rows.slice().reverse().map(o => {
       const lines = MAP[o.OrderID] || [];
       const itemsText = lines.map(l => `${l.ItemName} (${l.Qty})`).join(', ');
