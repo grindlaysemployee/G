@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Attendance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#111315;--card:#1a1d20;--text:#eaeaea;--muted:#bcbcbc;--yellow:#ffd400;--danger:#ff6b6b;--ok:#1ed760;}
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,system-ui,Segoe UI,Roboto,Arial,sans-serif;}
+  .wrap{max-width:900px;margin:0 auto;padding:16px;}
+  .top{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;}
+  .title{font-weight:800;font-size:22px;}
+  .btn{padding:10px 12px;border:1px solid var(--yellow);border-radius:10px;background:transparent;color:var(--yellow);font-weight:800;cursor:pointer;}
+  .btn.primary{background:var(--yellow);color:#000;border-color:var(--yellow);}
+  .btn.danger{background:#ff6b6b;color:#fff;border:none;}
+  .btn[disabled]{opacity:.5;cursor:not-allowed;filter:grayscale(.2);}
+  .card{background:var(--card);border:1px solid rgba(255,212,0,.25);border-radius:14px;padding:14px;margin-bottom:14px;}
+  .muted{color:var(--muted)}
+  .status{font-size:14px;margin:6px 0;}
+  .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media (max-width:700px){ .row{grid-template-columns:1fr;} }
+  input{width:100%;padding:10px;background:#0f1113;border:1px solid rgba(255,212,0,.4);border-radius:10px;color:var(--text);outline:none;}
+  .table{width:100%;border-collapse:collapse;font-size:14px;}
+  .table th,.table td{border-bottom:1px dashed rgba(255,212,0,.3);padding:8px 6px;text-align:left;vertical-align:top;}
+  .table th{color:var(--yellow)}
+  .ok{color:var(--ok)} .warn{color:#ffb020} .err{color:var(--danger)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top">
+    <div>
+      <div class="title">Attendance</div>
+      <div class="muted" id="who"></div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn" onclick="window.location.href='sales.html'">Back to Sales</button>
+      <button class="btn danger" onclick="logout()">Logout</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <div id="todayTitle" class="status">Loading…</div>
+    <div class="row">
+      <div>
+        <label>Note (optional)</label>
+        <input id="note" placeholder="e.g., Start of day, meeting, etc.">
+      </div>
+      <div>
+        <label>Location</label>
+        <div id="locText" class="muted">Not captured</div>
+        <div style="margin-top:6px;display:flex;gap:8px;flex-wrap:wrap;">
+          <button class="btn" onclick="getLoc()">Get Live Location</button>
+          <button id="checkInBtn" class="btn primary" onclick="doCheckIn()" disabled>Check In</button>
+          <button id="checkOutBtn" class="btn primary" onclick="doCheckOut()" disabled>Check Out</button>
+        </div>
+      </div>
+    </div>
+    <div id="msg" style="margin-top:8px;" class="muted"></div>
+  </div>
+
+  <div class="card">
+    <div style="display:flex;justify-content:space-between;align-items:center;">
+      <h3 style="margin:0;">Last 10 Days</h3>
+      <button class="btn" onclick="refresh()">Refresh</button>
+    </div>
+    <div id="hist" class="muted" style="margin-top:8px;">Loading…</div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+<script>
+  let LAT='', LNG='', STATUS='NONE';
+
+  async function init(){
+    try{ const p = await me(); document.getElementById('who').textContent = `${p.Name} (${p.UserID})`; }
+    catch(e){ alert('Session expired'); return logout(); }
+    refresh();
+  }
+
+  async function refresh(){
+    setButtons(); document.getElementById('msg').textContent='';
+    try{
+      const r = await attendanceStatus(10);
+      STATUS = r.status; const t = r.today || {};
+      const title = document.getElementById('todayTitle');
+      if (STATUS === 'NONE'){ title.innerHTML = `Today: <span class="warn">Not checked-in</span>`; }
+      else if (STATUS === 'IN'){ title.innerHTML = `Today: <span class="ok">Checked-in</span> at ${t.CheckIn || ''} ${t.CheckInMapLink?`• <a href="${t.CheckInMapLink}" target="_blank">Map</a>`:''}`; }
+      else { title.innerHTML = `Today: <span class="ok">Checked-in</span> ${t.CheckIn || ''} • <span class="ok">Checked-out</span> ${t.CheckOut || ''} ${t.CheckOutMapLink?`• <a href="${t.CheckOutMapLink}" target="_blank">Map</a>`:''}`; }
+      setButtons();
+
+      const rows = (r.history || []).map(x => `
+        <tr>
+          <td>${x.Date || ''}</td>
+          <td>${x.CheckIn || ''}</td>
+          <td>${x.CheckOut || ''}</td>
+          <td>${x.CheckInMapLink?`<a href="${x.CheckInMapLink}" target="_blank">In Map</a>`:''}
+              ${x.CheckOutMapLink?` | <a href="${x.CheckOutMapLink}" target="_blank">Out Map</a>`:''}</td>
+          <td>${x.CheckInNote || ''} ${x.CheckOutNote ? (' | ' + x.CheckOutNote) : ''}</td>
+        </tr>`).join('');
+      document.getElementById('hist').innerHTML = `<table class="table">
+          <tr><th>Date</th><th>Check In</th><th>Check Out</th><th>Location</th><th>Notes</th></tr>
+          ${rows || '<tr><td colspan="5" class="muted">No records</td></tr>'}
+        </table>`;
+    } catch(e){ document.getElementById('todayTitle').innerHTML = `<span class="err">${e.message||'Failed'}</span>`; }
+  }
+
+  function setButtons(){
+    const inBtn  = document.getElementById('checkInBtn');
+    const outBtn = document.getElementById('checkOutBtn');
+    const hasLoc = !!(LAT && LNG);
+    if (STATUS === 'NONE'){ inBtn.disabled = !hasLoc; outBtn.disabled = true; }
+    else if (STATUS === 'IN'){ inBtn.disabled = true; outBtn.disabled = !hasLoc; }
+    else { inBtn.disabled = true; outBtn.disabled = true; }
+  }
+
+  function getLoc(){
+    const el = document.getElementById('locText'); el.textContent='Getting location…';
+    if (!navigator.geolocation) { el.textContent='Not supported'; return; }
+    navigator.geolocation.getCurrentPosition(pos=>{
+      LAT = pos.coords.latitude.toFixed(6); LNG = pos.coords.longitude.toFixed(6);
+      el.innerHTML = `Lat: ${LAT}, Lng: ${LNG} • <a href="https://maps.google.com/?q=${LAT},${LNG}" target="_blank">Maps</a>`;
+      setButtons();
+    }, err=>{ LAT=''; LNG=''; el.innerHTML = '<span class="err">Location denied or unavailable</span>'; setButtons(); },
+    { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
+  }
+
+  async function doCheckIn(){
+    const msg = document.getElementById('msg'); if (!LAT || !LNG){ msg.textContent='Location required'; return; }
+    try{
+      msg.textContent='Checking in…'; const note = document.getElementById('note').value.trim();
+      await attend('in', { lat:LAT, lng:LNG, note }); document.getElementById('note').value = '';
+      msg.textContent='Checked-in!'; STATUS = 'IN'; LAT=''; LNG=''; document.getElementById('locText').textContent='Not captured'; await refresh();
+    } catch(e){ msg.textContent = e.message || 'Failed'; }
+  }
+  async function doCheckOut(){
+    const msg = document.getElementById('msg'); if (!LAT || !LNG){ msg.textContent='Location required'; return; }
+    try{
+      msg.textContent='Checking out…'; const note = document.getElementById('note').value.trim();
+      await attend('out', { lat:LAT, lng:LNG, note }); document.getElementById('note').value = '';
+      msg.textContent='Checked-out!'; STATUS = 'OUT'; LAT=''; LNG=''; document.getElementById('locText').textContent='Not captured'; await refresh();
+    } catch(e){ msg.textContent = e.message || 'Failed'; }
+  }
+  init();
+</script>
+</body>
+</html>
